@@ -1,0 +1,20 @@
+A. 异常处理机制
+	a. 常见错误
+		1. 语法错误
+		2. 逻辑错误
+		3. 运行错误 
+		4. io资源错误
+
+	b. 异常错误只能被catch处理一次
+		try{} catch(exception &e){}
+
+	c. 函数A抛出异常，可以被函数B catch到，只要B函数try的代码块间接或直接的调用A函数
+
+	d. catch(xx)能处理的类型转换, 如果抛出的异常不能被catch准确匹配则走系统流程
+		1. 向上转型
+		2. const转换
+		3. 数组与指针的转换
+
+	e. 异常规范是一个被抛弃的东西，不要使用它
+		ex： void func1() throw()	// 这个函数不抛异常
+		ex： void func1() throw(int, char*) // 只能抛出 int, char* 异常

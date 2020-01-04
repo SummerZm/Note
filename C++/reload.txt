@@ -1,0 +1,91 @@
+A. C++重载
+	a. 注意事项
+		1. 重载不能改变优先级结合性
+		2. 重载不能有默认参数
+		3. 重载可以做成全局或成员函数
+		4. 4个不能重载的操作符: 
+			长度运算符： sizeof
+			成员选择符： .
+			域解析运算符：::
+			条件运算符：:?
+
+	b. 如何选择应该重载成全局函数还是成员函数？
+		class complex {
+			public:
+				complex(double x, double y):m_real(x), m_imag(y){};
+				complex(double x:m_real(x), m_imag(0.0){};	// 转换构造函数
+				friend complex operator+(const complex&, complex&);
+				friend istream operator<<(istream in, const complex&);
+				complex operator++();	 // 前置形式 ++i
+				complex operator++(int); // 后置形式 i++
+
+			private:
+				double m_real;
+				double m_imag;
+		}
+
+		// 以全局的形式重载+，保证+运算符的对称性, 可以少写很多重载函数 [配合转换构造函数隐式转换]
+		const complex operator+(const complex& c1, complex& c2) {
+			complex c;
+			c.m_real = c1.m_real + c2.m_real;
+			c.m_imag = c1.m_imag + c2.m_imag;
+			return c;
+		}
+
+		// 以全局的形式重载<<, 让第三方对象有权访问私有成员.
+		istream& operator<<(istream &in, const complex & c1) {
+			in>>c1.m_real>>c1.m_imag;
+			return in;
+		}
+
+		complex complex::operator++() {
+			m_real++;
+			m_imag++;
+			return *this;
+		}
+
+		// 参数n 仅仅用于区分前置还是后置
+		complex complex::operator++(int n) {
+			complex c1 = *this;
+			m_real++;
+			m_imag++;
+			return c1;
+		}
+
+		// 重载[]运算符
+		class Array {
+			public:
+				Array(int n);
+				~Array();
+				const int& operator[](int) const;
+				int& operator[](int);
+
+			private:
+				int m_capacty;
+				int* m_arr;
+		}
+
+		Array::Array(int n):m_capacty(n) {
+			if(n>0) {
+				m_arr = new int[n];
+			}
+			else {
+				m_arr = NULL; 
+			}
+		}
+		
+		Array::~Array() {
+			delete[] m_arr;
+		}
+
+		// 为什么提供const重载函数？ const 对象只能调用const成员函数.
+		const int& Array::operator[](n) const{
+			return m_arr[n];
+		}
+
+		int& Array::operator[](n) {
+			return m_arr[n];
+		}
+
+
+

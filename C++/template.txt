@@ -1,0 +1,285 @@
+/* 模板函数: 类型参数化 */
+
+#include <iostream>
+using namespace std;
+
+template <typename T> T max(T &a, T &b);
+
+int main(int argc, char** argv)
+{
+	int a=1, b=2;
+	cout<<"The max val is: "<<max(a, b)<<endl;
+
+	float c=3.14, d=3.15;
+	cout<<"The max val is: "<<max(c, d)<<endl;
+	return 0;
+}
+
+template <typename T>
+T max(T &a, T &b)
+{
+	return a<b?b:a;
+}
+
+/* 模板类：成员类型参数化
+ * 成员函数的定义
+ * 对象的创建
+ * */
+
+#include <iostream>
+using namespace std;
+
+template <typename T1, typename T2>
+class Point
+{
+	public:
+		Point(T1 _x, T2 _y):x(_x), y(_y){};
+		void printPoint();
+		T1 getX();
+		T2 getY();
+	private:
+		T1 x;
+		T2 y;
+
+};
+
+template <typename T1, typename T2>
+void Point<T1, T2>::printPoint() {
+	cout<<"Point: {"<<getX()<<", "<<getY()<<"}"<<endl;
+}
+
+
+template <typename T1, typename T2>
+T1 Point<T1, T2>::getX() {
+	return x;
+}
+
+template <typename T1, typename T2>
+T2 Point<T1, T2>::getY(){
+	return y;
+}
+
+int main(int argc, char** argv) 
+{
+	//Point<int, int> p3 = new Point(1,1); -- new is operator.
+	Point<int, int> p1(1,1);
+	Point<int, float> p2(3,3.14);
+	p1.printPoint();
+	p2.printPoint();
+	return 0;
+}
+
+// 交换基础类型
+// 交换数组
+// 模板重载 -- [指针，引用， 值传递]
+
+
+#include <iostream>
+using namespace std;
+
+/*
+ * A. 函数实参类型推断 
+ *	1. 数值转换
+ *	2. 基类向上转换
+ *	3. const 转换
+ *	4. 函数/数组名转换
+ *	5. 自定义类型转换
+ *
+ * B。模板函数实参类型推断
+ *	1. const 转换
+ *	2. 数组/函数指针转换
+ *
+ * C. 不要依赖模板类型转换，使用显示指定模板类型
+ *
+ * D. 模板函数中的指针实参处理
+ *
+ */
+
+template <typename T1> void Swap(T1 a[], T1 b[], int);
+
+// 类型转换 - 如果传入数组，模板参数类型为引用，则不会转换为指针
+template <typename T1>
+void Swap(T1 &a, T1 &b)
+{
+	T1 tmep = a;
+	a = b;
+	b = tmep;
+}
+
+/* 会与非类型参数冲突
+template <typename T>
+void Swap(T *a, T *b) 
+{
+	T temp = *a;
+	*a = *b;
+	*b = temp;
+}*/
+
+
+
+template <typename T1>
+void Swap(T1 *a, T1 *b, int len)
+//void Swap(T1 *a, T1 *b, int len) -- if in int[20];  then T1 ==> int
+//void Swap(T1 a[], T1 b[], int len) -- if in int[20];  then T1 ==> int
+//void Swap(T1 a, T1 b, int len -- if in int[20];  then T1 ==> int*
+//void Swap(T1 &a, T1 &b, int len -- if in int[20];  then T1 ==> int[20] 
+{
+	T1 temp;
+	for(int i=0; i<len; i++) {
+		temp = a[i];
+		a[i] = b[i];
+		b[i] = temp;
+	}
+}
+
+// 非类型参数
+template <typename T1, unsigned N>
+void Swap(T1 (&a)[N], T1 (&b)[N])
+{
+	T1 temp;
+	for(int i=0; i<N; i++) {
+		temp =  a[i];
+		a[i] = b[i];
+		b[i] = temp;
+	}
+}
+
+void printfArray(char str[], int len)
+{
+	for(int i=0; i<len; i++){
+		cout<<str[i]<<" ";
+	}
+	cout<<endl;
+	return;
+}
+
+
+int main(int argc, char** argv)
+{
+	// template function with reference.
+	float a=1, b=9;
+	cout<<"a:"<<a<<" b:"<<b<<endl;
+	Swap(a, b);
+	cout<<"a:"<<a<<" b:"<<b<<endl;
+
+	// template function with array.
+	char str1[4] = {'a', 'b', 'c', 'd'};
+	char str2[4] = {'e', 'f', 'h', 'i'};
+
+	cout<<"str1"<<endl;
+	printfArray(str1, sizeof(str1));
+	cout<<"str2"<<endl;
+	printfArray(str2, sizeof(str2));
+
+	Swap(str1, str2, sizeof(str1));
+
+	cout<<"template function with array."<<endl;
+	cout<<"str1"<<endl;
+	printfArray(str1, sizeof(str1));
+	cout<<"str2"<<endl;
+	printfArray(str2, sizeof(str2));
+
+	// template non-type-argument
+	cout<<"template non-type-argument "<<endl;
+	Swap(str1, str2);
+	cout<<"str1"<<endl;
+	printfArray(str1, sizeof(str1));
+	cout<<"str2"<<endl;
+	printfArray(str2, sizeof(str2));
+
+	// template function with poiter.
+/*	char ch1 = '4';
+	char ch2 = '@';
+	cout<<"ch1: "<<ch1<<" ch2:"<<ch2<<endl;
+	Swap(&ch1, &ch2);
+	cout<<"ch1: "<<ch1<<" ch2:"<<ch2<<endl;
+*/
+	return 0;
+}
+
+
+/*  模板的具体化 -- 指定模板参数类型， 不同的参数类型可以有不同的处理方法*/
+#include <iostream>
+#include <string>
+using namespace std;
+
+template<typename T1, typename T2> class Point {
+	public:
+		Point(T1 _x, T2 _y):x(_x), y(_y){};
+		T1 getX();
+		T2 getY();
+		void printPoint();
+	private:
+		T1 x;
+		T2 y;
+};
+
+template<typename T1, typename T2>
+T1 Point<T1, T2>::getX() {
+	return x;
+}
+
+template<typename T1, typename T2>
+T2 Point<T1, T2>::getY() {
+	return y;
+}
+
+template<typename T1, typename T2>
+void Point<T1, T2>::printPoint() {
+	cout<<"x:"<<getX()<<" y: "<<getY()<<endl;
+}
+
+/* 显示具体化 */
+template<> class Point<string, string> {
+	public:
+		Point(string _x, string _y):x(_x), y(_y){};
+		string getX(){return x;};
+		string getY(){return y;};
+		void printPoint();
+	private:
+		string x;
+		string y;
+};
+
+void Point<string, string>::printPoint() {
+	cout<<"("<<getX()<<", "<<getY()<<")"<<endl;
+}
+
+/* 局部具体化 */
+template <typename T2>class Point<string, T2> {
+	public:
+		Point(string _x, T2 _y):x(_x), y(_y){};
+		string getX(){return x;};
+		T2 getY(){return y;};
+		void printPoint();
+	private:
+		string x;
+		T2 y;
+};
+
+template <typename T2>
+void Point<string, T2>::printPoint() {
+	cout<<getX()<<"|"<<getY()<<endl;
+}
+
+
+int main(int argc, char** argv) {
+	cout<<"Holle"<<endl;
+	Point<int, float> p(1,3);
+	Point<string, string> p2("6","3");
+	Point<string, float> p3("6", 3.14);
+	p.printPoint();
+	p2.printPoint();
+	p3.printPoint();
+	return 0;
+}
+
+ /* 模板的实例化
+  * 时间： 编译
+  * 简介： 编译器以模板为图纸实例化生成相关的类和函数
+  * 特性： 按需实例化； 
+  * 要求： 模板的声明和定义必须发到头文件中【最好放在同一个文件中】
+  * 其他： 可以通过显式实例化进行模板的多文件编程，不过对于lib的维护特别不友好。
+  *			-- 函数显式实例化: template int swap(char*, char*);
+  *			-- 类显示实例化: template class Point<int, float>;
+  * */
