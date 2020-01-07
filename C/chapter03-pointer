@@ -1,0 +1,118 @@
+1. C语言声明的限制
+	A. 不能返回一个函数
+	B. 不能返回一个数组
+	C. 数组不能存放函数
+
+2. 声明形式与使用形式做成一个样子【把截然不同的东西做成一个样子】，使得C语言难以理解使用
+	A. 令人迷惑的声明, 以下声明的意义?
+		eg1: const int *grap  ---> 指向常量的指针
+		eg2: int const *grap
+		eg3: int* const grap  ---> 常量指针
+		eg4: const int * const grap ---> 指向常量的常量指针
+		eg5: char *j[20]  ----> 存放char*的数组
+		eg6: char (*j)[20]	----> 指向char[20]的指针
+
+	B. 更复杂的声明
+		eg1: 函数 ===> void (*signal(int sig, void(*func)(int)))(int)
+		eg2: 数组 ===> char (*pstr[20])(int)
+		eg3: 函数指针 ===> char* const* (*next)(int)
+		eg4: 数组指针 ===> char (*j)[20]
+
+	C. 声明分析基础优先级知识
+		a. ()优先级高于*  ====》  char *p() 是一个函数, 返回char*
+		b. []优先级高于*  ====》  char *j[2] 是一个数组，存放char*
+		c. ()优先级最高   ====》  char (*j)[2] 是一个指针, 指向数组char xx[2]
+
+	D. 复杂函数分析
+		a. 找到第一个标志符: signal 
+			----> 标志符是什么【类型】?  
+
+		b. 根据优先级与右边的()配对: signal(int sig, void(*func)(int)) 是一个函数 
+			----> 类型是函数，所以关注它的【返回】
+
+		c. 根据优先级与左边的*配对: *signal(int sig void(*func)(int)) 是一个返回一个指针的函数
+			----> 返回是指针, 所以关注它的【指向】
+
+		d. 指针指向的类型是：void ()(int); 即返回的是一个函数指针. 
+			----> 指向一个接收int参数并返回void的函数.
+
+		e. b中类型是函数，所以关注它的【参数】 signal(int sig, void(*func)(int))
+			----> 参数是整型和函数指针
+			----> 实际上,  void ()(int)与signal(int sig, void(*func)(int))是一样的。
+			----> 所以可通过宏简化 typedef void(*myfunc)(int)
+			----> 最终：myfunc signal(int, myfunc);
+
+	E. 复杂数组分析
+		a. 找到第一个标志符: pstr
+			----> 标志符是什么【类型】?  
+
+		b. 根据优先级与右边的[]配对: pstr[20] 是一个数组
+			----> 类型是数组，所以关注它的【存放】
+
+		c. 根据优先级与左边的*配对: *pstr[20] 是存放指针
+			----> 存放是指针, 所以关注它的【指向】
+
+		d. 指针指向的类型是：char ()(int); 即返回的是一个函数指针. 
+			----> 指向一个接收int参数并返回char的函数.
+
+	
+	F. 复杂指针分析
+		a. 找到第一个标志符: next
+			----> 标志符是什么【类型】?  
+		
+		b. 根据优先级与左边的*配对:  char* const* (*next)(int)  是一个指针 
+			----> 类型是指针，所以关注它的【指向】
+
+		c. 根据优先级与右边的()配对: (*next)(int)  
+			----> 指向一个函数， 所以关注它的【返回】
+
+		d. 根据优先级与左边的*配对: *(*next)(int) 
+			----> 返回是指针, 所以关注它的【指向】
+
+		e. 根据优先级与左边的char* const配对: char* const* (*next)(int)
+			----> 指向char* const 即返回一个指针,这个指针的指向不能被修改
+
+
+	G. 声明分析总结
+		a. 明确标志符是什么类型？ 数组， 指针， 函数
+		b. 明确标志符类型自身的特性
+			eg1:标志符是数组 ---> 存放
+			eg2:标志符是函数 ---> 返回， 参数
+			eg3:标志符是指针 ---> 指向
+
+
+3. 简化声明typedef
+	A. 使用typedef的建议
+		a. 尽量不要为了减少struct的输入，而使用typedef
+			----> eg1: typedef struct example {...} example;
+			----> eg2: struct example {...} example;
+			----> 在eg1情况下： 语句example example; 会造成理解不便. 相对的 struct example example;语义更清楚些
+			---->宁愿多敲些代码以换取程序可读性.
+
+		b. typedef应该用在指针，数组，函数的组合类型。即: 上述的复杂声明
+		c. 可移植性: 使用typedef处理 int long short, 平台移植时修改相关的typedef就可以了
+
+4. 其他小技巧
+	A. 如何传参一个数组?
+		----> 用结构体将数组包裹起来 
+		----> 结构体：  struct leaf{ int Num[10]} xu;
+		----> 函数声明：void func (struct leaf xu);
+		----> 使用：xu.Num[i]+1;
+
+5. sizeof操作符
+    A. sizeof(类型) ---> 类型大小
+    B. sizeof(expr) ---> 计算表达式类型大小,但不会进行赋值
+    C. sizeof(指针) ---> 返回指针自身大小
+    D. sizeof(*pstr) ---> 返回指向内容大小
+    E. sizeof(数组) ---> 返回数组大小
+    F. sizeof(结构) ---> 返回结构体对齐大小
+    G. sizeof(静态变量) ---> sizeof用于计算栈空间变量的大小, 结果无法预测(static int 貌似正常， static char* char[]有问题). 
+    H. sizeof'A' ---> 返回4，发生类型的提升.
+
+
+
+
+
+
+
+

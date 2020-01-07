@@ -1,0 +1,82 @@
+1. 编译链接器的使用
+	A. 编译链接的几个阶段
+		a. 阶段p - 预处理器 ----> 处理宏
+		b. 阶段a - 编译器 ----> 生成目标文件
+		c. 阶段l - 链接器 ----> 将目标文件链接成可执行文件
+		d. 参数-w后面加相应的阶段的字符[p|a|l] 表示给相应的处理器设置选项
+			----> eg: -wl, -m 表示给链接器设置 -m 选项
+
+		e. 通过 gcc --help 可以了解相关信息
+
+	B. 动态链接的优点
+		a. 动态链接的程序小，可节省磁盘空间和虚拟内存。
+			----> 因为它运行时才被加载进内存
+			----> 所有动态链接到某一动态库的可执行程序，可以共享该函数库的一个单独拷贝
+
+		b. 动态链接的程序，可以不比因为库的更新或者系统的变动而重新链接，只需要更新动态库就可以了
+		
+	C. 动态库的一些基础知识
+		a. 动态库的位置不能随意改动，否则程序将找不到
+		b. 链接选项 -pic的作用
+			----> 生成与位置无关的代码。
+			----> 即：当动态库函数在运行时被加载进内存时，直接放置在空闲的地方,不需要改动代码的页面分布
+			----> 若不使用IPC：对于动态库，每个库函数不得不在运行的时候通过修改代码的页面而放置到固定的位置
+
+		c. 动态库文件拓展名为.so, 静态库拓展名为.a
+		d. eg: -lthread   表示链接库文件 libthread.so 或者libthread.a
+		e. eg: -L/usr/lib  表示在路径/usr/lib, 搜索库文件
+
+		f. 相比于动态库，静态库的链接更严格
+			----> 静态库的链接需要注意库的链接顺序
+			----> 顺序出错时提示：symbol refencing errors
+        
+        g. 不要写与函数库或系统函数同名字的函数。会造成极其隐秘的BUG 
+		h. nm + 程序名 查看程序的符号列表
+
+            例子：
+			nm ~/cdemo/syscall/ipc/fifo/writeTest:
+			0000000000601064 B __bss_start
+            0000000000601064 b completed.6354
+            0000000000601060 D __data_start
+            0000000000601060 W data_start
+            0000000000400630 t deregister_tm_clones
+            00000000004006a0 t __do_global_dtors_aux
+            0000000000600e18 t __do_global_dtors_aux_fini_array_entry
+            00000000004008b8 R __dso_handle
+            0000000000600e28 d _DYNAMIC
+            0000000000601064 D _edata
+            0000000000601068 B _end
+                             U __errno_location@@GLIBC_2.2.5
+            00000000004008a4 T _fini
+            00000000004006c0 t frame_dummy
+            0000000000600e10 t __frame_dummy_init_array_entry
+            0000000000400a98 r __FRAME_END__
+            0000000000601000 d _GLOBAL_OFFSET_TABLE_
+                             w __gmon_start__
+            0000000000400540 T _init
+            0000000000600e18 t __init_array_end
+            0000000000600e10 t __init_array_start
+            00000000004008b0 R _IO_stdin_used
+                             w _ITM_deregisterTMCloneTable
+                             w _ITM_registerTMCloneTable
+            0000000000600e20 d __JCR_END__
+            0000000000600e20 d __JCR_LIST__
+                             w _Jv_RegisterClasses
+            00000000004008a0 T __libc_csu_fini
+            0000000000400830 T __libc_csu_init
+                             U __libc_start_main@@GLIBC_2.2.5
+            00000000004006ed T main
+                             U memset@@GLIBC_2.2.5
+                             U mkfifo@@GLIBC_2.2.5
+                             U open@@GLIBC_2.2.5
+                             U printf@@GLIBC_2.2.5
+                             U puts@@GLIBC_2.2.5
+            0000000000400660 t register_tm_clones
+            0000000000400600 T _start
+            0000000000601068 D __TMC_END__
+                             U write@@GLIBC_2.2.5
+
+
+
+
+

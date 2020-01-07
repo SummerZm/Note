@@ -1,0 +1,39 @@
+1. K&R C 与 ANSI C 原型标准问题
+    A. K&R C 函数的声明方式
+        a. 函数声明: int func1();
+        b. 函数定义: int func1(a, b) char a, int b { ..... }
+
+    B. ANSI C 函数的声明方式
+        a. 函数原型声明: int func2(char , int);
+        b. 函数定义: int func2(char a, int b) { ..... }
+
+    C. K&R C函数声明，旧的编译器，会将传给函数的参数进行类型的提升,然后在函数内部又降回去
+    D. ANSI C函数声明，参数是什么类型就传什么类型 
+    E. 原型混搭问题 
+        a. K&R C的函数定义， ANSI C的函数声明 
+            ----> 假如根据声明传入 char , 那么在K&R C情况下会提升为int，向后多取两位，导致隐患
+        
+        b. ANSI C的函数定义，K&R的函数声明
+            ----> 使用K&R声明，传入char会被提升为int, short会转为int, float被提升为double.
+            ----> 假如传入的第一参数是, 那么在ANSI C情况下, 会根据函数的定义，转换为char 
+
+        c. 两种风格不能混搭
+
+
+2. 强制类型转换
+    A. qsort函数声明 (接受一个开发者自己编写的比较函数指针)： 
+            eg: void qsort(void base, size_t nel, size_t with,
+                int (*compar)(const void* const void*));
+    
+    B. 假如你的比较函数为 int mycompare(int *i, int* n), 如何进行函数的类型转换?
+            ans: qsort(
+                    j, 
+                    k,
+                    g,
+                    (int (*)(const void* const void*))mycompare
+                );
+
+3. debug hook
+    A. 可以在写一下调试函数，这些函数在正常程序流程中不会被调用, 但在用调试工具调试的过程中
+    我们可以在断点处，使用调试工具调用这些函数
+

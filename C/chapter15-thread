@@ -1,0 +1,65 @@
+A. 线程安全函数 [线程并发/线程可重入]
+	a. 一个函数被称为线程安全的，当且仅当被多个并发线程反复的调用时
+	b. 线程不安全转换成线程安全
+		1. 不需要共享时，请为每个线程提供一个专用的数据副本。
+		2. 如果共享非常重要，则提供显式同步，通过将过程包含在语句中来锁定和解除锁定互斥，可以使不安全过程变成线程安全过程。
+		3. 线程不安全的，因为返回的数据是存放在静态的内存缓冲区中的。通过修改接口，由调用者自行提供缓冲区就可以使这些函数变为线程安全的。
+
+	c. 多线程程序中常见的疏忽性问题
+		1. 将指针作为新线程的参数传递给调用方栈。(不能把局部变量当成参数传给线程)
+		2. 在没有同步机制保护的情况下访问全局内存的共享可更改状态。
+		3. 两个线程尝试轮流获取对同一对全局资源的权限时导致死锁。
+		4. 尝试重新获取已持有的锁（递归死锁）。
+		5. 在同步保护中创建隐藏的间隔。如果受保护的代码段包含的函数释放了同步机制，而又在返回调用方之前重新获取了该同步机制，则将在保护中出现此间隔。结果具有误导性。
+		6. 将UNIX 信号与线程混合时，使用sigwait(2) 模型来处理异步信号。
+		7. 调用setjmp(3C) 和longjmp(3C)，然后长时间跳跃，而不释放互斥锁。
+		8. 从对*_cond_wait() 或*_cond_timedwait() 的调用中返回后无法重新评估条件。
+
+B. 可重入函数 [信号安全/中断可重入]
+	a. 一个可重入的函数简单来说就是可以被中断的函数。中断处理函数过后不应该该函数的正确执行
+	b. 可重入函数是线程安全函数的一个真子集
+	c. 可重入函数只能使用自己的栈空间存储数据, 中断处理函数可能会修改除栈外其他内存的数据
+	d. 函数不可重入的特征:
+		1. 已知它们使用静态数据结构.
+		2. 它们调用malloc和free. -- 因为malloc通常会为所分配的存储区维护一个链接表，而插入执行信号处理函数的时候，进程可能正在修改此链接表.
+		3. 它们是标准IO函数. -- 因为标准IO库的很多实现都使用了全局数据结构.
+	
+	e. 中断处理函数中使用可重入函数 [errno的处理]
+		1. 一个线程中只有一个errno变量，信号处理函数中使用的可重入函数也有可能会修改errno。
+		2. 例如，read函数是可重入的，但是它也有可能会修改errno。
+		3. 因此，正确的做法是在信号处理函数开始，先保存errno；在信号处理函数退出的时候，再恢复errno。
+
+	f. 使用不可重入函数的方法 [屏蔽信号]
+		1. 例如，程序正在调用printf输出，但是在调用printf时，出现了信号，对应的信号处理函数也有printf语句，就会导致两个printf的输出混杂在一起。
+		2. 如果是给printf加锁的话，同样是上面的情况就会导致死锁。对于这种情况，采用的方法一般是在特定的区域屏蔽一定的信号。
+		3. 屏蔽信号的方法：
+			-- signal(SIGPIPE, SIG_IGN); //忽略一些信号
+			-- sigprocmask() // 单线程
+			-- pthread_sigmask() // 多线程
+
+		4. 信号处理函数屏蔽信号格式
+			sigset_t newmask, oldmask, zeromask;
+			...
+			/* Register the signal handler */
+			signal(SIGALRM, sig_handler);
+			/* Initialize the signal sets */
+			sigemtyset(&newmask); sigemtyset(&zeromask);
+			/* Add the signal to the set */
+			sigaddset(&newmask, SIGALRM);
+			/* Block SIGALRM and save current signal mask in set variable 'oldmask'
+			*/
+			sigprocmask(SIG_BLOCK, &newmask, &oldmask);
+			/* The protected code goes here
+			...
+			...
+			*/
+			/* Now allow all signals and pause */
+			sigsuspend(&zeromask);
+			/* Resume to the original signal mask */
+			sigprocmask(SIG_SETMASK, &oldmask, NULL);
+			/* Continue with other parts of the code */
+
+		5. 信号的主要问题在于: 信号处理函数修改了进程中的数据。
+
+C. 常见的线程问题
+

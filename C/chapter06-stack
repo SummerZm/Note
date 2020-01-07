@@ -1,0 +1,79 @@
+1. size 命令可以查看可执行程序各个段的大小
+    A. BBS段: 存放全局未初始化变量
+    B. data段: 存放全局已初始化的 变量
+    C. 代码段: 存放可执行文件的命令
+
+2. 栈的作用
+    A. 存放函数调用时的参数
+    B. 维护函数调用的活动过程记录 [递归函数的调用]
+    C. 通过alloca()可以在栈上分配存储空间，但是函数调用结束后分配的空间将失效
+    D. 实际上除了维护递归调用，栈并非必须的.p
+
+3. 程序段的位置
+    A. 通过程序找出一个程序中段的大致位置:
+        ----> 代码: ~/cdemo/other/expert C/sectionLocation
+
+    B. 通过nm可以看到程序中段的具体分布
+
+4. 过程活动记录
+    A. 简介
+        a. 过程活动记录用于记录函数的调用关系。
+        b. 当函数返回时，可以通过查看过程活动记录，获得上一个函数的地址
+        c. 过程活动记录可以通过栈实现，也可以将记录存放于寄存器中以获得更快的速度 
+
+    B. setJump(jmp_buf)与longJump(jmp_buf, int)
+        a. setJump()用于记录函数当前状态
+            ----> jmp_buf buf; setJump(buff)
+            ----> 函数将当前的函数状态存放在jmp_buf类型的buf中,并且返回0。buf存放的时此时的过程活动记录
+            ----> 如果由longJump函数触发跳转，则setJump返回值由longJump的第二个参数决定.
+
+        b. longJump()用于跳到之前某个函数的状态
+            ----> longJump(buff, 1)
+            ----> 第一个参数是：过程活动记录buff
+            ----> 第二个参数是：函数的返回值. 这个返回值会成为跳转到原位置的setjump的返回值
+
+        c. C++的try{}catch{} 可由setJump和longJump实现
+            ----> 进入 try 的时候调用 setJump 记录过程活动 
+            ----> 出现错误时，触发系统中断处理函数，在中断函数里面调用 longJump 实现程序过程的恢复
+            ----> 并且通过longJump的返回值控制。程序进行catch. 执行出错处理
+            ----> setJump longJump 实现 try{} catch {} 简析
+                    try{
+                        int i = 12;
+                    }
+                    catch{
+                        printf("error");
+                    }
+
+                   类似于:
+
+                    switch(setJump(buf)){
+                        case 0:   ---------- try 部分
+                            int i = 12;
+                            printf("%s\n", i); ------- 出错，触发系统中断函数
+                            break;
+                        case 1:
+                            printf("error"); ---------  catch 部分
+                            break;
+                    }
+                    
+                    中断函数：
+                    intr(){
+                        longJump(buff, 1);  // 返回 1 跳转到catch部分
+                    }
+
+            
+    
+5. C语言常用工具简介
+    A. nm 查看程序的符号表
+    B. strings 查看嵌入二进制文件中的字符串,可用于查看程序错误信息，内置文件名， 版本号，符号表等
+    C. file 查看文件类型
+
+
+
+
+
+
+
+
+
+
