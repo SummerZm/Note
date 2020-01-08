@@ -1,0 +1,278 @@
+
+1. ServerRoot: 服务器的基础目录，一般来说它将包含conf/和logs/子目录，其它配置文件的相对路径即基于此目录。默认为安装目录
+	注意，此指令中的路径最后不要加/。
+
+2. Listen: 指定服务器监听的IP和端口。默认情况下Apache会在所有IP地址上监听。
+	如果在配置文件中找不到这个指令，服务器将无法启动。
+	语法：Listen [IP-address:]portnumber [protocol]
+	a. Listen指令指定服务器在那个端口或地址和端口的组合上监听接入请求。
+	b. 如果只指定一个端口，服务器将在所有地址上监听该端口。如果指定了地址和端口的组合，服务器将在指定地址的指定端口上监听。
+	c. 可选的protocol参数在大多数情况下并不需要，若未指定该参数，则将为443端口使用默认的https 协议，为其它端口使用http协议。
+	d. 如果使用IPV6地址，必须用方括号把IPV6地址括起来：
+		Listen [2001:db8::a00:20ff:fea7:ccea]:80
+
+3. LoadModule：加载特定的DSO模块。Apache默认将已编译的DSO模块存放于4.1目录结构小节中所示的动态加载模块目录中。
+	语法：LoadModule module filename
+	如：LoadModule rewrite_module modules/mod_rewrite.so
+	a. 若filename使用相对路径，则路径是相对于ServerRoot所指示的相对路径。
+	b. Apache配置文件默认加载所有已编译的DSO模块，笔者建议只加载如下模块：
+		authn_file、authn_default、 authz_host、authz_user、authz_default、auth_basic、dir、alias、filter、speling、
+		log_config、env、vhost_alias、setenvif、mime、negotiation、rewrite、deflate、 expires、headers、cache、
+		file-cache、disk-cache、mem-cache。
+
+4. User：设置实际提供服务的子进程的用户。
+	a. 如果你以非root身份启动服务器，子进程将不能够切换至非特权用户，并继续以启动服务器的原始用户身份运行。
+	b. 如果确实以root用户启动了服务器，那么父进程将仍然以root身份运行。用于运行子进程的用户必须是一个没有特权的用户。
+	例：User daemon
+
+5. Group：设置提供服务的Apache子进程运行时的用户组。
+	a. Apache必须以root初始化启动，否则在切换用户组时会失败，并继续以初始化启动时的用户组运行
+	例：Group daemon
+
+6. ServerAdmin：设置在所有返回给客户端的错误信息中包含的管理员邮件地址。
+	语法：ServerAdmin email-address|URL
+
+7. ServerName：设置服务器用于辨识自己的主机名和端口号。
+	语法：ServerName [scheme://]fully-qualified-domain-name[:port]
+	可选的'scheme://'前缀仅在2.2.3以后的版本中可用，用于在代理之后或离线设备上也能正确的检测规范化的服务器URL。
+	当没有指定ServerName时，服务器会尝试对IP地址进行反向查询来推断主机名。
+	如果在ServerName中没有指定端口号，服务器会使用接受请求的那个端口。
+	为了加强可靠性和可预测性，建议使用ServerName显式的指定一个主机名和端口号。
+	如果使用的是基于域名的虚拟主机，在<VirtualHost>段中的ServerName将是为了匹配这个虚拟主机，在"Host:"请求头中必须出现的主机名。
+
+8. DocumentRoot：设置Web文档根目录。 语法：DocumentRoot directory-path
+	在没有使用类似Alias这样的指令的情况下，服务器会将请求中的URL附加到DocumentRoot后面以构成指向文档的路径。
+	a. 如果directory-path不是绝对路径，则被假定为是相对于ServerRoot的路径。
+	b. 指定DocumentRoot时不应包括最后的"/"。
+
+9. <Directory>：<Directory>和</Directory>用于封装一组指令，使之仅对某个目录及其子目录生效。
+	语法：<Directory Directory-path> ... </Directory>
+	a. <Directory>指令不可被嵌套使用，也不能出现在<Limit>或<LimitExcept>配置段中。
+	b. 正则表达式将在所有普通配置段之后予以考虑。所有的正则表达式将根据它们出现在配置文件中的顺序进行应用。
+	c. 如果有多个(非正则表达式)<Directory>配置段符合包含某文档的目录(或其父目录)，那么指令将以短目录优先的规则进行应用
+
+10. <Files>：提供基于文件名的访问控制，类似于<Directory>和<Location>指令。
+	语法：<Files filename> ... </Files>
+	a. 文件被处理之后，但在<Location>段之前。
+	b. <Files>能嵌入到<Directory>段中以限制它们作用的文件系统范围，也可用于.htaccess文件当中，以允许用户在文件层面上控制对它们
+		自己文件的访问。
+
+11. <IfModule>：封装根据指定的模块是否启用而决定是否生效的指令。
+	语法：<IfModule [!]module-file|module-identifier> ... </IfModule>
+		a. module-file是指编译模块时的文件名，比如mod_rewrite.c　。
+		b. module-identifier是指模块的标识符，比如mod_rewrite　。
+	在<IfModule>配置段中的指令仅当测试结果为真的时候才进行处理，否则所有其间的指令都将被忽略。
+
+12. Options：控制在特定目录中将使用哪些服务器特性
+13. AllowOverride：确定允许存在于.htaccess文件中的指令类型。
+	当此指令设置为All时，所有具有".htaccess"作用域的指令都允许出现在.htaccess文件中。
+	a. directive-type可以是下列各组指令之一：
+		AuthConfig 　允许使用与认证授权相关的指令
+		FileInfo 　允许使用控制文档类型的指令、控制文档元数据的指令、mod_rewrite中的指令、mod_actions中的Action指令
+		Indexes 　允许使用控制目录索引的指令
+		Limit 　允许使用控制主机访问的指令
+
+	b. AllowOverride仅在不包含正则表达式的<Directory>配置段中有效的。在<Location>,<DirectoryMatch>,<Files>配置段中都是无效的。
+	c. Order：控制默认的访问状态与Allow和Deny指令生效的顺序。
+	d. Allow：控制哪些主机可以访问服务器的该区域。可以根据主机名、IP地址、IP地址范围或其他环境变量中捕获的客户端请求进行控制。
+		【语法：Allow from all|host|env=env-variable [host|env=env-variable]】
+		-. Allow from all则允许所有主机访问，按照下述Deny和Order指令的配置；
+		-. host可以用下面任何一种格式来指定：一个（部分）域名、完整的IP地址、部分IP地址、网络/掩码、网络/nnn无类别域间路由规格；
+		-. Allow from env=env-variable，如果环境变量env-variable存在则访问被允许.
+			使用由mod_setenvif提供的指令，服务器用一种基于客户端请求的弹性方式提供了设置环境变量的能力。
+			因此，这条指令可以用于允许基于像User-Agent(浏览器类型)、Referer或其他 HTTP请求头字段的访问。
+	e. Deny：此指令的参数设置和Allow指令完全相同。
+
+14. DirectoryIndex：当客户端请求一个目录时寻找的资源列表。
+	语法: DirectoryIndex Local-url [Local-url] ...
+	例: DirectoryIndex index.html index.php
+
+15. ErrorLog：指定当服务器遇到错误时记录错误日志的文件。
+	语法：ErrorLog file-path|syslog[:facility]
+	a. file-path不是一个以斜杠(/)开头的绝对路径，那么将被认为是一个相对于ServerRoot的相对路径；
+	b. 如果file-path以一个管道符号(|)开头，那么会为它指定一个命令来处理
+	c. 例: ErrorLog "|/usr/local/sbin/cronolog /var/log/httpd/%w/errors_log"　。
+
+16. LogLevel：用于调整记录在错误日志中的信息的详细程度。
+	语法：LogLevel level
+	可以选择下列level，依照重要性降序排列：
+		emerg 　紧急(系统无法使用)
+		alert 　必须立即采取措施
+		crit 　致命情况
+		error 　错误情况
+		warn 　警告情况
+		notice 　一般重要情况
+		info 　 普通信息
+		debug 　调试信息
+
+	当错误日志是一个单独分开的正式文件的时候，notice级别的消息总是会被记录下来，而不能被屏蔽。
+	但是，当使用syslog来记录时就没有这个问题。
+
+20. Alias：映射URL到文件系统的特定区域。
+	语法：Alias URL-path file-path|directory-path
+	a. Alias指令使文档可以被存储在DocumentRoot以外的本地文件系统中。以(%已解码的)url-path被映射到以directory-path开头的本地文件。
+	b. 如果对在DocumentRoot之外的某个目录建立了一个Alias ，则可能需要通过<Directory>段明确的对目标目录设定访问权限。
+
+21. ScriptAlias：映射一个URL到文件系统并视之为CGI脚本目录。
+	a. ScriptAlias指令的行为与Alias指令相同，但同时它又标明此目录中含有应该由cgi-script处理器处理的CGI脚本。
+
+22. ScriptSock：在以线程式MPM(worker)运行的Apache中设置用来与CGI守护进程通信的套接字文件名前缀
+	a. (其后附加父进程 PID组成完整的文件名)。
+	b. 这个套接字将会用启动Apache服务器的父进程用户权限(通常是root)打开。
+	c. 为了维护与CGI脚本通讯的安全性，不允许其他用户拥有写入套接字所在目录的权限是很重要的。
+
+23. DefaultType：在服务器无法由其他方法确定内容类型时，发送的默认MIME内容类型。
+	语法：DefaultType MIME-type
+	默认：DefaultType text/plain
+
+23. AddType：在给定的文件扩展名与特定的内容类型之间建立映射关系。
+	语法：AddType MIME-type extension [extension] ...
+	a. MIME-type指明了包含extension扩展名的文件的媒体类型。
+	b. 这个映射关系会添加在所有有效的映射关系上，并覆盖所有相同的extension扩展名映射。
+
+24. ErrorDocument：批示当遇到错误的时候服务器将给客户端什么样的应答。
+	语法：ErrorDocument error-code document
+	例: 
+		ErrorDocument 500http://www.entage.net/err500.html
+		ErrorDocument 404 /errors/bad_urls.html
+		ErrorDocument 403 "Sorry can't allow you access today"
+
+25. EnableMMAP：指示httpd在递送中如果需要读取一个文件的内容，它是否可以使用内存映射。
+	语法：EnableMMAP On|Off
+	a. 这种内存映射有时会带来性能的提高，但在某些情况下，您可能会需要禁用内存映射以避免一些操作系统的问题：
+	b. 在一些多处理器的系统上，内存映射会减低一些httpd的性能；
+	c. 在挂载了NFS的DocumentRoot上，若已经将一个文件进行了内存映射，则删除或截断这个文件会造成httpd因为分段故障而崩溃。
+	d. 在可能遇到这些问题的服务器配置过程中，应当使用下面的命令来禁用内存映射：
+		对于挂载了NFS的文件夹，可以单独在<directory>段中指定禁用内存映射：
+		<Directory "/path-to-nfs-files">EnableMMAP Off</Directory>
+
+27. EnableSendfile：控制httpd是否可以使用操作系统内核的sendfile支持来将文件发送到客户端。
+	a. 默认情况下，当处理一个请求并不需要访问文件内部的数据时(比如发送一个静态的文件内容)，
+	b. 如果操作系统支持，Apache将使用sendfile将文件内容直接发送到客户端而并不读取文件。
+	c. 针对NFS或SMB，可以单独在<directory>段中指定禁用：
+
+		<Directory "/path-to-nfs-files">
+			EnableSendfile Off
+		</Directory>
+
+28. include：在服务器配置文件中包含其它配置文件。
+	语法：Include file-path|directory-path
+	a. Shell风格(fnmatch())的通配符可以用于按照字母顺序一次包含多个文件。
+	b. 如果Include指向了一个目录而不是一个文件，Apache将读入该目录及其子目录下的所有文件，
+		并依照字母顺序将这些文件作为配置文件进行解析。但是并不推荐这么做，因为偶尔会有临时文件在这个目录中生成，
+		从而导致httpd启动失败。文件的路径可以是一个完整的绝对路径(以一个斜杠开头)，或是相对于ServerRoot目录的相对路径。
+
+29. 设置动态加载的DSO模块
+
+ #如果需要提供基于文本文件的认证,加载此模块，否则注释掉
+ LoadModule authn_file_module modules/mod_authn_file.so
+ #如果需要提供基于DBM文件的认证,加载此模块,否则注释掉
+ #LoadModule authn_dbm_module modules/mod_authn_dbm.so
+ #如果需要提供匿名用户认证,加载此模块,否则注释掉
+ #LoadModule authn_anon_module modules/mod_authn_anon.so
+ #如果需要提供基于SQL数据库的认证,加载此模块,否则注释掉
+ #LoadModule authn_dbd_module modules/mod_authn_dbd.so
+ #如果需要在未正确配置认证模块的情况下简单拒绝一切认证信息,加载此模块,否则注释掉
+ LoadModule authn_default_module modules/mod_authn_default.so
+
+ #此模块提供基于主机名、IP地址、请求特征的访问控制,Allow、Deny指令需要,推荐加载。
+ LoadModule authz_host_module modules/mod_authz_host.so
+ #如果需要使用纯文本文件为组提供授权支持,加载此模块,否则注释掉
+ #LoadModule authz_groupfile_module modules/mod_authz_groupfile.so
+ #如果需要提供基于每个用户的授权支持,加载此模块,否则注释掉
+ #如果需要使用DBM文件为组提供授权支持,加载此模块,否则注释掉
+ #LoadModule authz_dbm_module modules/mod_authz_dbm.so
+ #如果需要基于文件的所有者进行授权,加载此模块,否则注释掉
+ #LoadModule authz_owner_module modules/mod_authz_owner.so
+ #如果需要在未正确配置授权支持模块的情况下简单拒绝一切授权请求,加载此模块,否则注释掉
+ LoadModule authz_default_module modules/mod_authz_default.so
+ #如果需要提供基本的HTTP认证,加载此模块,否则注释掉,此模块至少需要同时加载一个认证支持模块和一个授权支持模块
+ LoadModule auth_basic_module modules/mod_auth_basic.so
+ ##如果需要提供HTTP MD5摘要认证,加载此模块,否则注释掉,此模块至少需要同时加载一个认证支持模块和一个授权支持模块
+ #LoadModule auth_digest_module modules/mod_auth_digest.so
+ #此模块提供文件描述符缓存支持,从而提高Apache性能,推荐加载,但请小心使用
+ LoadModule file_cache_module modules/mod_file_cache.so
+
+ #此模块提供基于URI键的内容动态缓存(内存或磁盘),从而提高Apache性能,必须与mod_disk_cache/mod_mem_cache同时使用,推荐加载
+ LoadModule cache_module modules/mod_cache.so
+
+ #此模块为mod_cache提供基于磁盘的缓存管理,推荐加载
+ LoadModule disk_cache_module modules/mod_disk_cache.so
+ #此模块为mod_cache提供基于内存的缓存管理,推荐加载
+ LoadModule mem_cache_module modules/mod_mem_cache.so
+ #如果需要管理SQL数据库连接，为需要数据库功能的模块提供支持,加载此模块,否则注释掉(推荐)
+ #LoadModule dbd_module modules/mod_dbd.so
+
+ #此模块将所有I/O操作转储到错误日志中,会导致在日志中写入及其海量的数据,只建议在发现问题并进行调试的时候使用
+ #LoadModule dumpio_module modules/mod_dumpio.so
+ #如果需要使用外部程序作为过滤器,加载此模块(不推荐),否则注释掉
+ #LoadModule ext_filter_module modules/mod_ext_filter.so
+ #如果需要实现服务端包含文档(SSI)处理,加载此模块(不推荐),否则注释掉
+ #LoadModule include_module modules/mod_include.so
+ #如果需要根据上下文实际情况对输出过滤器进行动态配置,加载此模块,否则注释掉
+ LoadModule filter_module modules/mod_filter.so
+
+ #如果需要服务器在将输出内容发送到客户端以前进行压缩以节约带宽,加载此模块(推荐),否则注释掉
+ LoadModule deflate_module modules/mod_deflate.so
+ ##如果需要记录日志和定制日志文件格式,加载此模块(推荐),否则注释掉
+ LoadModule log_config_module modules/mod_log_config.so
+
+ #如果需要对每个请求的输入/输出字节数以及HTTP头进行日志记录,加载此模块,否则注释掉
+ #LoadModule logio_module modules/mod_logio.so
+ #如果允许Apache修改或清除传送到CGI脚本和SSI页面的环境变量,加载此模块,否则注释掉
+ LoadModule env_module modules/mod_env.so
+ #如果允许通过配置文件控制HTTP的"Expires:"和"Cache-Control:"头内容,加载此模块(推荐),否则注释掉
+ LoadModule expires_module modules/mod_expires.so
+ #如果允许通过配置文件控制任意的HTTP请求和应答头信息,加载此模块,否则注释掉
+ LoadModule headers_module modules/mod_headers.so
+
+ #如果需要实现RFC1413规定的ident查找,加载此模块(不推荐),否则注释掉
+ #LoadModule ident_module modules/mod_ident.so
+ #如果需要根据客户端请求头字段设置环境变量,加载此模块,否则注释掉
+ LoadModule setenvif_module modules/mod_setenvif.so
+
+ #此模块是mod_proxy的扩展,提供Apache JServ Protocol支持,只在必要时加载
+ #LoadModule proxy_ajp_module modules/mod_proxy_ajp.so
+ #此模块是mod_proxy的扩展,提供负载均衡支持,只在必要时加载
+ #LoadModule proxy_balancer_module modules/mod_proxy_balancer.so
+
+ #如果需要根据文件扩展名决定应答的行为(处理器/过滤器)和内容(MIME类型/语言/字符集/编码),加载此模块,否则注释掉
+ LoadModule mime_module modules/mod_mime.so
+ #如果允许Apache提供DAV协议支持,加载此模块,否则注释掉
+ #LoadModule dav_module modules/mod_dav.so
+ #此模块生成描述服务器状态的Web页面,只建议在追踪服务器性能和问题时加载
+ #LoadModule status_module modules/mod_status.so
+ #如果需要自动对目录中的内容生成列表(类似于"ls"或"dir"命令),加载此模块(会带来安全问题,不推荐),否则注释掉
+ #LoadModule autoindex_module modules/mod_autoindex.so
+
+ #如果需要服务器发送自己包含HTTP头内容的文件,加载此模块,否则注释掉
+ #LoadModule asis_module modules/mod_asis.so
+ #如果需要生成Apache配置情况的Web页面,加载此模块(会带来安全问题,不推荐),否则注释掉
+ #LoadModule info_module modules/mod_info.so
+ #如果需要在非线程型MPM(prefork)上提供对CGI脚本执行的支持,加载此模块,否则注释掉
+ #LoadModule cgi_module modules/mod_cgi.so
+
+ #此模块在线程型MPM(worker)上用一个外部CGI守护进程执行CGI脚本,如果正在多线程模式下使用CGI程序,推荐替换mod_cgi加载,否则注释掉
+ #LoadModule cgid_module modules/mod_cgid.so
+ #此模块为mod_dav访问服务器上的文件系统提供支持,如果加载mod_dav,则也应加载此模块,否则注释掉
+ #LoadModule dav_fs_module modules/mod_dav_fs.so
+ #如果需要提供大批量虚拟主机的动态配置支持,加载此模块,否则注释掉
+ #LoadModule vhost_alias_module modules/mod_vhost_alias.so
+
+ #如果需要提供内容协商支持(从几个有效文档中选择一个最匹配客户端要求的文档),加载此模块(推荐),否则注释掉
+ LoadModule negotiation_module modules/mod_negotiation.so
+ #如果需要指定目录索引文件以及为目录提供"尾斜杠"重定向,加载此模块(推荐),否则注释掉
+ LoadModule dir_module modules/mod_dir.so
+ #如果需要处理服务器端图像映射,加载此模块,否则注释掉
+ #LoadModule imagemap_module modules/mod_imagemap.so
+ #如果需要针对特定的媒体类型或请求方法执行CGI脚本,加载此模块,否则注释掉
+ #LoadModule actions_module modules/mod_actions.so
+ #如果希望服务器自动纠正URL中的拼写错误,加载此模块(推荐),否则注释掉
+ LoadModule speling_module modules/mod_speling.so
+ #如果允许在URL中通过"/~username"形式从用户自己的主目录中提供页面,加载此模块,否则注释掉
+ #LoadModule userdir_module modules/mod_userdir.so
+ #此模块提供从文件系统的不同部分到文档树的映射和URL重定向,推荐加载
+ LoadModule alias_module modules/mod_alias.so
+ #如果需要基于一定规则实时重写URL请求,加载此模块(推荐),否则注释掉
+ LoadModule rewrite_module modules/mod_rewrite.so
+

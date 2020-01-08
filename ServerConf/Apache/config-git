@@ -1,0 +1,100 @@
+
+<VirtualHost *:80>
+	ServerName git.gitServer.com
+	SetEnv GIT_HTTP_EXPORT_ALL
+	SetEnv GIT_PROJECT_ROOT /gitrepo
+	ScriptAlias /git /usr/lib/git-core/git-http-backend/ 
+	SSLEngine on
+	SSLCertificateFile "/gitrepo/git.crt"
+	SSLCertificateKeyFile "/gitrepo/apache.key"
+	<Location />
+			AuthType Basic
+			AuthName "Git"
+			#AuthUserFile /etc/httpd/conf.d/git-team.htpasswd
+			AuthUserFile /gitrepo/git-htpasswd
+			Require valid-user
+	</Location>
+</VirtualHost>
+
+<VirtualHost *:443>
+	# Change this to the domain which points to your host.
+	ServerName 192.168.1.114
+    SetEnv GIT_HTTP_EXPORT_ALL
+    SetEnv GIT_PROJECT_ROOT /gitrepo/
+	SSLEngine on
+
+	SSLCertificateFile "/gitrepo/git.crt"
+	SSLCertificateKeyFile "/gitrepo/apache.key"
+
+	DocumentRoot /gitrepo
+
+	<Files "git-http-backend">
+		AuthType Basic
+		AuthName "Git Access"
+        AuthUserFile /gitrepo/git-htpasswd
+		Require valid-user
+		Order deny,allow
+		Deny from env=AUTHREQUIRED
+		Satisfy any
+	</Files>
+
+	<Location />
+		AuthType Basic
+		AuthName "Git Repositories"
+        AuthUserFile /gitrepo/git-htpasswd
+		#AuthUserFile /opt/sites_conf/htpasswd
+		Require valid-user
+		Order allow,deny
+		Allow from all
+	</Location>
+
+	ScriptAlias / /usr/lib/git-core/git-http-backend/ 
+
+	RewriteEngine On
+	RewriteCond %{QUERY_STRING} service=git-receive-pack [OR]
+	RewriteCond %{REQUEST_URI} /git-receive-pack$
+	RewriteRule ^/ - [E=AUTHREQUIRED]
+</VirtualHost>
+
+=============================OK=================================================
+
+<VirtualHost *:802>
+	# Change this to the domain which points to your host.
+	ServerName 192.168.1.114
+    SetEnv GIT_HTTP_EXPORT_ALL
+    SetEnv GIT_PROJECT_ROOT /gitrepo
+
+	SSLEngine on
+	SSLCertificateFile "/gitrepo/git.crt"
+	SSLCertificateKeyFile "/gitrepo/apache.key"
+
+	ScriptAlias / /usr/lib/git-core/git-http-backend/ 
+
+	<Files "git-http-backend">
+		AuthType Basic
+		AuthName "Git Access"
+        AuthUserFile /gitrepo/git-htpasswd
+		Require valid-user
+		Order deny,allow
+		Deny from env=AUTHREQUIRED
+		Satisfy any
+	</Files>
+
+	<Location />
+		AuthType Basic
+		AuthName "Git Repositories"
+        AuthUserFile /gitrepo/git-htpasswd
+		Require valid-user
+		Order allow,deny
+		Allow from all
+	</Location>
+
+	RewriteEngine On
+	RewriteCond %{QUERY_STRING} service=git-receive-pack [OR]
+	RewriteCond %{REQUEST_URI} /git-receive-pack$
+	RewriteRule ^/ - [E=AUTHREQUIRED]
+</VirtualHost>
+
+
+
+

@@ -1,0 +1,35 @@
+
+配置多路处理模块(MPM) httpd-mpm.conf
+==============================================================
+prefork模式
+这个多路处理模块(MPM)实现了一个非线程型的、预派生的web服务器，它的工作方式类似于Apache 1.3。
+它适合于没有线程安全库，需要避免线程兼容性问题的系统。
+最重要的是将MaxClients设置为一个足够大的数值以处理潜在的请求高峰，同时又不能太大，以致需要使用的内存超出物理内存的大小。
+
+#设置prefork多路处理模块
+<IfModule mpm_prefork_module>
+    StartServers          5
+    MinSpareServers       5
+    MaxSpareServers      10
+    ServerLimit　　　　8000
+    MaxClients         8000
+    MaxRequestsPerChild   0
+</IfModule>
+	
+	StartServers：设置服务器启动时建立的子进程数量。因为子进程数量动态的取决于负载的轻重,所有一般没有必要调整这个参数。
+	MinSpareServers：设置空闲子进程的最小数量(没有正在处理请求的子进程)如果当前空闲子进程数少于MinSpareServers,那么将以最大每秒一个的速度产生新的子进程。 
+	MaxSpareServers：设置空闲子进程的最大数量。如果当前有超过MaxSpareServers数量的空闲子进程,那么父进程将杀死多余的子进程。
+					 如果你将该指令的值设置为比MinSpareServers 小,Apache将会自动将其修改成"MinSpareServers+1"。
+
+	ServerLimit：服务器允许配置的进程数上限。只有在你需要将MaxClients设置成高于默认值256的时候才需要使用。要将此指令的值保持和MaxClients一样。
+					 修改此指令的值必须完全停止服务后再启动才能生效，以restart方式重启动将不会生效。
+
+	MaxClients：用于伺服客户端请求的最大请求数量（最大子进程数），任何超过MaxClients限制的请求都将进入等候队列。
+					默认值是256，如果要提高这个值必须同时提高ServerLimit的值。笔者建议将初始值设为(以Mb为单位的最大物理内存/2),
+					然后根据负载情况进行动态调整。比如一台4G内存的机器，那么初始值就是4000/2=2000。
+
+	MaxRequestsPerChild：设置每个子进程在其生存期内允许伺服的最大请求数量。到达MaxRequestsPerChild的限制后，子进程将会结束。
+					如果MaxRequestsPerChild为"0"，子进程将永远不会结束。将MaxRequestsPerChild设置成非零值有两个好处：
+					可以防止(偶然的)内存泄漏无限进行而耗尽内存；给进程一个有限寿命，从而有助于当服务器负载减轻的时候减少活动进程的数量。
+					如果设置为非零值，建议设为10000-30000之间的一个值。
+					公式：MaxClients<=ServerLimit

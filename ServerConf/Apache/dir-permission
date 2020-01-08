@@ -1,0 +1,88 @@
+1. apache 文件目录权限规则
+	A. 设置虚拟目录 
+		a. 进入Apache的conf目录 
+		b. 打开httpd.conf文件, 在ScriptAlias/cgi-bin/”D:/ProgramFiles/wamp/server/Apache2.2/cgi-bin/” 的后面输入：Alias/php “F:/www_php” 
+		c. 注释掉documentroot路径. 注意：虚拟目录为php
+
+		a. 将#Includeconf/extra/httpd-vhosts.conf前面的“#”去掉 
+		b. 打开Apache目录下Apache2.2\conf\extra\httpd-vhosts.conf文件 
+		c. 在文件末尾添加: Alias /php “F:/www_php”
+
+	B. 目录权限规则配置 <Directory></Directory>
+
+		Alias /test “/var/www/test”
+		<Directory“/var/www/test”>
+			Options -Indexes FollowSymLinks MultiViews  
+			AllowOverride None          
+			Order allow,deny
+			Allow from all
+		</Directory>
+
+		a. Options: 控制特定目录将启用哪些服务器特性 (服务器核心配置|虚拟主机配置|特定目录配置[directory]|.htaccess)
+			-. Options指令的完整语法为：Options [+|-]option [[+|-]option]
+			-. All ---> 表示除MultiViews之外的所有特性。这也是Options指令的默认设置。
+			-. indexes ---> 目录浏览 [mod_autoindex]
+			-. MultiViews ---> 使用"MultiViews"搜索，即服务器执行一个隐含的文件名模式匹配，并在其结果中选择。  
+			-. None ---> 表示不启用任何的服务器特性。
+			-. FollowSymLinks ---> 服务器允许在此目录中使用符号连接。如果该配置选项位于<Location>配置段中，将会被忽略。
+			-. MultiViews ---> 允许使用mod_negotiation模块提供内容协商的"多重视图"。
+			-. SymLinksIfOwnerMatch ---> 服务器仅在符号连接与目标文件或目录的所有者具有相同的用户ID时才使用它。
+			-. ExecCGI ---> 允许使用mod_cgi模块执行CGI脚本。
+			-. Includes ---> 允许使用mod_include模块提供的服务器端包含功能。
+			-. IncludesNOEXEC ---> 允许服务器端包含，但禁用"#exec cmd"和"#exec cgi"。但仍可以从ScriptAlias目录使用"#include virtual"虚拟CGI脚本。
+				简而言之，如果客户端请求的路径可能对应多种类型的文件，那么服务器将根据客户端请求的具体情况自动选择一个最匹配客户端要求的文件。
+				例如，在服务器站点的file文件夹下中存在名为hello.jpg和hello.html的两个文件，此时用户输入Http://localhost/file/hello，
+				如果在file文件夹下并没有hello子目录，那么服务器将会尝试在file文件夹下查找形如hello.*的文件，
+				然后根据用户请求的具体情况返回最匹配要求的hello.jpg或者hello.html。
+
+			-. Apache允许在一个目录配置中设置多个Options指令。
+				如果一个目录被多次设置了Options，则指定特性数量最多的一个Options指令会被完全接受(其它的被忽略)，而各个Options指令之间并不会合并。
+				如果我们在可选配置项前加上了符号"+"或"-"，那么表示该可选项将会被合并。
+				所有前面加有"+"号的可选项将强制覆盖当前的可选项设置，而所有前面有"-"号的可选项将强制从当前可选项设置中去除。
+	
+		b. Apache 使用的访问控制指令： 
+			-. Order 指定执行规则顺序 
+				Orderallow,deny(默认禁止所有客户访问，在执行deny规则前先执行allow规则) 
+				Orderdeny,allow(默认禁止所有客户访问，在执行allow规则前先执行deny规则)
+
+			-. Deny 指定拒绝访问列表 
+			-. Allow 指定允许访问列表 
+				Deny和allow访问列表的几种形式： 
+					ALL：所有客户 
+					域名：如：sina.com 
+					IP：部分或全部（中间用空格隔开） 
+		
+		c. AllowOverride: 重写指令
+			-. 指明Apache服务器是否去找.htacess文件作为配置文件
+				设置为none,那么服务器将忽略.htacess文件, 设置为All,那么所有在.htaccess文件里有的指令都将被重写。
+				利用Apache的rewrite模块对URL进行重写的时，rewrite规则会写在.htaccess文件里,必须对.htaccess所在目录进行配置权限。
+				从安全性考虑，根目录的AllowOverride属性一般都配置成不允许任何Override。即:
+					<Directory /> 
+						AllowOverride None 
+					</Directory> 
+
+				当此指令设置为All时，所有具有".htaccess"作用域的指令都允许出现在 .htaccess 文件中。 
+				对于URLrewrite 来说，至少需要把目录设置为 
+					< Directory /myblogroot/> 
+						AllowOverride FileInfo 
+					< /Directory> 
+
+			-. AuthConfig: 允许使用所有的权限指令，他们包括AuthDBMGroupFile AuthDBMUserFile  AuthGroupFile  AuthName AuthTypeAuthUserFile和Require
+			-. FileInfo: 允许使用文件控制类型的指令. 它们包括AddEncoding AddLanguage  AddType  DEfaultType ErrorDocument LanguagePriority
+			-. Indexes:	允许使用目录控制类型的指令, 它们包括:
+					AddDescription
+					AddIcon
+					AddIconByEncoding
+					AddIconByType
+					DefaultIcon
+					DirectoryIndex
+					FancyIndexing
+					HeaderName
+					IndexIgnore
+					IndexOptions
+					ReadmeName
+
+			-. Limit: 允许使用权限控制指令。它们包括Allow Deny和Order
+			-. Options: 允许使用控制目录特征的指令.他们包括Options 和XBitHack
+
+
