@@ -1,15 +1,15 @@
 ## <b>Linux内存配置和性能指标</b> ##
 > <b>使用缓存和不使用缓存性能相差近百倍</b>
 
-### <b>1. Linux配置</b> ###
+### <b>1. Linux内存配置</b> ###
 - /proc/pid/oom_adj 
     1. 设置某一进程的OOM阈值  OOM（Out of memory）
     2. 取值：[-17, 15] （17:禁用OOM）
     3. 目的：避免某一进程用光内存
 
 - /proc/meminfo
-    1. Buffer: 物理硬盘上的自带缓存
-    2. Cached: 将磁盘上的文件数据缓存到内存设备中，加快读取，不用访问硬盘
+    1. Buffer: 具体的文件系统与物理硬盘数据交互使用的内存【直接读写磁盘这个值会变大】
+    2. Cached: VFS系统缓存物理硬盘相关数据使用的内存【直接读写文件这个值会变大】
     3. SReclaimable: Slab伙伴内存管理系统可回收部分
 
 - /proc/sys/vm/min_free_kbytes
