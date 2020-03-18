@@ -53,7 +53,6 @@ E. 段错误类型:
 	c. 访问受保护地址 (int*(0)) 
 	d. 栈溢出
 
-
 F. 相关代码:
 	a. source: add.c 
 		#include <stdio.h>  

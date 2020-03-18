@@ -1,0 +1,58 @@
+A. 清空缓冲区，可移植性做法
+	1. while((c=getchar())!='\n' && c!=EOF) // getchar()是行缓冲
+	2. fflush() libc兼容性问题
+	3. rewind() libc兼容性问题
+
+B. C语言密码输入
+	#include <stdio.h>
+	#include <conio.h>
+	#include <ctype.h>
+	#define PWDLEN 20
+
+	void getpwd(char *pwd, int pwdlen);
+
+	int main(){
+	    char pwd[PWDLEN+1];
+		printf("Input password: ");
+		getpwd(pwd, PWDLEN);
+	    printf("The password is: %s\n", pwd);
+		return 0;
+	}
+
+	/**
+	* 获取用户输入的密码
+	* @param  pwd     char*  保存密码的内存的首地址
+	* @param  pwdlen  int    密码的最大长度
+	**/
+	void getpwd(char *pwd, int pwdlen){
+	    char ch = 0;
+	    int i = 0;
+	    while(i<pwdlen){
+			ch = getch();
+
+		    if(ch == '\r'){  //回车结束输入
+				printf("\n");
+				break;
+			}
+					       
+			if(ch=='\b' && i>0){  //按下删除键
+		        i--;
+				printf("\b \b");
+			}else if(isprint(ch)){  //输入可打印字符
+		        pwd[i] = ch;
+				printf("*");
+				i++;
+	       }
+       }
+		pwd[i] = 0;
+	}
+
+C. EOF虽然是文件结束符，但并不是在任何情况下输入Ctrl+D(Windows下Ctrl+Z)都能够实现文件结束的功能，只有在下列的条件下，才作为文件结束符。
+	1. 遇到getcahr函数执行时，要输入第一个字符时就直接输入Ctrl+D；
+	2. 在前面输入的字符为换行符时， 接着输入Ctrl+D；
+	3. 在前面有字符输入且不为换行符时，要连着输入两次Ctrl+D，这时第二次输入的Ctrl+D起到文件结束符的功能，第一次的Ctrl+D作为行结束符。
+	4. EOF作为行结束符时的情况，这时候输入Ctrl+D作为行结束的标志能结束getchar()的“阻塞”，使getchar()逐个字符读入，但是EOF会被“吃掉”，并不会被读取。
+	其实，这三种情况都可以总结为只有在getchar()提示新的一次输入时， 直接输入Ctrl+D才相当于文件结束符。
+
+
+
