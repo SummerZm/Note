@@ -1,4 +1,23 @@
 ## <b>数据库基本技巧</b> ##
+- <b>MYSQL 引擎查看</b>
+    ```SQL
+    show engines;
+    +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+    | Engine             | Support | Comment                                                        | Transactions | XA   | Savepoints |
+    +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+    | FEDERATED          | NO      | Federated MySQL storage engine                                 | NULL         | NULL | NULL       |
+    | MRG_MYISAM         | YES     | Collection of identical MyISAM tables                          | NO           | NO   | NO         |
+    | MyISAM             | YES     | MyISAM storage engine                                          | NO           | NO   | NO         |
+    | BLACKHOLE          | YES     | /dev/null storage engine (anything you write to it disappears) | NO           | NO   | NO         |
+    | CSV                | YES     | CSV storage engine                                             | NO           | NO   | NO         |
+    | MEMORY             | YES     | Hash based, stored in memory, useful for temporary tables      | NO           | NO   | NO         |
+    | ARCHIVE            | YES     | Archive storage engine                                         | NO           | NO   | NO         |
+    | InnoDB             | DEFAULT | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+    | PERFORMANCE_SCHEMA | YES     | Performance Schema                                             | NO           | NO   | NO         |
+    +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+    9 rows in set (0.02 sec)
+    ```
+
 - <b>SQL语句性能分析</b>
     ```SQL
     -- 查看性能分析功能是否开
