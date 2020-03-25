@@ -48,3 +48,22 @@
 - FileSort 排序则一般在内存中进行排序，占用 CPU 较多。如果待排结果较大，会产生临时文件 I/O 到磁盘进行排序的情况，效率较低。
 - 避免全表扫描在 WHERE 子句和 ORDER BY 子句中使用索引>
 - ORDER BY排序: 单索引> 联合索引 > FileSort
+- 什么是自适应hash索引？
+    1. MySQL提供了一个自适当Hash索引的功能（Adaptive Hash index）
+    2. 自适应指的是不需要人工来制定，而是系统根据情况来自动完成的
+    3. 某个数据经常会访问到，当满足一定条件的时候，就会将这个数据页的地址存放到Hash表中
+    4. 自适应哈希索引只保存热数据（经常被使用到的数据），并非全表数据。因此数据量并不会很大，可以让自适应Hash放到缓冲池中，也就是InnoDB buffer pool，进一步提升查找效率。
+    5. InnoDB中的自适应Hash相当于是“索引的索引”，采用Hash索引存储的是B+树索引中的页面的地址。
+    6. 通过innodb_adaptive_hash_index变量来查看是否开启了自适应Hash。比如：mysql> show variables like '%adaptive_hash_index';
+    
+- 普通索引和唯一索引在查询效率上有什么不同呢？
+    1. 唯一索引：在普通索引上增加了约束性，也就是关键字唯一，找到了关键字就停止检索。
+    2. 普通索引：将这个记录所在的页加载到内存中，在内存中多几次“判断下一条记录”的操作。性能差别不大
+
+### <b>Mysql InnoDB 三大特性？</b> ###
+- 自适应Hash，插入缓冲（Insert Buffer），二次写(Double Write)。
+
+### <b>各种数据库页大小</b> ###
+- Mysql InnoDB引擎默认支持16K
+- SQL Server 的页大小为 8KB
+- Oracle 中我们用术语“块”（Block）来代表“页”，Oralce 支持的块大小为 2KB，4KB，8KB，16KB，32KB 和 64KB。

@@ -139,4 +139,21 @@
     5. DEFAULT  [字段的默认值]
     6. CHECK约束 [ CHECK(height>=0 AND height<3) ]
 
+- <b>MYSQL 相关信息查看</b>
+    ```SQL
+    -- 查看IO单位页大小
+    show variables like '%innodb_page_size%';
+    -- 是否开启自适应索引
+    show variables like '%adaptive_hash_index';
+    -- innodb_file_per_table=ON，意味着每张表都会单独保存为一个.ibd 文件。
+    show variables like 'innodb_file_per_table';
+    -- 查看缓冲池的大小
+    show variables like 'innodb_buffer_pool_size'
+    -- 设置缓冲池的大小128M
+    set global innodb_buffer_pool_size=134217728 
+    -- 查看缓冲池个数
+    show variables like 'innodb_buffer_pool_instances';
+    -- 查看SQL语句的执行成本，输出查询访问的页数和查询花费时间
+    show status like 'last_query_cost';
 
+    ```

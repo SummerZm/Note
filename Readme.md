@@ -44,3 +44,9 @@
 |History_computerTheory|计算机数学理论历史|
 |History_math_part1|中世纪前数学史|
 |History_math_part2|中世纪~费马数学史|
+
+### **Dir: SQL** ###
+|File|Comment|
+|:---|:---|
+|[Dir] Intro | SQL基本概念简介|
+|[Dir] Optimization | SQL优化相关|
