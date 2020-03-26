@@ -122,6 +122,15 @@
     SELECT team_name, (SELECT count(*) FROM player WHERE player.team_id = team.team_id) AS player_num
     FROM team
 
+    -- 表锁
+    LOCK TABLE product_comment READ;
+    UNLOCK TABLE;
+
+    -- 行锁
+    SELECT comment_id, product_id, comment_text, user_id 
+    FROM product_comment 
+    WHERE user_id = 912178 LOCK IN SHARE MODE
+
     ```
     
 - <b>SQL函数</b>
@@ -155,5 +164,6 @@
     show variables like 'innodb_buffer_pool_instances';
     -- 查看SQL语句的执行成本，输出查询访问的页数和查询花费时间
     show status like 'last_query_cost';
-
+    -- 查看是否启用了查询缓存 
+    show variables like '%query_cache%';
     ```
