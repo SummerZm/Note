@@ -64,7 +64,7 @@
 2. Mysql设置事务提交方式：set autocommit =0/1/2
     ```SQL
     -- completion=0：执行COMMIT提交事务,需要使用 START TRANSACTION 或者 BEGIN开启新事务
-    -- completion=1：提交事务后，相当于执行了 COMMIT AND CHAIN，也就是开启一个链式事务
+    -- completion=1：提交事务后，相当于执行了 COMMIT AND CHAIN，也就是开启一个链式事务【每个语句都处于事务中】
     -- completion=2，这种情况下 COMMIT=COMMIT AND RELEASE，也就是当我们提交后，会自动与服务器断开连接。
     ```
 
@@ -104,6 +104,8 @@
     |可重复读|NO  |NO       |YES |
     |可串行化|NO  |NO       |NO  |
 
-
-
-
+- <b>长事务问题排查</b>
+    1. 查找耗时大于10s的事务
+    ```SQL
+        select * from information_schema.innodb_trx where TIME_TO_SEC(timediff(now(),trx_started))>10
+    ```

@@ -50,6 +50,20 @@
     +----------------------+----------+
     15 rows in set, 1 warning (0.00 sec)
     ```
+
+- <b>Mysql 查看连接池</b>
+    ```SQL
+    -- 长连接过多会导致内存被大量占用 
+    -- MySQL 5.7 以上版本，每次执行一个比较大的操作后，可执行 mysql_reset_connection 重新初始化连接资源。这个过程不需要重连和重新做权限验证
+    show processlist;
+    +------+------+-----------+------+---------+------+-------+------------------+
+    | Id   | User | Host      | db   | Command | Time | State | Info             |
+    +------+------+-----------+------+---------+------+-------+------------------+
+    | 3780 | root | localhost | NULL | Query   |    0 | init  | show processlist |
+    +------+------+-----------+------+---------+------+-------+------------------+
+    1 row in set (0.00 sec)
+    ```
+
 - <b>SQL常用命令</b>
     ```SQL
     -- 创建一个名为nba的数据库
@@ -131,6 +145,9 @@
     FROM product_comment 
     WHERE user_id = 912178 LOCK IN SHARE MODE
 
+    -- 查找耗时大于10s的事务
+    -- 监控 information_schema.Innodb_trx 表，设置长事务阈值，超过就报警 / 或者 kill
+    select * from information_schema.innodb_trx where TIME_TO_SEC(timediff(now(),trx_started))>10
     ```
     
 - <b>SQL函数</b>
@@ -167,3 +184,6 @@
     -- 查看是否启用了查询缓存 
     show variables like '%query_cache%';
     ```
+
+- <b>Mysql其他</b>
+    1. 在一个表上有更新的时候，跟这个表有关的查询缓存会失效
