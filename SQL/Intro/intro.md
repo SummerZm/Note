@@ -32,7 +32,7 @@
             ```
             a. 关系型数据库采用了索引提升检索效率，但是针对全文索引效率却较低
             b. 搜索引擎的优势在于采用了全文搜索的技术，核心原理是“倒排索引
-            c.  全文搜索引擎有 Elasticsearch、Splunk 和 Solr
+            c. 全文搜索引擎有 Elasticsearch、Splunk 和 Solr
             ```
         - HBase - 列存储数据库
             ```
