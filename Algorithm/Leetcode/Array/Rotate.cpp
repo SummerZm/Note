@@ -6,7 +6,8 @@
  * 法2：额外数组 - 空间复杂度 O(n).
  * 法3：把数组当成一个环 - 会形成闭环.
  * 法4：将数组进行两次反转.
- * 注解: NULL
+ * 注解：NULL
+ * 链接：https://leetcode-cn.com/problems/rotate-array/
  */
 class Solution {
 public:

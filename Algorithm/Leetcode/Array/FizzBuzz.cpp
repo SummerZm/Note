@@ -7,6 +7,7 @@
  * 完成度: 80% - 2
  * 前置条件: NULL.
  * 注解: NULL
+ * 链接: https://leetcode-cn.com/problems/fizz-buzz/
  */
 class Solution {
 public:
@@ -38,7 +39,7 @@ public:
             string ret;
             for (auto f:dict) {
                 if (i%f.first==0) {
-                        ret += f.second;
+                    ret += f.second;
                 }
             }
             if (ret.empty()) {
