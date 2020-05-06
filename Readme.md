@@ -76,10 +76,41 @@
 |[Dir]	[Network](Linux/Network)  | <b>网络性能，nat相关知识</b>  |
 |[Dir]	[Other](Linux/Other) | <b>动态追踪内核，性能优化知识</b> |
 
-### **Dir: Algorithm **###
+### **Dir: Algorithm** ###
+> <b>编程就是在 同步，异步， 并发， 时间/空间限制不同场景下使用 判断，分支，循环对数据进行存储，分析，修改</b>
+- 概念解释
+    1. 数据结构：构建合适数据结构用于简洁高效的操作数据
+        - 例如：环形数组
+        - 难点：需求明确/逻辑严谨/接口设计相关经验
+
+    2. 数据处理：数据和数据存储结构的修改
+        - 例如：一维结构[array]改变成二维结构[set/map/tree/queue/heap]；
+        - 例如：双指针去重
+        - 难点：熟悉API。
+
+    3. 数据分析：寻找数据特性，根据特性进行数据处理
+        - 例如：简单数据特性 - 顺序、前N个、等等
+        - 例如：复杂数据特性 - 符合某种规则, 异位词、共同树祖先、等等
+        - 难点：寻找重复子问题；思维/逻辑严谨
+        - 备注：一些简单数据分析问题，在数据处理时就已经被解决了
+
 |File|Comment|
 |:---|:---|
-|[Dir] Base | <b>基础数据结构实现</b> |
-|[Dir] Leafxu | <b>算法笔记，心得，总结</b> |
-|[Dir] Leetcode | <b>常见题目</b> |
-|[Dir] Template | <b>高频代码模板</b> |
+|[Dir] Base | <b>目录：基础数据结构实现</b> |
+|[Dir] Leafxu | <b>目录：算法笔记，心得，总结</b> |
+|[Dir] Structure|<b>目录：构建合适数据结构用于简洁高效的操作数据</b>|
+|Note.md|构建简洁高效便于操作的数据结构注意点和一些实现|
+|[Dir] Process|<b>目录：数据和数据存储结构的修改</b>|
+|common.md|常见的数据处理转换代码模板|
+|[Dir] Analize|<b>目录：寻找数据特性，根据特性进行数据处理</b>|
+|qList.md|常见数据分析问题思路|
+|[Dir] Leetcode | <b>目录：Leetcode题目</b> |
+|[Dir] Array | <b>目录：数组题目</b> |
+|Rotate.cpp|旋转/环形mod数组 - 数据结构|
+|FizzBuzz.cpp|使用map映射-数据处理|
+|Remove-duplicates-from-sorted-array.cpp|双指针去重 - 数据处理|
+|groupAnagrams.cpp|Array->Map 转换成方便处理(统计)的数据 - 数据处理&分析|
+|valid-anagrams.cpp|比较数据是否具有共性 - 数据分析|
+|[Dir] Heap | <b>目录：堆题目</b> |
+|top-k-frequent-elements.cpp|一维数组转二维Map结构 - 数据处理|
+|[Dir] Tree | <b>目录：树题目</b> |
