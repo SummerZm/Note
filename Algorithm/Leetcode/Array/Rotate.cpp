@@ -11,6 +11,26 @@
  */
 class Solution {
 public:
+    void rotate1(vector<int>& nums, int k) {
+        int count = 0;
+        int len = nums.size();
+        k = k % len;
+        // 将已经处理了几个当做循环的终止条件
+        for (int start=0; count<len; start++) {
+            int prev = nums[start];
+            int current = start;
+            do {
+                int next = (current+k) % len;
+                int temp = nums[next];
+                nums[next] = prev;
+                prev = temp;
+                current = next;
+                count++;
+            } while (start != current);
+        }
+    }
+
+
     void rotate(vector<int>& nums, int k) {
         int tmp = 0;
         int len = nums.size();

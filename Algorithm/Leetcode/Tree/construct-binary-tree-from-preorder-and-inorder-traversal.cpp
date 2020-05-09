@@ -13,7 +13,9 @@
  *
  *  完成度：40%
  *  解法：递归/迭代
+ *  注解：使用Map加速，用先序创建结点，用中序构建树形关系.
  *  分类：数据处理
+ *  链接：https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal
  */
 struct TreeNode {
     int val;
