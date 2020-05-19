@@ -30,6 +30,21 @@
         ```
 
 ### <b>网络传输层优化</b> ###
+- 大量 TIME_WAIT 问题分析
+    1. TIME_WAIT是主动关闭连接的一方保持的状态，进入TIME_WAIT的状态，保持这个状态2MSL（max segment lifetime）时间之后，彻底关闭回收资源。
+    2. 对方连接的异常，或自己没有迅速回收资源。
+    3. 为啥还要保持资源一段时间呢？
+        ```sh
+        # 1. 防止上一次连接中的包，迷路后重新出现，影响新连接（经过2MSL，上一次连接中所有的重复包都会消失）
+        # 2. 可靠的关闭TCP连接：在主动关闭方发送的最后一个ack(fin) 有可能丢失，这时被动方会重新发fin,
+        #    如果这时主动方处于 CLOSED 状态 ，就会响应 rst 而不是 ack。
+        #    所以主动方要处于 TIME_WAIT 状态，而不能是 CLOSED 
+        # 3. TIME_WAIT会2MSL定时的回收资源，不存在挂死现象
+        ```
+
+- 大量 CLOSE_WAIT 问题分析
+    1. 服务器保持了大量CLOSE_WAIT状态： 原因只有一种情况，在对方关闭连接之后服务器程序自己没有进一步发出ack信号。 
+
 - 优化与 TIME_WAIT 状态相关的内核选项
     1. 增大处于 TIME_WAIT 状态的连接数量 net.ipv4.tcp_max_tw_buckets 
     2. 并增大连接跟踪表的大小 net.netfilter.nf_conntrack_max。
@@ -37,6 +52,7 @@
     4. 开启端口复用 net.ipv4.tcp_tw_reuse。这样，被 TIME_WAIT 状态占用的端口，还能用到新建的连接中。
     5. 增大本地端口的范围 net.ipv4.ip_local_port_range 。这样就可以支持更多连接，提高整体的并发能力。
     6. fs.nr_open 和 fs.file-max ，分别增大进程和系统的最大文件描述符数；或在应用程序的 systemd 配置文件中，配置 LimitNOFILE ，设置应用程序的最大文件描述符数。
+
 
 - 缓解SYN FLOOD等，利用TCP协议特点进行攻击而引发的性能问题
     1. 增大 TCP 半连接的最大数量 net.ipv4.tcp_max_syn_backlog
