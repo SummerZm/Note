@@ -148,6 +148,31 @@
     -- 查找耗时大于10s的事务
     -- 监控 information_schema.Innodb_trx 表，设置长事务阈值，超过就报警 / 或者 kill
     select * from information_schema.innodb_trx where TIME_TO_SEC(timediff(now(),trx_started))>10
+
+    -- 查询数据库中的存储过程和函数
+    select `name` from mysql.proc where db = 'xx' and `type` = 'PROCEDURE'
+    select `name` from mysql.proc where db = 'xx' and `type` = 'FUNCTION'
+    show procedure status; 
+    show function status;
+
+    -- 查看存储过程或函数的创建代码
+    show create procedure proc_name;
+    show create function func_name;
+
+    -- 查看视图
+　　select * from information_schema.VIEWS   //视图
+　　select * from information_schema.TABLES   //表
+
+    -- 查看触发器
+　　show TRIGGERS [FROM db_name] [LIKE expr]
+　　select * FROM triggers T WHERE trigger_name=”mytrigger” \G
+
+    -- 调用函数
+    select CountProc2(101);
+
+    -- 调用储存过程
+    call CountProc1(101 , @num);
+    SELECT  @num;
     ```
     
 - <b>SQL函数</b>
