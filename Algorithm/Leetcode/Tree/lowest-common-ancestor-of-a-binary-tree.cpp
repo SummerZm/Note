@@ -33,14 +33,23 @@
 
 class Solution {
 public:
+    /* 
+        A. 递归代码结构整个有三层：
+            1. 当前层要解决的问题.
+            2. 如何进入下一层.
+            3. 如何回到上一层.
+        B. 要识别问题的难点在哪一层                   
+    */
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
-         // <1> 递归 如果p和q在一边, 我们返回那一边它们的最近祖先; 在两边, 那么最近祖先就是root;遇到了p或者q, 就返回p或q, 否则返回NULL
+        // <1> 递归 如果p和q在一边, 我们返回那一边它们的最近祖先; 在两边, 那么最近祖先就是root;遇到了p或者q, 就返回p或q, 否则返回NULL
+        // 【当前层】
         if (root == nullptr|| root == p || root == q ) {
             return root;
         } 
-            
+        // 【进入下一层】  
         TreeNode* left =  lowestCommonAncestor(root->left, p, q); //在左子树和右子树中分别去找p,q的最近公共祖先
         TreeNode* right = lowestCommonAncestor(root->right, p, q);
+        // 【返回上一层】
         if(left && right) // p和q分别在root的左右两棵子树, 那么root就是最近公共祖先
             return root;
         else if(left == nullptr) // 说明p和q都不在左子树里, 那么只能返回右子树的结果

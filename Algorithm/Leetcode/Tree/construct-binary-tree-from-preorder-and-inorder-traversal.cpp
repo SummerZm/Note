@@ -43,6 +43,7 @@ class Solution {
 		}
 
 		/* 左闭右闭区间 */
+        /* 思路：找到最小子问题，根据思路中结点的处理顺序，写递归代码*/
 		TreeNode* build(vector<int>& preorder, int is,int ie,map<int,int>& m, int& cur){
 			if(ie<is)
 			return nullptr;
