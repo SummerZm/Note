@@ -1,5 +1,5 @@
 /*************************************************************************
- > File Name: lowest-common-ancestor-of-a-binary-tree.cpp
+ > File Name: minimum-height-tree-lcci
  > Author: Leafxu
  > Created Time: 2020年06月11日 星期三 12时36分52秒
  ************************************************************************/
