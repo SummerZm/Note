@@ -160,12 +160,12 @@
     show create function func_name;
 
     -- 查看视图
-　　select * from information_schema.VIEWS   //视图
-　　select * from information_schema.TABLES   //表
+    select * from information_schema.VIEWS   //视图
+    select * from information_schema.TABLES   //表
 
     -- 查看触发器
-　　show TRIGGERS [FROM db_name] [LIKE expr]
-　　select * FROM triggers T WHERE trigger_name=”mytrigger” \G
+    show TRIGGERS [FROM db_name] [LIKE expr]
+    select * FROM triggers T WHERE trigger_name=”mytrigger” \G
 
     -- 调用函数
     select CountProc2(101);
@@ -173,7 +173,14 @@
     -- 调用储存过程
     call CountProc1(101 , @num);
     SELECT  @num;
-    ```
+
+    -- 执行脚本法1
+    -- mysql -uroot -pxxxx -D[database] < [sql script]
+    -- -p : 密码； -D 指定：数据库； sql script 要执行的脚本路径名字
+    -- ex: mysql -uroot -p12345 -D test < backup.sql
+    -- 执行脚本法2
+    use datebaseName;
+    source /sql_script_path;
     
 - <b>SQL函数</b>
     1. SQL函数与SQL基础数据类型一一对应
