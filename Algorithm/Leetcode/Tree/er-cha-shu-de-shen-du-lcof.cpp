@@ -24,7 +24,7 @@
   *  解法：前序遍历， 后序遍历【尾递归加速】
   *  应用：
   *     
-  *  分类：数据查询
+  *  分类：数据分析
   *  链接：https://leetcode-cn.com/problems/er-cha-shu-de-shen-du-lcof/
   */
 class Solution {

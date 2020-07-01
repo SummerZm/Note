@@ -24,7 +24,7 @@
   *  解法：前序遍历 ， 中序遍历, O(n)
   *  应用： 
   *     
-  *  分类：数据查找
+  *  分类：数据分析
   *  链接：https://leetcode-cn.com/problems/search-in-a-binary-search-tree/solution
   */
  /**
