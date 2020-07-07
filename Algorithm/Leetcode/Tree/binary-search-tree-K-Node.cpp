@@ -35,6 +35,9 @@ public:
         return res;
     }
 
+    /* 难点1. 层数记录
+    *  难点2. 数据返回路径的方式
+    * */
     void dfs(TreeNode* root, int k, int* n, int* res){
         if (root==NULL) return;
         dfs(root->right, k, n, res);
@@ -43,4 +46,15 @@ public:
         dfs(root->left, k, n, res);
         return;
     }
+
+    /* 通过函数返回直接进行数据返回 */
+    int dfs1(TreeNode* root, int k, int* n, int res){
+        if (root==NULL) return res;
+        res = dfs1(root->right, k, n, res);
+        if (k==++(*n)) {
+            return root->val;
+        }
+        return dfs1(root->left, k, n, res);
+    }
+
 };
