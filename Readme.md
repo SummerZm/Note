@@ -4,6 +4,18 @@
 
 ## **Directories intro** ##
 
+### **[Latency in computer](./Hareware/latency.md)** ###
+|Time Cost||
+|:--|:--|
+|纳秒级|cpu计算cache访问|
+|10~100纳秒级|cpu访问内存|
+|微秒级|内存读取1M数据|
+|百微秒级|1.SSD读取1M数据; 2.局域网ping; 3.Redis一次查询|
+|毫秒级|机械硬盘读取1M数据|
+|10~100ms|1.域网ping; 2.局域网数据库查询|
+|秒级|访问网站|
+|||
+
 ### **Dir: C** ###
 > From 《C expert》
 
