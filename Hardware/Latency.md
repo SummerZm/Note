@@ -37,6 +37,7 @@
 |Path|CostTime|
 |:--|:--|
 |TCP 包重传|1~3s|
+|TCP keepalive设置|设置成ms级容易断连|
 |OS虚拟化系统重启|4s|
 |硬件虚拟化系统重启|40s|
 |物理服务器重启|5min|
