@@ -27,7 +27,7 @@
  *  要求：
  *  说明：
  *
- *  完成度：60%
+ *  完成度：70%
  *  解法：1. 开个数组中序遍历并将节点存一遍，在逐个返回。 2. 受控递归[自己控制递归栈]
  *  注解：
  *  分类：数据处理
@@ -48,6 +48,7 @@ private:
 
     stack<TreeNode*> quickIndex;
     void inOrderLeft(TreeNode* root) {
+        /* 子树所有左侧左结点加入到栈中 */
         while(root) {
             quickIndex.push(root);
             root = root->left;
@@ -67,6 +68,7 @@ public:
         TreeNode* min = quickIndex.top();
         quickIndex.pop();
         if (min->right!=NULL) {
+            /* 将当前结点右子树压栈形成局部有序-受控递归 */
             inOrderLeft(min->right);
         }
         return min->val;

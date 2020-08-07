@@ -52,9 +52,11 @@ public:
         // 清空-树指针指向关系.
         root->left = NULL;
         root->right = NULL;
-        // 递归-进入最底层.
-        auto res = upsideDownBinaryTree(l);
+        // 递归-进入最底层-res根节点
+        auto res = upsideDownBinaryTree1(l);
         // 重建当前层树指针指向关系.
+        // 把右子树挂到左子树左结点上
+        // 把当前根节点挂到左子树右节点上
         l->left = r;
         l->right = root;
         return res;
