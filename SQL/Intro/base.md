@@ -148,6 +148,21 @@
     -- 查找耗时大于10s的事务
     -- 监控 information_schema.Innodb_trx 表，设置长事务阈值，超过就报警 / 或者 kill
     select * from information_schema.innodb_trx where TIME_TO_SEC(timediff(now(),trx_started))>10
+    -- 查看表结构
+    desc user;
+    +-----------+--------------+------+-----+---------------------+----------------+
+    | Field     | Type         | Null | Key | Default             | Extra          |
+    +-----------+--------------+------+-----+---------------------+----------------+
+    | id        | int(11)      | NO   | PRI | NULL                | auto_increment |
+    | accout    | varchar(64)  | NO   |     | NULL                |                |
+    | password  | varchar(128) | NO   |     | NULL                |                |
+    | company   | varchar(64)  | YES  |     | NULL                |                |
+    | contact   | varchar(64)  | YES  |     | NULL                |                |
+    | name      | varchar(64)  | YES  |     | NULL                |                |
+    | creat     | timestamp    | NO   |     | CURRENT_TIMESTAMP   |                |
+    | lastmodiy | timestamp    | NO   |     | 0000-00-00 00:00:00 |                |
+    | rank      | int(11)      | NO   |     | NULL                |                |
+    +-----------+--------------+------+-----+---------------------+----------------+
 
     -- 查询数据库中的存储过程和函数
     select `name` from mysql.proc where db = 'xx' and `type` = 'PROCEDURE'
