@@ -196,6 +196,23 @@
     -- 执行脚本法2
     use datebaseName;
     source /sql_script_path;
+
+    -- 备份数据库【带数据】
+    mysqldump -uroot -pxxxx databaseName > databaseName.sql
+    -- 备份数据库【不带数据】 
+    mysqldump --no-data -uroot -pxxxx databaseName > databaseName.sql
+    -- 备份数据库【带drop语句--还原时会先drop掉旧表】
+    mysqldump --add-drop-table -hhostname -uroot -pxxx databaseName > databaseName.sql
+    -- 备份数据库某些表 【带压缩】
+    mysqldump -hhostname -uroot -pxxxx databaseName table1 table2 | gzip > databaseName.sql
+    -- 备份数据库【多个or全部】
+    mysqldump -hhostname -uroot -pxxxx --databases databaseName1 databaseName2 > datebaseNames.sql
+    mysqldump --all-databases -hhostname -uroot -pxxxx > allbackupfile.sql
+ 
+    -- 还原数据库【压缩or没压缩】
+    mysql -hhostname -uroot -pxxxx databaseName < databaseName.sql
+    gunzip < databaseName.sql.gz | mysql -hhostname -uroot -pxxxx databaseName
+    ```
     
 - <b>SQL函数</b>
     1. SQL函数与SQL基础数据类型一一对应
