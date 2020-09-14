@@ -1,6 +1,26 @@
 # **Introduction** #
 
 ## **Preview** ##
+> **对基础进行建设收益是最高的 -- 身体，人文，数学， 英语，基础工具**
+
+- **理科基础【原理/思维】：数学知识** - 自然科学物质运行规律
+    - 微积分 - 研究变化
+    - 概率论 - 
+    - 线性代数 - 
+    - 离散数学 - 
+
+- **工科基础【实践/经验】：框架意识** - 可拓展，可维护，简单，层次
+    - 设计模式
+    - 工具熟练度
+    - 知识面的广度
+    - 实际经验
+
+- **文科基础【沟通/价值】：认知能力** - 自科是第一生产力，人文定义社会价值
+    - 沟通能力 - 英语等
+    - 持续输出 - 细心，耐心, 专注
+    - 价值取向 - 坚固的心理精神内核
+
+- **健康身体：根本载体**
 
 ## **Directories intro** ##
 
@@ -108,24 +128,26 @@
 
 |File|Comment|
 |:---|:---|
-|[Dir] Base | <b>目录：基础数据结构实现</b> |
-|[Dir] Leafxu | <b>目录：算法笔记，心得，总结</b> |
-|[Dir] Structure|<b>目录：构建合适数据结构用于简洁高效的操作数据</b>|
+|**[Dir] Base** | <b>目录：基础数据结构实现</b> |
+|**[Dir] Leafxu** | <b>目录：算法笔记，心得，总结</b> |
+|**[Dir] Structure**|<b>目录：构建合适数据结构用于简洁高效的操作数据</b>|
 |Note.md|构建简洁高效便于操作的数据结构注意点和一些实现|
-|[Dir] Process|<b>目录：数据和数据存储结构的修改</b>|
+|**[Dir] Process**|<b>目录：数据和数据存储结构的修改</b>|
 |common.md|常见的数据处理转换代码模板|
-|[Dir] Analize|<b>目录：寻找数据特性，根据特性进行数据处理</b>|
+|**[Dir] Analize**|<b>目录：寻找数据特性，根据特性进行数据处理</b>|
 |qList.md|常见数据分析问题思路|
-|[Dir] Leetcode | <b>目录：Leetcode题目</b> |
-|[Dir] Array | <b>目录：数组题目</b> |
-|Rotate.cpp|旋转/环形mod数组 - 数据结构|
-|FizzBuzz.cpp|使用map映射-数据处理|
-|Remove-duplicates-from-sorted-array.cpp|双指针去重 - 数据处理|
-|groupAnagrams.cpp|Array->Map 转换成方便处理(统计)的数据 - 数据处理&分析|
-|valid-anagrams.cpp|比较数据是否具有共性 - 数据分析|
-|[Dir] Heap | <b>目录：堆题目</b> |
+|**[Dir] Leetcode**| <b>目录：Leetcode题目</b> |
+|**[Dir] Leetcode/Array** | <b>目录：数组题目</b> |
+|[1. Rotate.cpp](Algorithm/Leetcode/Array/Rotate.cpp)|旋转/环形mod数组 - 数据结构|
+|[2. FizzBuzz.cpp](Algorithm/Leetcode/Array/FizzBuzz.cpp)|使用map映射-数据处理|
+|[3. Remove-duplicates-from-sorted-array.cpp](Algorithm/Leetcode/Array/Remove-duplicates-from-sorted-array.cpp)|双指针去重 - 数据处理|
+|[4. groupAnagrams.cpp](Algorithm/Leetcode/Array/groupAnagrams.cpp)|Array->Map 转换成方便处理(统计)的数据 - 数据处理&分析|
+|[5. valid-anagrams.cpp](Algorithm/Leetcode/Array/valid-anagrams.cpp)|比较数据是否具有共性 - 数据分析|
+|[6. container-with-most-water.cpp](Algorithm/Leetcode/Array/container-with-most-water.cpp)|双指针夹逼法 - **二次方程降维** - 数据分析|
+|[7. move-zeroes.cpp](Algorithm/Leetcode/Array/move-zeroes.cpp)|快慢指针 - **归类一定顺序的数据** - 数据分析|
+|**[Dir] Leetcode/Heap** | <b>目录：堆题目</b> |
 |top-k-frequent-elements.cpp|一维数组转二维Map结构 - 数据处理|
-|[Dir] Tree | <b>目录：树题目</b> |
+|**[Dir] Leetcode/Tree** | <b>目录：树题目</b> |
 
 ### **Dir: Web** ###
 |File|Comment|
