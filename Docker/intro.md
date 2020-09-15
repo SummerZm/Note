@@ -158,6 +158,19 @@
     [root@xxx ~]# docker pull xianhu/centos:git
     ```
 
+- **容器与本地主机的文件拷贝**
+    ```sh    
+    #  1. 从容器里面拷某个目录的所有文件到本地主机 【在本地主机上面执行命令】 
+    #  docker cp 容器名：要拷贝的文件在容器里面的路径   要拷贝到本地主机的相应路径   
+    root@sz-H81U:/home/sz# docker cp -a fe5282e395eb:/demo_ws/ /home/sz/code/
+
+    # 2. 从本地主机拷文件到容器里面 【在本地主机上面执行命令】
+    # docker  cp  要拷贝的文件路径  容器名:要拷贝到容器里面对应的路径
+    root@sz-H81U:/home/sz/code# docker cp a.txt 47683ef9b01e:/demo_ws/a.txt
+
+    #  3. 不管容器有没有启动，拷贝命令都会生效
+    ```
+
 - **利用Docker创建一个用于Flask开发的Python环境**
     ```sh
     #【镜像更新的两种方式-回顾】
