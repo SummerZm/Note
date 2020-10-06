@@ -1,0 +1,41 @@
+A. 棋盘状态模型
+	1. Warren Smith 的模型
+		--> 一维棋盘模型 [一维数组] 
+		--> 步进数组 {1，9，11，10}
+		
+B. 扫描线的数据模型
+	typedef struct tagLines
+	{
+		int line_s[MAX_LINE_S]; //起点数组
+		int off_dir; //步进量
+	}LINES;
+
+C. 禁手表
+	typedef struct tagForbiddenItem
+	{
+		int off_step[MAX_FORBIDDEN_PATTERN];
+		int off_cnt;
+	}FORBIDDEN_ITEM;
+
+	FORBIDDEN_ITEM forbidden_patterns[] = 
+	{
+		{ { -1,-2,-3,10,20,30 }, 6 },
+		{ { -1,-10,1,2,10,20 },  6  },
+		{ { -10,-11,11,20 },     4  },
+		{ { -1,1,-10,10 },       4  }
+	};
+	
+	bool GameState::IsMatchSingleForbidden(FORBIDDEN_ITEM& item, int cell, int player_id)
+	{
+		int match_cnt = 0;
+		for(int j = 0; j < item.off_cnt; j++)
+		{
+			int cf = cell + item.off_inc[j];
+			if((cf >= 0) && (cf < BOARD_CELLS))
+			{
+				match_cnt += ((m_board[cf] == player_id) ? 1 : 0);
+			}
+		}
+
+		return (match_cnt == item.off_cnt);
+	}

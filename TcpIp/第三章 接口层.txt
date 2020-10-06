@@ -1,0 +1,177 @@
+************************************************
+ Author : Leafxu
+ Create : 2018-02-09 17:00:00
+************************************************
+
+1. ifnet结构
+	A. ifnet 可以划分为五部分
+		a. 实现信息 --> 内核识别设备需要的一些信息(唯一标识)
+		b. 硬件信息 --> 数据链路类型  (链路层接口特性,波特率等)
+		c. 接口统计 --> SNMP的MIB-II (MIB简单网络管理信息库)
+		d. 函数指针 --> 由设备驱动函数初始化; 函数指针的调用： (*ifp->if_start)(ifp)
+			1. if_init   初始化接口
+			2. if_output 对要输出的传输分组进行排队
+			3. if_start  启动分钟传输
+			4. if_done   传输完成后的清除(未用)
+			5. if_ioctl  处理IO控制命令
+			6. if_reset  复位接口设备
+			7. if_watchdog  周期性接口例程
+
+		e. 输出队列 --> 输出队列结构体详解
+			
+			struct ifqueue {
+				struct mbuf *ifq_head;
+				struct mbuf *ifq_tail;
+				int ifq_len;
+				int ifq_maxlen;
+				int ifq_drops;
+			} if_snd;
+		
+	
+	B. 每个网络设备都用一个ifnet, 支持多种协议(internet/OSI 等), 每种协议可以有多个IP地址
+	
+	
+2. ifaddr 结构
+	A. 位于ifnet结构体 - 实现信息部分 - struct ifaddr *if_addrlist 成员
+	B. ifaddr结构体声明代码
+		
+		struct ifaddr {
+			struct ifaddr *ifa_next;   // 这个结构体是IP地址信息链表
+			struct ifnet *ifa_ifp;     // 指回父结构ifnet的指针
+			
+			// 存放IP地址
+			struct sockaddr *ifa_addr;     // 常用协议类型的IP地址存放在这里
+			struct sockaddr *ifa_dstaddr;  // 其他协议类型或p-to-p链接地址
+			struct sockaddr *ifa_netmask;  // 子网掩码
+			
+			// 支持路由查找
+			void (*ifa_rtrequest)();
+			u_short ifa_flags;
+			short ifa_refcnt;
+			int ifa_metric;
+		}
+		
+		
+3. sockaddr结构 
+	A. 可变长结构体，最大长度不能超过256字节
+	B. sockaddr结构体声明
+		
+		struct sockaddr {
+			u_char sa_len; 		// 实现可边长结构体的关键
+			u_char sa_family;	// 地址所属的协议族
+			char  sa_data[4];   // 存放地址(可变长)
+		}
+		
+	C. sockaddr中的sa_family选项 -- 协议家族
+		a. AF_INET         -- Internet
+		b. AF_ISO, AF_OSI  -- OSI 
+		c. AF_UNIX         -- Unix
+		d. AF_ROUTE 	   -- 路由表
+		e. AF_LINK		   -- 数据链路
+		f. AF_UNSPEC	   -- 视情况而定，大多数情况包含一个以太网地址
+		
+
+4. ifnet与ifaddr专用化
+
+	引语：ifnet与ifaddr如何适用于其他设备和协议的专用信息？ 这是一个值得学习的技巧
+	A. 以太网专有化例子
+		
+		struct arpcom {
+			struct ifnet ac_if;
+			
+			// 以太网专用信息
+			u_char ac_enaddr[6];	   // 物理地址
+			struct in_addr ac_ipaddr;  // 上一次分配给该设备的IP
+			struct ether_multi *ac_multiaddrs;  // 多播信息
+			int ac_multicn;	// 多播信息
+		};
+		
+		struct le_softc {
+			struct arpcom sc_ac;
+			#define sc_if    sc_ac.ac_if;
+			#define sc_addr  sc_ac.ac_enaddr;
+			....
+		} le_softc[NLE];
+		
+		arpcom嵌套ifnet, le_softc嵌套arpcom, 仔细分析可知：ifnet是arpcom, le_softc结构体首位置
+		arpcom, le_softc可以被强制转换成 ifnet.
+	
+	
+5. 网络初始化概述
+	A. 初始化流程：
+		a. cpu_startup() --> 硬件设备init, 查找
+		b. (*pdev->pdev_attach)(pdev->pdev_count); --> 伪设备初始化
+		c. s = splimp(); --> 设置优先级
+		d. ifinit(); --> init网络结口
+		e. domaininit(); --> 协议初始化
+		f. splx(s); --> 恢复优先级
+		
+	B. SLIP和环回接口是伪设备
+	
+		a. 存储在内核全局数组 pdevinit 数组中
+		b. pdevinit数组
+		
+			struct pdevinit pdevinit[] = {
+				{slattach, 1},
+				{loopattach, 1},
+				{0, 0}
+			};
+		
+	C. 网络设备专用初始化函数
+		a. 以太网 --> leattach()
+		b. SLIP --> slattach()
+		c. 环回 --> loopattach()
+
+	D. cpu_startup()函数
+		a. 为所有的网络设备调用专用初始化函数
+		b. 以太网的leattach
+			1. 内核在全局维护了一个以太网卡列表 le_softc[..]
+			2. 从设备中复制硬件地址
+			3. 初始化专用ifnet结构 (从le_softc[...]获取，然后进行赋值)
+			4. 调用if_attach(ifnet); 绑定专有ifnet结构
+		
+		c. 网络接口绑定函数 if_attach()
+			1. if_attach核心功能： 关联网卡设备表ifnet 和 地址设备表 ifnet_addrs (全局变量)
+			
+			2. if_attach执行流程
+				a. 若ifnet_addrs不存在， 分配ifnet_addr数组.
+				b. 创建链路层名称 sockaddr_dl.
+				c. 复制链路层地址 物理地址
+				d. 设置掩码用于获取链路层名称 
+				e. 调用ether_ifattach，对所有以太网设备进行通用的的ifnet结构初始化
+			
+			3. ifnet:        --> le_softc[..]  -->  sl_softc[0]  --> loif       // 网卡设备列表
+			   ifnet_addrs:  --> ifaddr{}      -->  ifaddr{}     --> ifaddr{}   // 地址设备列表
+				
+			4. 设备物理地址结构体： sockaddr_dl
+				
+				struct sockaddr_dl {
+					u_char sdl_len;
+					u_char sdl_family;
+					u_short sdl_index;
+					
+					u_char sdl_type;  // 内核标识接口
+					u_char sdl_nlen;
+					
+					u_char sdl_alen;
+					u_char sdl_slen;
+					char   sdl_data[12];  // 例如：第一个SLIP串行口“s10”，第一个以太网口“le” 6字节48bit的物理地址
+				};
+				sockaddr_dl 存放链路层的地址：物理地址 + 逻辑地址（名称，内核索引）
+			
+	E. if_init函数
+		a. 设置的每个接口的输出队列。
+		b. 为接口启动监视计时器，接口时钟周期到期，内核会调用这个接口的把关定时函数。
+		
+		
+
+
+
+
+
+
+
+
+
+
+	

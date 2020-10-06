@@ -1,0 +1,49 @@
+************************************************
+ Author : Leafxu
+ Create : 2018-02-09 17:00:00
+************************************************
+
+1. 内核进程表[proc] 中维护一个文件表结构 filedesc; 
+2. 进程打开的文件表[filedesc] 维护着 fd_ofileflags 和 fd_ofiles 两个数组;
+
+3. 文件描述符标志[fd_ofileflags]- 8 bit 
+	A. 两个可以为所有描述符设置的标志
+		a. FD_CLOEXEC标志: fork进程时如果设置了FD_CLOEXEC，打开的文件描述符，在执行exec被关闭;
+		b. Mapped-from-device标志
+
+4. 文件结构体[fd_ofiles]维护着三个重要的结构体 f_ops, f_data, f_type.
+	A. 描述符操作函数集 f_ops : fo_write, fo_read, ....
+	B. 描述符数据类型 f_data
+		a. 网络数据：f_data指向socket结构
+		b. 文件数据: f_data指向vnode结构
+	C. 描述符类型
+		a. 网络类型：DTYPE_SOCKET
+		b. 其他类型: DTYPE_VNODE - [磁盘文件系统, NFS, CD-ROM文件系统]
+
+5. 网络描述符[socket] 也维护着三个重要的结构体 so_type, so_pcb, so_snd
+	A. so_type: 网络数据包的类型：SO_DGRAM(报文包)和SOCK_STREAM(数据流包)
+	B. so_pcb：internet协议控制块
+	C. so_snd: 指向mbuf结构体. mbuf存放发送/接收的网络数据。 
+	
+	
+1. 网络数据包接收处理流程：
+	A. 硬件接受网络数据，接收完后触发中断
+	B. 以太网设备驱动程序处理中断生成mbuf, 并传给以太网输入例程
+	C. 以太网输入例程触发软中断，进入IP输出例程
+	D. IP输入例程校验数据, 传给上层例程 UDP/TCP/ICMP ...
+	
+	
+1. 中断级别与并发
+	A. 分配优先级函数 (从低到高)
+		a. spl0: 正常操作方式，不阻中断
+		b. Splsoftclock: 低优先级时钟处理
+		c. splnet：网络协议处理
+		d. spltty: 终端输入输出
+		e. splbio: 磁盘输入输出
+		f. splimp: 网络设备输入输出
+		g. splclock: 高优先级时钟处理
+		h. splhigh: 阻塞所有中断
+		i. splx(s): 回到原来优先级
+		
+	B. 网络处理程序例程代码中： 需要使用splimp函数提高的CPU优先级，防止被中断。
+	

@@ -1,0 +1,182 @@
+欧拉图与弗罗莱（Fleury）算法
+============================================================
+A. 欧拉回路
+	a. 从图论的角度看，有向图和无向图都有欧拉回路的概念，但是判定的方法不一样
+	b. "一笔画"游戏
+		1. 所有点的连接边数都是偶数的情况
+		2. 连接边数是奇数的点有且只有两个的情况
+			-- 第一种情况从任何点开始都可以完成一笔画，
+			-- 第二种情况只能从其中一个奇数点开始到另一个奇数点结束才能一笔画成。【欧拉路径】
+			
+	c. 无向图中存在欧拉回路的条件是每个顶点的度数都是偶数
+	d. 有向图中存在欧拉回路的条件是每个顶点的入度 = 出度
+	
+B. 问题集
+	a. 如何快速判断一个图是不是欧拉图?
+	b. 在图中寻找欧拉回路?
+	
+C. 算法分析
+	a. 判断图的连通性，主要关注的是顶点的连接关系 -- [邻接表]
+		typedef struct
+		{
+			bool visited;
+			std::vector<int> relVertex;  //相邻边顶点
+		}VERTEX_NODE;
+
+		typedef struct
+		{
+			int count;   //图的顶点的个数
+			VERTEX_NODE vertexs[MAX_VERTEXNODE];  //图的顶点列表
+		}EU_GRAPH;
+		
+	b. 连通图相关概念
+		1. 无向图中任意两点都有边相连，则这个无向图是个连通图
+		2. 有向图，如果任意两点都是双向连通的话，这个图就是强连通图
+		
+	c. 无向连通图的遍历
+		1. 深度优先遍历
+			void DsfEnumeration(EU_GRAPH& g, int node)
+			{
+				g.vertexs[node].visited = true; //设置当前点的访问标志
+				for (int i : g.vertexs[node].relVertex)
+				{
+					if (!g.vertexs[i].visited) //i 是 node 的相邻点，并且 i 没有被访问过
+					{
+						DsfEnumeration(g, i);
+					}
+				}
+			}
+			
+			
+		2. 广度优先遍历 
+			void BsfEnumeration(EU_GRAPH& g, int node)
+			{
+				std::queue<int> q;
+				q.push(node);    //起始位置入队列
+
+				while (!q.empty())
+				{
+					int cur = q.front(); //取队首元素（顶点编号）
+					q.pop();   //删除队首元素
+					g.vertexs[cur].visited = true;   //设置访问标志
+					for (int i : g.vertexs[cur].relVertex)
+					{
+						if (!g.vertexs[i].visited)   //i 是 cur 的相邻点，并且 i 没有被访问过
+						{
+							q.push(i); //没有被访问过的顶点入队列
+						}
+					}
+
+				}
+			}
+			
+		3. 判断是否连通 -- isvisited
+			bool IsConnected(EU_GRAPH& g)
+			{
+				for (int i = 0; i < g.count; i++)
+				{
+					if (!g.vertexs[i].visited)
+					{
+						return false;
+					}
+				}
+				
+				return true;
+			}
+		
+		4. 是否为欧拉图  -- 顶点边为偶数
+			bool IsEuler(EU_GRAPH& g)
+			{
+				if (!IsConnected(g))
+				{
+					return false;
+				}
+
+				for (int i = 0; i < g.count; i++)
+				{
+					int n = g.vertexs[i].relVertex.size();
+					if ((n & 1) != 0)
+					{
+						return false;
+					}
+				}
+
+				return true;
+			}
+		
+		5. 欧拉回路路径
+			-- 图的数据模型: 邻接矩阵  -- 边的删除添加操作比较多
+			-- 算法原理
+				-> 无向欧拉图
+				-> 任取 G 中的一个顶点
+				-> 假设沿着 P_{i} = V{0}E{1}V{1}E{2}V{2}...E{i}V{i}P 到达顶点 V{i}
+					--> 从剩下边集中选Ei+1，必须满足
+					--> Ei+1与Ei相连
+					--> 除非没有别的边可供选择，否则E不应该是剩下边集的【桥】 
+					
+					void fleury(FE_GRAPH& g, std::queue<int>& s, int cur, int start)
+					{
+						bool flag = false;      //是否还有与 cur 关联的边
+						s.push(cur);            //当前顶点入栈
+						for (int i = start; i < g.vertexs; i++)
+						{
+							if (g.edge[cur][i] == 1)    //当前顶点与 Vi 相连
+							{
+								flag = true;
+								DeleteEdge(g, cur, i);      //删除当前顶点与 vi 的边，然后从 vi 开始继续搜索
+								fleury(g, s, i, 0);
+								break;
+							}
+						}
+
+						//没有顶点与当前节点 cur 相连
+						if (!flag)
+						{
+							s.pop();        //抛弃最后入栈的那个顶点
+							int m = s.front();
+							AddEdge(g, cur, m);     //没有顶点与当前顶点相连，说明之前删除的是桥，先恢复这条边
+							int new_start = cur + 1; //从当前顶点的下一个顶点继续搜索
+							if (s.size() == g.edges)  //路径 P 中的边数与图的边数相等
+							{ 
+								s.push(cur);
+							}
+							else
+							{
+								s.pop();
+								fleury(g, s, m, new_start);
+							}
+						}
+					}
+D. 判断无向图是不是连通图，还有一种效率比较高的并查集方法
+	a. 并查集的原理
+		1. 初始化时将每个节点看作一个集合
+		2. 每扫描一条边就把连接的两个节点的集合合并，
+		3. 最后遍历完所有的边，剩下几个集合就是图中有几个连通分量，若只有一个集合，则说明是一个连通图，
+		
+	b. 并查集方法通常情况下时间效率较高，还能判断一个图是否有回路。
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		

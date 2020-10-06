@@ -1,0 +1,84 @@
+************************************************
+ Author : Leafxu
+ Create : 2018-02-09 17:00:00
+************************************************
+
+1. mbuf的四种类型
+	A. mbuf只包含数据并且数据长度 <= 108 bytes
+	B. mbuf包含分组首部并且数据长度 <= 100 bytes
+	C. mbuf不包含分组首部，但数据长度 > 208 bytes, mbuf指针指向2048字节内存 
+	D. mbuf包含分组首部，但数据长度 > 208 bytes, mbuf指针指向2048字节内存
+
+   mbuf是一个大小为128字节的结构体
+   
+2. mbuf结构声明代码：
+	struct m_hdr {
+		struct mbuf *mh_next; // 这个分组的下一个mbuf
+		struct mbuf *mh_nextpkt; // 链接形成分组链表
+		int mh_len;
+		caddr_t mh_data;
+		short mh_type; // mh_data存了什么数据
+		short mh_flags; // 链路层广播/多播，分组的结束/开始， 是否带2048字节的簇
+	}
+	
+	struct pkthdr { // 分组首部
+		int len;
+		struct ifnet *rcvif
+	}
+	
+	struct m_ext { // 2048字节的外部内存
+		caddr_t ext_buf;
+		void (*ext_free)();
+		u_int ext_size;
+	}
+	
+	struct mbuf {
+		struct m_hdr m_hdr;
+		union {
+			struct {
+				struct pkthdr MH_pkthdr; // 带分组头部的mbuf
+				union {
+					struct m_ext MH_ext; // 带分组头部的mbuf, 2048外部内存。   1.C 1.D
+					char MH_databuf[MHLEN]; // 带分组头部的mbuf， MHLEN = 100  1.B
+ 				} MH_dat;
+			} MH;
+			char M_databuf[MLEN]; // 数据108字节  1.A
+		} M_dat;
+	};
+	
+	#define m_next  m_hdr.mh_next;
+	#define m_len   m_hdr.mh_len;
+	#define m_data  m_hdr.mh_data;
+	#define m_type  m_hdr.mh_type;
+	.....
+	#define m_dat   M_dat.M_databuf;
+	
+	注： 这种数据结构写法值得学习。
+
+	
+3. m_buf存放的数据 Mbuf m_type
+
+	A. MT_CONTROL  -->  外部数据协议报文
+	B. MT_DATA -->  动态数据分配
+	C. MT_FTABLE -->  分片重组首部
+	D. MT_HEADER -->  分组首部
+	E. MT_HTABLE -->  IMP主机表
+	F. MT_IFADDR -->  接口地址
+	G. MT_OOBDATA -->  加速数据
+	H. MT_PCB  --> 协议控制块
+	I. MT_RTABLE -->  路由表
+	J. MT_SONAMW  -->  插口名称
+	K. MT_SOOPTS -->  插口选项
+	L. MT_SOCKET -->  插口结构
+
+	[A, B, D, E, J, K] ---> net/3 TCP/IP
+
+4. 实用宏
+	A. #define mtod(m, t) ((t)((m)->m_data))
+	B. #define dtom(x)  ((struct mbuf*)((int)(x) & ~(MSIZE-1))) 
+	// mbuf结构体大小 MSIZE = 128
+	// 内核总是为mbuf分配 MSIZE 连续的内存
+	// dtom 清除指针的低位, 进而发现 mbuf 的地址
+	
+
+	

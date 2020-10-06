@@ -1,0 +1,83 @@
+************************************************
+ Author : Leafxu
+ Create : 2018-02-10 11:00:00
+************************************************
+
+1. 以太网卡接收分组
+	A. leintr中断函数： 
+		a. 硬件传输完一个完整的帧时，触发leintr中断。
+		b. leintr调用leread将这个帧从接口复制到的mbuf链中。
+		c. 更新接口统计
+	
+	B. leread函数
+		a. 参数：设备接口，驱动数据帧buf，数据长度
+		b. 将数据帧buf,转换成ether_header结构体
+			struct ether_header{
+				u_char ether_dhost[6]; // 目的地址
+				u_char ether_shost[6]; // 源地址
+				u_short ether_type;    // 以太网IP/ARP包
+			}
+			
+		c. 流程：
+			1. 数据帧mbuf转换成结构体 ether_header
+			2. 广播地址检查
+			3. 混杂模式BPF检查/处理
+			4. m_devget 将数据从缓存中复制到 它分配的的mbuf链中
+
+	C. ether_input函数
+ 		a. 将接收到的分组加入到队列中等待处理.
+		b. 参数：
+			1. ifp: 指向接收此分组的ifnet接口
+			2. eh: 指向接收分组的以太网首部指针
+			3. m:  指向接收分组的指针(不包括以太网首部)
+
+		c. ether_input 识别广播多播
+		d. ether_input 根据 ether_type [ETHERTYPE_IP|ETHERTYPE_ARP] 分配 
+		
+2. 以太网发送分组
+	A. ether_output函数： 所有以太网设备的if_output是 ether_output.
+		a. 参数：
+			1. 设备接口：struct ifnet *ifp
+			2. 分组指针: struct mbuf  *m
+			3. 目标地址: struct sockaddr *dst
+			4. 路由信息: struct rtentry *rt0
+			
+		b. 流程:
+			1. 检查网口是否打开
+			2. 检查主机路由
+			3. 检查网关路由
+			4. 是否响应ARP请求(禁用-避免ARP防洪)
+			5. IP输出 --> 根据目标地址结构体中的sa_family 进行跳转 [ AF_INET | AF_ISO | AF_UNSPEC ]
+				A. AF_INET协议族
+					a. 如果IP不在的高速缓存中，则推出交由ARP
+					b. 判断是否的是广播,如果是，则复制分组备份给自己
+			6. 计算CRC，由以太网硬件在传输时计算
+			7. 检查帧是不是为空，若为空，则丢弃帧。若不为空，则加入队列, 调用if_start发送数据
+			8. if_start 调用 lestart 从设备中输出队列中取出帧，交给以太网卡发送
+			
+3. ioctl系统调用
+	A. 获取系统插口和配置信息
+		a. ioctl(描述符, 命令, 存数据的databuff)
+		b. ioctl 处理插口时调用 soo_ioctl; 处理终端时调用 cttyioctl
+		c. soo_ioctl 调用 ifioctl 
+		d. ifioctl接受4个命令
+			1. SIOCGIFCONF	--->  获取接口配置清单
+			2，SIOCGIFFLAGS --->  获取接口标志
+			3. SIOCGIFMETRIC -->  获取接口度量
+			4. SIOCSIFFLAGS --->  设置接口标志
+			5. SIOCSIFMETRIC -->  设置接口度量
+		
+		e. 当传入的命令是 SIOCGIFCONF时, ifioctl调用ifconf获取接口信息.
+		f. ifconf：标准的系统接口信息获取函数. 返回（struct ifconf）的databuff
+
+	B. if_down和if_up函数是通过 ioctl 设置 SIOCSIFFLAGS 实现
+	
+	
+	
+	
+	
+		
+		
+		
+		
+		
