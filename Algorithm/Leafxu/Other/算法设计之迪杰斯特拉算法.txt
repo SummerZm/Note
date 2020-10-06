@@ -1,0 +1,161 @@
+Dijkstra -- “迪杰斯特拉算法”
+------------------------------------------------
+A. 解单源最短路径问题的经典算法，算不上高效，但确实是最简单的算法
+B. 使用可用算法解决实际问题
+    a. 首先要解决数据模型的问题，即需要定义一个能参与到算法运算中的数据结构，存放初始值、结果和运算过程中产生的中间数据；
+    b. 其次是将文字描述的算法原理解释成程序代码
+    c. 最后是将运算结果转化成人类能理解的方式，或按照题目要求的方式输出出来。
+
+C. 一直以来的重点
+    a. 引导读者从一个文字描述的算法理论开始，逐步分析、建模，最终将理论翻译成算法代码。
+    b. 介绍分析的方法、建模需要考虑的问题以及算法实现用到的技巧
+
+D. Dijkstra 算法分析与设计  -- 【带权有向图】
+    a. Dijkstra 算法原理分析
+        1. 对于任意一个顶点到其他顶点的最短路径求解过程
+            --  对于一个带权有向图 G=(V,E)，其中任意两个相连顶点 Vi 和 Vj 间的距离用权重表示为：w(Vi,Vj)
+            --  准备一个集合 T 存放当前已经找到最短路径的顶点集，再准备一个数组 dist 存放起始点到各个顶点的最短路径，即 dist[Vx] 表示起始点到顶点 Vx 的最短路径值。
+            --  将 T 初始化为只包含起始点 S 的状态，即 T{S}，S 可以是任意一个顶点 Vx；
+            --  dist 数组的值为起始点 S 到顶点 Vx 的边的权重，即 dist[Vx] = w(S,Vx)，如果起始点 S 到 Vx 没有路径相连，则将其值设置为无穷大。对于起始点 S，则设置 dist[S] = 0。
+            --  对于所有不属于集合 T 的顶点 Vi，从 dist 数组中寻找最小值 dist[Vi]，这个最小值 dist[Vi] 就是起点到顶点 Vi 的最短路径，将顶点 Vi 加入到集合 T 中
+            --  对于新加入的顶点 Vi，查看 Vi 能够到达的所有顶点，计算通过 Vi 到达其他顶点的路径长度是否比起始点直接到达该顶点的长度短，如果是，则替换 dist 数组中对应顶点的值。
+            --  重复上述Vi过程，直到集合 T 包含了所有顶点。
+
+            通过上述原理的描述，可以看出来这个算法需要遍历途中的所有顶点，并且是按照广度优先的方式遍历的。遍历采用的是迭代法，每个迭代完成一个顶点的处理。
+
+    b. 准备数据模型
+        1. Dijkstra 算法适用于权值为非负数的有向图，要实现这个算法，绕不开图的定义。
+        2. 如果采用邻接矩阵的方式，则简单很多，矩阵中每个元素的值就是对应边的权重，算法实现的时候可以利用顶点下标直接从二维数组中获取该值。
+        3. 每个适用 Dijkstra 算法的例题都有各自不同的描述方法，问题抽象之后的那个“图”和求解最短路径的起始点。
+            typedef struct
+            {
+                int vertexs;  //题目给出的实际顶点个数
+                int w[MAX_VERTEX][MAX_VERTEX]; //图的权重矩阵，表示顶点间的距离
+                int start_vertex;   //起始点编号
+            }Problem_T;
+
+            typedef struct
+            {
+                int value;
+                bool is_in_t;   // 是否集合T中
+            }Dist_T;
+
+            typedef struct
+            {
+                int vertexs;  //题目给出的实际顶点个数
+                int T[MAX_VERTEX];  //集合T - 【下标/权重值】
+                int tc; //当前T中顶点个数
+                Dist_T dist[MAX_VERTEX];  //dist数组
+            }Dijkstra_T;
+
+        4. 对 Dijkstra_T 数据结构中的 T 和 dist 进行初始化。
+
+            void init_dijkstra(Dijkstra_T *dj, Problem_T *p_data)
+            {
+                //将 T 初始化为只包含起始点 S 的状态，即 T{ S }
+                dj->T[0] = p_data->start_vertex;
+                dj->tc = 1;
+
+                //初始化 dist 数组的值为起始点 S 到顶点 Vx 的边的权重，即 dist[Vx] = w(S, Vx)
+                dj->vertexs = p_data->vertexs;
+                for (int i = 0; i < dj->vertexs; i++)
+                {
+                    dj->dist[i].is_in_t = false;
+                    //对无穷大的处理，已经隐含在邻接矩阵 w 的处理中了
+                    dj->dist[i].value = p_data->w[p_data->start_vertex][i];
+                }
+                //起始点特殊处理一下
+                dj->dist[p_data->start_vertex].is_in_t = true;  //起始点初始化在 T 中了
+                dj->dist[p_data->start_vertex].value = 0; //对于起始点 S，则设置 dist[S] = 0；
+            }
+
+            void dijkstra(Dijkstra_T *dj, Problem_T *p_data)
+            {
+                while (dj->tc < dj->vertexs) //直到集合 T 包含了所有顶点，第（5）步描述的循环终止条件
+                {
+                    //第（3）步
+                    //对于所有不属于集合 T 的顶点 Vi，从 dist 数组中寻找最小值 dist[Vi]
+                    int min_dist = INFINITE;
+                    int min_vi = -1;
+                    for (int i = 0; i < dj->vertexs; i++)s
+                    {
+                        if (!dj->dist[i].is_in_t && (dj->dist[i].value < min_dist))
+                        {
+                            min_dist = dj->dist[i].value;
+                            min_vi = i;
+                        }
+                    }
+
+                    //将顶点 Vi 加入到集合T中，完成第（3）步
+                    dj->T[dj->tc] = min_vi; //新加入顶点 min_vi
+                    dj->tc++;
+                    dj->dist[min_vi].is_in_t = true;
+
+                    //第（4）步
+                    //对于新加入的顶点 Vi，查看 Vi 能够到达的所有顶点
+                    for (int j = 0; j < dj->vertexs; j++)
+                    {
+                        if (p_data->w[min_vi][j] < INFINITE) //从 min_vi 能直接到达 j
+                        {
+                            //距离。dist 中的距离是之前用贪婪策略得到的最短距离（局部最优解），实际可能并不是最短的距离, 需要更新计算
+                            //从起点到 min_vi 的最小距离加上 min_vi 到 j 的距离之和小于从起点直接到 j 的距离
+                            int new_dist = dj->dist[min_vi].value + p_data->w[min_vi][j];
+                            if(new_dist < dj->dist[j].value)
+                            {
+                                //替换 dist 数组中对应顶点的值
+                                dj->dist[j].value = new_dist;
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            这里需要说明一下对无穷大的处理方式。计算机无法表示无穷大和无穷小，一般的处理原则是用一个计算机能表达的特殊值代替无穷大或无穷小；
+            很多人喜欢用“−1”这样的负数表示这个特殊值，以区别正数表示的距离值。实际上这是个不好的习惯，除非别无选择，否则尽量不要使用这种方法。好的做法是，使用一个明显超出问题域中各值范围的正整数值来表示无穷大的概念，这样选择可以很好地满足代码处理的一致性原则
+
+    c. 如何输出路线
+        -- 宋江的困扰
+
+            一心想被招安的宋江终于如愿以偿，为了向朝廷递上投名状，宋江被高太尉忽悠去攻打方腊。从梁山到方腊路途遥远，中间间隔众多城镇，这些城镇之间要么是水路相连、要么是山路、要么是平康大道、要么是被山挡着，不能直接到达。梁山大军从一个城镇移动到另一个城镇需要的时间各不相同，如何用最短的时间抵达方腊，这个问题一直困扰着宋江，请你帮宋江解决这个问题吧，规划一条从梁山到方腊的路线，使得梁山大军能用最短的时间到达方腊。
+
+            测试数据的格式如下，第一行是一个数字，表示城镇的数量 n，2 ≤ n < 20；第二行是对应城镇的名称，中间用空格隔开；第三行是两个数字，分别表示梁山对应的编号和方腊对应的编号，城市编号从 0 开始；第四行是城镇之间交通信息的数量。之后紧跟着 M 行交通信息，每行有三个数字，分别是起点城镇的编号、终点城镇的编号和这两个城镇的交通时间，单位是天。
+
+            根据题目分析，这是个求最短路径的问题，每个城镇看作是图上的一个顶点，城镇之间的交通时间可视为边的权，这个数始终为正数，符合 Dijkstra 算法的要求，可以应用 Dijkstra 算法求解。确定了算法，接下来就看如何把题目描述的信息转化成算法要求的数据模型。Dijkstra 算法可以计算出从起始点到任意点的最短路径，把梁山作为起始点，找到方腊对应的 dist 值没有问题，但是这个题目要求输出从梁山到方腊的路线，这就需要我们修改数据模型的定义，增加最短路径的节点信息，最后在输出信息的时候，除了输出花费的行军时间，还要输出行军路线。
+
+            首先修改 Dist_T 数据结构的定义，增加路径信息 path，Dist_T 原本设计就是存放最终结果，路径信息放在这里最合适。
+
+            typedef struct
+            {
+                int value;     
+                int path[MAX_VERTEX];
+                int pc;
+                bool is_in_t;  
+            }Dist_T;
+            接下来对第（2）步初始化的算法代码进行修改，增加 path 的初始化。path 初始化的原则是当存在从起始点到 Vi 的通路时（两个城镇没有被山挡着），则将起始点增加到 path 中，说明当前 dist[Vi] 的值是从起始点到 Vi 的距离，起始点是这条路径的第一个点。需要调整的代码如下：
+
+                    dj->dist[i].is_in_t = false;
+                    dj->dist[i].pc = 0;
+                    dj->dist[i].value = p_data->w[p_data->start_vertex][i];
+                    if (dj->dist[i].value < INFINITE)
+                    {
+                        dj->dist[i].path[0] = p_data->start_vertex;
+                        dj->dist[i].pc = 1;
+                    }
+            最后是修改算法第（4）步的内容，当满足“(dist[Vi] + >w[Vi][j]) < dist[j]”条件时，不仅更新 dist[j] 的值，同时更新 dist[j] 的路径信息。更新的方法是从 dist[Vi] 复制 Vi 的最短路径信息，再把 Vi 顶点附加在路径最后，表示是经过 Vi 这个顶点再到 j 的路径。修改后的代码如下：
+
+                if (new_dist < dj->dist[j].value)
+                {
+                    //替换 dist 数组中对应顶点的值
+                    dj->dist[j].value = new_dist;
+                    //从 min_vi 复制路径信息
+                    for (int k = 0; k < dj->dist[min_vi].pc; k++)
+                    {
+                        dj->dist[j].path[k] = dj->dist[min_vi].path[k];
+                    }
+                    dj->dist[j].pc = dj->dist[min_vi].pc;
+                    //附加新路径信息，即从 min_vi 到 j 这一段
+                    dj->dist[j].path[dj->dist[j].pc] = min_vi;
+                    dj->dist[j].pc++;
+                }
+            最后，在算法的主体不变的情况下，修改结果数据模型定义，并少量修改代码，就可以得到一个针对本问题的算法。例如，题目给出一组测试数据如下：

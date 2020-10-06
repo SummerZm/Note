@@ -1,0 +1,160 @@
+分离轴理论（Separating Axis Theorem）
+------------------------------------------------------------------
+1. 分离轴理论（SAT）是一个判断两个凸多边形是否碰撞的理论
+2. 分离轴概念:
+	分离轴理论使用的概念就是投影，先想象一下两个平面物体如果相交的话，那么从任何一个方向打上一个平行光源，都可以得到一个完整的阴影。
+	如果两个物体不相交，那么总可以找到一个方向，在这个方向上的平行光可以从它们之间的缝隙穿透过去。
+
+3. 算法原理
+	a. 得到两个多边形的分离轴；
+	b. 对每条分离轴，将两个多边形中的每条边向这条分离轴做投影；
+	c. 检查两个多边形的投影是否有重叠，如果没有，则直接结束，此时两个多边形没有碰撞；
+	d. 如果两个多边形的投影有重叠，则转到b继续判断其他分离轴，如果分离轴都已经处理完，则结束处理，此时两个多边形有碰撞。
+	
+4. 数据模型
+	A. 多边形是点的集合
+		class Polygon
+		{
+			......
+			std::vector<Point> vertex;
+		};
+	
+	B. 投影范围
+
+		class Projection
+		{
+			......
+			double min;
+			double max;
+		};
+		投影其实就是多边形在分离轴上的投影范围，多边形的每条边都能得到一个投影，投影的长度可以通过向量的点积计算出来，其表现就是在分离轴所在的直线上的一段，
+		每条边对应一段范围，所有边的投影叠加在一起可以得到一个范围，min 和 max 分别是这个范围的最小值和最大值。
+		
+	C. 分离轴
+		a. 什么是分离轴？
+			1. 平面物体可以向任何方向投影，想象一下这样的投影轴有千千万万个，这可怎么计算？幸运的是，根据多边形的特性，只要检测几个方向即可。
+			2. 根据分离轴理论的解释，需要检测的投影方向的数量就是两个多边形边数，也就是说，需要做投影检测的方向数量是有限的。
+			3. 这些方向就是多边形每条边的法向量方向。要求边的法向量。
+			
+		b. 如何找到分离轴？
+			1. 在只给了多边形各个顶点坐标的情况下，边的向量如何得到？答案就是向量的减法，
+			2. 将多边形的顶点视作起点是坐标原点的向量，依次做向量的减法，就可以得到多边形的各条边向量。
+			3. 根据前面介绍的法向量的几何意义，就可以得到边向量对应的法向量。GetPerpendicular() 函数获取当前向量的法向量，
+			4. 调用 Normalize() 函数将法向量单位化。单位化的目的是为了后续计算投影范围时，两个多边形的投影范围能在一个相同的比例尺度上进行比较。
+			5. 其他细节
+				Point p2 = vertex[(i + 1) % vertex.size()];
+				==》
+				if((i + 1) == vertex.size())
+				{
+					p2 = vertex[0];
+				}
+				else
+				{
+					p2 = vertex[i + 1];
+				}
+			
+			
+		c. 计算投影
+			1. 
+				class Vector
+				{
+					......
+					double DotProduct(const Vector& v) const
+					{
+						return (x * v.x + y * v.y);
+					}
+				};
+
+				class Polygon
+				{
+					......
+					Projection GetProject(const Vector &axes) const
+					{
+						double min = RANGE_MAX;
+						double max = RANGE_MIN;
+						for (const Point& i : vertex)
+						{
+							Vector p = Vector(i); //把顶点视作以 (0,0) 为起点的向量
+							double prj = p.DotProduct(axes);
+							if (prj < min)
+								min = prj;
+
+							if (prj > max)
+								max = prj;
+						}
+						return Projection(min, max);
+					}
+				};
+				
+		D. 检测碰撞
+			class Projection
+			{
+				......
+				bool IsOverlap(const Projection& p) const
+				{
+					return ((max > p.min) && (p.max > min));
+				}
+			};
+
+			bool CollisionTest(const Polygon& pa, const Polygon& pb)
+			{
+				std::vector<Vector> axes_a, axes_b;
+				pa.GetAxes(axes_a);
+				for (auto& ax : axes_a)
+				{
+					Projection pj1 = pa.GetProject(ax);
+					Projection pj2 = pb.GetProject(ax);
+					if (!pj1.IsOverlap(pj2)) /*只要有一条轴上的投影没有重叠，就说明不相交*/
+					{
+						return false;
+					}
+				}
+
+				pb.GetAxes(axes_b);
+				for (auto& ax : axes_b)
+				{
+					Projection pj1 = pa.GetProject(ax);
+					Projection pj2 = pb.GetProject(ax);
+					if (!pj1.IsOverlap(pj2)) /*只要有一条轴上的投影没有重叠，就说明不相交*/
+					{
+						return false;
+					}
+				}
+
+				return true;
+			}	
+5. SAT 算法只能用于凸多边形，那么对于凹多边形怎么办呢？很好办，就是将凹多边形分解为若干个小的凸多边形，然后分别计算。
+	根据欧氏几何原理，凹多边形总是可以被分成凸多边形或三角形的组合。不仅SAT算法，GJK算法也只适用于凸多边形，对于凹多边形的处理方法是一样的。
+	为了提高算法的效率，游戏开发人员一般用矩形包围盒算法排除一些明显不可能碰到一起的物体，然后再用SAT算法精确检查那些疑似碰撞的物体。
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			

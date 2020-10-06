@@ -1,0 +1,176 @@
+计算几何类的问题
+===============================================================================================================================================
+A. 简介：
+    1. 求直线斜率的公式。
+    2. 用一遍扫描统计出有序序列中哪个值出现次数最多的代码技巧。
+    3. 快速排序在实际问题中的应用方法。
+    4. 浮点数的处理技巧。
+
+B. 问题：
+    1. 在这N个点中，找出哪两个点组成的直线上包含最多的点，也就是找出含有最多点的那条直线。
+        a. 按照直线斜率的排序
+        b. 输出最多共线点的个数以及这些点的信息，包括点的编号信息和坐标值。
+
+C. 问题分析:
+    1. 从N个点中选择两个点，构成一个两点式直线方程, 对剩下的 N-2 个点，依次带入直线方程，确定是否在直线上，得到一个共线的点的记录；
+       需要处理 N * (N − 1) * (N − 2) 次点与直线关系的判断, 算法时间复杂度: N的3方。
+
+    2. 以点为对象进行穷举，计算每个点与其他点组成的直线的斜率，斜率相等的那些点肯定就是共线的点
+
+D. 数据模型设计:
+    1. 离散信息常用的数据结构有数组、链表、集合和哈希表。
+        typedef struct {
+            double x;
+            double y;
+        };
+
+    2. Scope数据结构表示斜率值和点
+        typedef struct
+        {
+            double k;
+            int p_idx;
+        }Slope;
+
+E. 算法实现
+    1. 浮点数的处理: 不要对两个浮点数直接判等
+        a. 计算机表示的浮点数有效数位比较多，在某些条件下，直接判等的要求非常苛刻
+            比如迭代法中的迭代收敛条件，如果用判断最近两次迭代值相等作为迭代精度要求的退出条件，对于一些收敛比较慢的迭代算法来说，基本上就相当于死循环了。
+            你会发现经过漫长的迭代之后，小数点后面XX位还是不相同的。
+
+        b. 常用的判断浮点数相等的方法：
+            const double EPS = 1e-8; //定义本问题的浮点数精度范围（小数点后面 8 位有效数字相同）
+            bool IsEqualFloat(double v1, double v2)
+            {
+                if (std::fabs(v1 - v2) < EPS)
+                    return true;
+                return false;
+            }
+
+    2. 斜率公式计算 -- 计算机无法表示无穷大
+        //#define DBL_MAX         1.7976931348623158e+308 /* max value */  
+        double CalcSlope(const Point& p0, const Point& p1)
+        {
+            if (IsEqualFloat(p0.x, p1.x)) //点的 x 坐标相等，斜率为无穷大
+            {
+                return DBL_MAX; //用浮点数的最大值代表无穷大
+            }
+            return (p1.y - p0.y) / (p1.x - p0.x);
+        }
+
+    3. 斜率值统计 --（N−1个） 
+        a. 维护一张表。
+            -- 额外的存储空间存储这张表
+            -- 最终还是要对表中的数据做一次遍历
+
+        b. 用一遍扫描统计出有序序列中哪个值出现次数最多的代码技巧
+            -- 首先对这 N − 1 个斜率值进行排序（升序或降序都可以）
+                std::sort(slopes.begin(), slopes.end(), [](const Slope & s1, const Slope & s2) { return s1.k < s2.k; });
+              
+                排序算法:
+                -- 现实中的大部分问题都不是简单的整数数组而是数据表，表中的每一项都是一个数据集合
+                -- 排序都是基于关键字进行的，集合中关键字之外的属性都是跟随属性，随着记录的移动来移动它们就行，所以要先确定关键字。关键字就是要做数据比较的那个属性
+
+                void exchange(std::vector<Slope>& slopes, int m, int n)
+                {
+                    Slope tmp = slopes[m];
+                    slopes[m] = slopes[n];
+                    slopes[n] = tmp;
+                }
+
+                int partion(std::vector<Slope>& slopes, int p, int r)
+                {
+                    Slope x = slopes[r];
+                    int i = p;
+                    for (int j = p; j < r; j++)
+                    {
+                        if (slopes[j].k < x.k) //只比较关键字
+                        {
+                            if (i != j)
+                            {
+                                exchange(slopes, i, j);
+                            }
+                            i++;
+                        }
+                    }
+                    exchange(slopes, i, r);
+                    return i;
+                }
+
+                void quick_sort(std::vector<Slope>& slopes, int p, int r)
+                {
+                    if (p < r)
+                    {
+                        int mid = partion(slopes, p, r);
+                        quick_sort(slopes, p, mid - 1);
+                        quick_sort(slopes, mid + 1, r);
+                    }
+                }
+
+            -- 注意前提条件是先排序：
+                typedef struct
+                {
+                    int start_idx;
+                    int count;
+                }Slope_Rec;
+
+                Slope_Rec GetMaxPointList(const std::vector<Slope>& slopes)
+                {
+                    int max_len = 0;    //  表示已经找到的最多斜率值相同个数。
+                    int max_start_pos = 0;  // 表示已经找到的最多相同斜率值的第一项在排序后列表中的位置。
+
+                    int len = 1;    // 表示当前正在处理的斜率值的相同个数。
+                    int start_pos = 0;  // 表示当前正在处理的相同斜率值的第一项在排序后列表中的位置。
+
+                    for (int s = 1; s < slopes.size(); s++) //从第2项开始
+                    {
+                        if (!IsEqualFloat(slopes[s].k, slopes[s - 1].k)) //是否相同
+                        {
+                            if (len > max_len) //是否需要更新 max_len 和 max_start_pos
+                            {
+                                max_len = len;
+                                max_start_pos = start_pos;
+                            }
+                            start_pos = s; //赋值当前位置统计下一个
+                            len = 1;
+                        }
+                        else
+                        {
+                            len++;
+                        }
+                    }
+                    return { max_start_pos, max_len };
+                }
+
+        c. 算法主体
+
+            void StraightLine(const std::vector<Point>& points, int n, std::vector<int>& pts)
+            {
+                for (int i = 0; i < n; i++)
+                {
+                    std::vector<Slope> slopes;
+                    for (int j = 0; j < n; j++)
+                    {
+                        if (i == j)     // 从N个目标中任选2个（不能重复）的处理模式
+                            continue;
+
+                        double k = CalcSlope(points[i], points[j]);
+                        slopes.push_back({ k, j }); // 当前点的索引 - 与原点构成直线的斜率。
+                    }
+
+                    quick_sort(slopes, 0, slopes.size() - 1); //排序
+
+                    Slope_Rec posi = GetMaxPointList(slopes);// 取当前最大记录
+                    if (posi.count > pts.size()) //与已经保存的其他点的最大记录比较
+                    {
+                        //需要更新最大记录
+                        pts.clear();
+                        pts.push_back(i); //先将原点加入
+                        //再将斜率表中的其他点加入（都是斜率相同的点，p_idx 记录的是点的编号）
+                        for (int p = posi.start_idx; p < (posi.start_idx + posi.count); p++)
+                        {
+                            pts.push_back(slopes[p].p_idx);
+                        }
+                    }
+                }
+            }
+
