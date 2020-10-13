@@ -156,6 +156,22 @@
 |**[Dir] Leetcode/Tree** | <b>目录：树题目</b> |
 
 ### **Dir: Web** ###
+> **Web 通信相关**
+- **Http 通信中安全问题**
+- **Web 应用层无状态通信相关问题**
+
 |File|Comment|
 |:---|:---|
 |[Dir] Auth | <b>Some web auth question.</b> |
+|[token](Web/Auth/token)|构建简洁高效便于操作的数据结构注意点和一些实现|
+|[Dir] TLS | <b>Some about ssl.</b> |
+|[ssl_tls.md](Web/TLS/ssl_tls.md)|构建简洁高效便于操作的数据结构注意点和一些实现|
+
+### **Dir: OS** ###
+> **操作系统/底层硬件层面相关概念**  
+
+- **总线通信的一些问题方案概念**
+
+|File|Comment|
+|:---|:---|
+|[CPU.md | <b>CPU简介</b> |
