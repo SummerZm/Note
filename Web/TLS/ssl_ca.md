@@ -12,6 +12,7 @@
 - **A. 创建根文件秘钥 root.key** 
     ```sh
     # 可以设置密码.
+    # 如果出现以下问题: unable to write 'random state'; 请检查openssl.cnf中'RANDFILE'所指向目录文件的权限或所在文件系统是否可读.
     openssl genrsa -ras -out root.key
     ```
 - **B. 创建证书申请文件 root.csr**

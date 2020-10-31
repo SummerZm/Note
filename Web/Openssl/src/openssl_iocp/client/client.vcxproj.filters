@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Files">
+      <UniqueIdentifier>{481d20ee-9eb9-4421-8d2a-7d51543e78b8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="targetver.h">
+      <Filter>Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\openssl_iocp.h">
+      <Filter>Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Files</Filter>
+    </ClCompile>
+    <ClCompile Include="client.cpp">
+      <Filter>Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\openssl_iocp.cpp">
+      <Filter>Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
