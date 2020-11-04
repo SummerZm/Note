@@ -20,7 +20,7 @@
     # 需要使用A步骤中的root.key, 需要填入国家，公司，等相关信息.
     openssl req -new -key root.key -out root.csr
     ```
-- **C. 创建根证书root.crt**
+- **C. 创建根证书 root.crt**
     ```sh
     # 需要输入A中的密码.
     # 这个根证书要放到浏览器的证书管理中心.
@@ -28,6 +28,8 @@
     ```
 
 ### **三、如何颁发服务器证书**
+> **证书申请者向CA机构提供信息，CA机构为申请者生成公密钥和创建证书** 
+
 - **A. 创建服务器秘钥**
     ```sh
     openssl genrsa -out server.key 2048
@@ -79,6 +81,12 @@
     #将客户端证书文件client.crt和客户端证书密钥文件client.key合并成客户端证书安装包client.pfx：
     openssl pkcs12 -export -in client.crt -inkey client.key -out client.pfx
     ```
+
+### **五、注意事项**
+- **A. 根证书的Common Name填写root**
+- **B. 根证书的这个字段和客户端证书、服务器端证书不能一样**
+
+
 
 
 
