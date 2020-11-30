@@ -14,7 +14,12 @@
 			----> 所有动态链接到某一动态库的可执行程序，可以共享该函数库的一个单独拷贝
 
 		b. 动态链接的程序，可以不比因为库的更新或者系统的变动而重新链接，只需要更新动态库就可以了
-		
+        c. 如何查看动态库? ldconfig -p | grep lib
+        d. 如何安装动态库?
+            法1: ln -s /where/you/install/lib/*.so  /usr/lib; sudo ldconfig
+            法2: export LB_LIBRARY_PATH=/where/you/install/lib:$LB_LIBRARY_PATH;sudo ldconfig
+            法3：vim /etc/ld.so.confg;  add /where/you/install/lib; sudo ldconfig
+
 	C. 动态库的一些基础知识
 		a. 动态库的位置不能随意改动，否则程序将找不到
 		b. 链接选项 -pic的作用
