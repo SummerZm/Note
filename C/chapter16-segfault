@@ -50,14 +50,14 @@ D. 常见问题 [相关make]
 E. 段错误类型:
 	a. 访问只读地址	 (常量区)
 	b. 访问不存在地址 (NULL)
-	c. 访问受保护地址 (int*(0)) 
+	c. 访问受保护地址 (int*(0))
 	d. 栈溢出
 
 F. 相关代码:
 	a. source: add.c 
-		#include <stdio.h>  
-		#include <stdlib.h>  
-		#include <unistd.h>  
+		#include <stdio.h>
+		#include <stdlib.h>
+		#include <unistd.h>
 		  
 		int add1(int num)  
 		{  
