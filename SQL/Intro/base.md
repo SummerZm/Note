@@ -212,6 +212,9 @@
     -- 还原数据库【压缩or没压缩】
     mysql -hhostname -uroot -pxxxx databaseName < databaseName.sql
     gunzip < databaseName.sql.gz | mysql -hhostname -uroot -pxxxx databaseName
+
+    -- 如何比较SQL中的时间段
+    select * from table where timestamp(create_time)='2020-12-09 21:01:20';
     ```
     
 - <b>SQL函数</b>

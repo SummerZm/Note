@@ -43,16 +43,82 @@
         ```
 
 - 大量 CLOSE_WAIT 问题分析
-    1. 服务器保持了大量CLOSE_WAIT状态： 原因只有一种情况，在对方关闭连接之后服务器程序自己没有进一步发出ack信号。 
+    1. 服务器保持了大量CLOSE_WAIT状态： 原因: 在对方关闭连接之后服务器程序死锁自己没有进一步发出ack信号;CPU太忙
 
-- 优化与 TIME_WAIT 状态相关的内核选项
+- TCP 四次挥手过程
+    1. 主动关闭连接的一方 – 也就是主动调用socket的close操作的一方，最终会进入TIME_WAIT状态.**[等待最后一个ACK]**
+    2. 被动关闭连接的一方，有一个中间状态，即CLOSE_WAIT。**[因为协议层在等待上层的应用程序，主动调用close操作后才主动关闭这条连接]**
+    3. TIME_WAIT会默认等待2MSL时间后，才最终进入CLOSED状态
+    4. 在一个连接没有进入CLOSED状态之前，这个连接是不能被重用的
+    5. 状态转移：
+        ```sh
+        # close()[Client]
+        #   ------ FIN ------->
+        #   FIN_WAIT1   CLOSE_WAIT
+        #   <----- ACK -------
+        #   FIN_WAIT2
+        #               close() [Server]
+        #   <------ FIN ------
+        #   TIME_WAIT   LAST_ACK
+        #   ------ ACK ------->
+        #   CLOSED      CLOSED
+
+        # 客户端TCP状态迁移:
+        # CLOSED -> SYN_SENT -> ESTABLISHED -> FIN_WAIT_1 -> FIN_WAIT_2 -> TIME_WAIT -> CLOSED
+        # 服务器TCP状态迁移:
+        # CLOSED -> LISTEN -> SYN收到 -> ESTABLISHED -> CLOSE_WAIT -> LAST_ACK -> CLOSED
+        ```
+    
+- 优化与 TIME_WAIT 状态相关的内核选项 -- [/etc/sysctl.conf]
     1. 增大处于 TIME_WAIT 状态的连接数量 net.ipv4.tcp_max_tw_buckets 
     2. 并增大连接跟踪表的大小 net.netfilter.nf_conntrack_max。
     3. 减小 net.ipv4.tcp_fin_timeout 和 net.netfilter.nf_conntrack_tcp_timeout_time_wait ，让系统尽快释放它们所占用的资源。
-    4. 开启端口复用 net.ipv4.tcp_tw_reuse。这样，被 TIME_WAIT 状态占用的端口，还能用到新建的连接中。
-    5. 增大本地端口的范围 net.ipv4.ip_local_port_range 。这样就可以支持更多连接，提高整体的并发能力。
-    6. fs.nr_open 和 fs.file-max ，分别增大进程和系统的最大文件描述符数；或在应用程序的 systemd 配置文件中，配置 LimitNOFILE ，设置应用程序的最大文件描述符数。
+    4. 增大本地端口的范围 net.ipv4.ip_local_port_range 。这样就可以支持更多连接，提高整体的并发能力。
+    5. fs.nr_open 和 fs.file-max ，分别增大进程和系统的最大文件描述符数；或在应用程序的 systemd 配置文件中，配置 LimitNOFILE ，设置应用程序的最大文件描述符数。
+    6. 开启端口复用 net.ipv4.tcp_tw_reuse。这样，被 TIME_WAIT 状态占用的端口，还能用到新建的连接中。
+    7. 开启tw_recylce和tw_reuse功能, 一定需要timestamps的支持。
+    8. 1万条TIME_WAIT的连接，也就多消耗1M左右的内存，对现代的很多服务器，已经不算什么了。至于CPU，能减少它当然更好，但是不至于因为1万多个hash item就担忧。
+        ```sh
+        # net.ipv4.tcp_timestamps 【快捷回收基础选项】
+        # RFC 1323 在 TCP Reliability一节里，引入了timestamp的TCP option，两个4字节的时间戳字段.
+        # 其中第一个4字节字段用来保存发送该数据包的时间
+        # 第二个4字节字段用来保存最近一次接收对方发送到数据的时间。
+        # tcp_tw_reuse 和 tcp_tw_recycle就依赖这些时间字段。
 
+        # net.ipv4.tcp_tw_reuse 【客户端快速回收选项】
+        # 这个参数是reuse TIME_WAIT状态的连接。一条socket连接是个五元组
+        # 应用场景：某一方，需要不断的通过“短连接“连接其他服务器，总是自己先关闭连接(TIME_WAIT在自己这方)，关闭后又不断的重新连接对方。
+        # 
+        # 当连接被复用了之后，延迟或者重发的数据包到达，新的连接怎么判断，到达的数据是属于复用后的连接，还是复用前的连接呢？
+        # 复用连接后，这条连接的时间被更新为当前的时间，当延迟的数据达到，延迟数据的时间是小于新连接的时间，所以，内核可以通过时间判断出，延迟的数据可以安全的丢弃掉了。
+        #
+        # 要求连接双方同时对timestamps的支持。仅仅影响outbound连接，即做为客户端的角色，连接服务端[connect(dest_ip, dest_port)]时复用TIME_WAIT的socket。
+
+        # net.ipv4.tcp_tw_recycle 【服务器端快速回收选项】
+        # 销毁掉 TIME_WAIT。当开启了这个配置后，内核会快速的回收处于TIME_WAIT状态的socket连接。
+        # 多快？不再是2MSL，而是一个RTO（retransmission timeout，数据包重传的timeout时间）的时间，这个时间根据RTT动态计算出来，但是远小于2MSL。
+        #
+        # 在启用该配置，当一个socket连接进入TIME_WAIT状态后，内核里会记录包括该socket连接对应的五元组中的对方IP等在内的一些统计数据，包括从该对方IP所接收到的最近的一次数据包时间。
+        # 当有新的数据包到达，只要时间晚于内核记录的这个时间，数据包都会被统统的丢掉。【保障丢失重传或者延迟的数据包，不会被新的连接错误的接收】
+        #
+        # 要求连接双方对timestamps的支持。同时，这个配置，主要影响到了inbound的连接（对outbound的连接也有影响，但是不是复用）
+        # 即做为服务端角色，客户端连进来，服务端主动关闭了连接，TIME_WAIT状态的socket处于服务端，服务端快速的回收该状态的连接。
+        
+        # 问题：如果客户端处于NAT的网络(多个客户端，同一个IP出口的网络环境)，如果配置了tw_recycle，就可能在一个RTO的时间内，只能有一个客户端和自己连接成功
+        # (不同的客户端发包的时间不一致，造成服务端直接把数据包丢弃掉)。
+        ```
+
+- TCP 内核设置信息获取
+    1. 内核里有保存所有连接的一个hash table，包含TIME_WAIT状态的连接，也包含其他状态的连接。不同的内核hash table的大小不同。查看方式：
+        ```sh
+        [root@web01 ~]# dmesg |grep --color "TCP established hash table"
+        TCP established hash table entries: 524288 (order: 11, 8388608 bytes)
+        ```
+    2. 有一个hash table用来保存所有的bound ports，主要用于可以快速的找到一个可用的端口或者随机端口：
+        ```sh
+        [root@web01 ~]# dmesg |grep --color "TCP bind hash table"
+        TCP bind hash table entries: 65536 (order: 8, 1048576 bytes)
+        ```
 
 - 缓解SYN FLOOD等，利用TCP协议特点进行攻击而引发的性能问题
     1. 增大 TCP 半连接的最大数量 net.ipv4.tcp_max_syn_backlog
