@@ -1,7 +1,7 @@
 Array 实战题目
 https://leetcode-cn.com/problems/container-with-most-water/ [Ok-2021-01-01树空间生成角度]
-https://leetcode-cn.com/problems/move-zeroes/
-https://leetcode.com/problems/climbing-stairs/
+https://leetcode-cn.com/problems/move-zeroes/ [Ok-2020-01-02记录点-遍历交换]
+https://leetcode.com/problems/climbing-stairs/ [Ok-2020-01-03数列的递推关系转换成矩阵关系]
 https://leetcode-cn.com/problems/3sum/ (高频老题）
 Linked List 实战题目
 https://leetcode.com/problems/reverse-linked-list/
