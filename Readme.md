@@ -110,6 +110,19 @@
 |[Dir]	[Practice](SQL/Practice)|<b>SQL 实践介绍</b>|
 |[master_slave_sync.md](SQL/Practice/storage.md)|mysql 主从一致简介|
 |[recovery.md](SQL/Practice/storage.md)|mysql 数据恢复介绍|
+|||
+
+### **Dir: Math** ###
+|File|Comment|
+|:---|:---|
+|[sequence](Math/sequence.md)  | <b>数列知识大杂烩</b>  |
+|||
+
+### **Dir: English** ###
+|File|Comment|
+|:---|:---|
+|[Dir] [Grammar](English/Grammar)  | <b>英语语法</b>  |
+|||
 
 ### **Dir: Linux** ###
 |File|Comment|
@@ -119,6 +132,7 @@
 |[Dir]	[Memory](Linux/Memory)  | <b>内存指标相关知识</b>  |
 |[Dir]	[Network](Linux/Network)  | <b>网络性能，nat相关知识</b>  |
 |[Dir]	[Other](Linux/Other) | <b>动态追踪内核，性能优化知识</b> |
+|||
 
 ### **Dir: Algorithm** ###
 > <b>编程就是在 同步，异步， 并发， 时间/空间限制不同场景下使用 判断，分支，循环对数据进行存储，分析，修改</b>
@@ -160,6 +174,7 @@
 |**[Dir] Leetcode/Heap** | <b>目录：堆题目</b> |
 |top-k-frequent-elements.cpp|一维数组转二维Map结构 - 数据处理|
 |**[Dir] Leetcode/Tree** | <b>目录：树题目</b> |
+|||
 
 ### **Dir: Web** ###
 > **Web 通信相关**
@@ -172,6 +187,7 @@
 |[token](Web/Auth/token)|构建简洁高效便于操作的数据结构注意点和一些实现|
 |[Dir] TLS | <b>Some about ssl.</b> |
 |[ssl_tls.md](Web/TLS/ssl_tls.md)|构建简洁高效便于操作的数据结构注意点和一些实现|
+|||
 
 ### **Dir: OS** ###
 > **操作系统/底层硬件层面相关概念**  
@@ -181,3 +197,4 @@
 |File|Comment|
 |:---|:---|
 |[CPU.md | <b>CPU简介</b> |
+|||
