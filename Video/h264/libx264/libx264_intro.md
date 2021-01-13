@@ -8,6 +8,7 @@
 - x264_param_default()：设置参数集结构体x264_param_t的缺省值。
 - x264_picture_alloc()：为图像结构体x264_picture_t分配内存。
 - x264_encoder_open()：打开编码器。
+- x264_encoder_headers()：输出SPS，PPS，SEI等信息。
 - x264_encoder_encode()：编码一帧图像。
 - x264_encoder_close()：关闭编码器。
 - x264_picture_clean()：释放x264_picture_alloc()申请的资源。 
@@ -114,3 +115,4 @@
     # x264_encoder_close()中的x264_ratecontrol_summary()：码率控制信息。
     # x264_encoder_close()中的x264_ratecontrol_delete()：释放码率控制。
     ```
+
