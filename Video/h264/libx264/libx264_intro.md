@@ -15,6 +15,23 @@
 
 ### **libx264 函数介绍**
 > **反映了图中从左到右，从用户API到库内部的调用逻辑过程**
+
+- **x264_encoder_open()**
+    > **Init [帧内预测-像素值计算-DCT-量化-去块滤波器-lookahead-码率控制]**
+
+    ```sh
+    # x264_validate_parameters()：检查输入参数（例如输入图像的宽高是否为正数）。
+    # x264_predict_16x16_init()：初始化Intra16x16帧内预测汇编函数。
+    # x264_predict_4x4_init()：初始化Intra4x4帧内预测汇编函数。
+	# x264_pixel_init()：初始化像素值计算相关的汇编函数（包括SAD、SATD、SSD等）。
+	# x264_dct_init()：初始化DCT变换和DCT反变换相关的汇编函数。
+	# x264_mc_init()：初始化运动补偿相关的汇编函数。
+	# x264_quant_init()：初始化量化和反量化相关的汇编函数。
+	# x264_deblock_init()：初始化去块效应滤波器相关的汇编函数。
+	# x264_lookahead_init()：初始化Lookahead相关的变量[识别I，P，B帧]。
+ 	# x264_ratecontrol_new()：初始化码率控制相关的变量。
+    ```
+
 - **x264_encoder_headers()调用了下面的函数**
     ```sh
     # x264_sps_write()：输出SPS
