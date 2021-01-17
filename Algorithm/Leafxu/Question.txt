@@ -8,7 +8,7 @@ https://leetcode.com/problems/reverse-linked-list/ [OK-2021-01-05用心是一种能力]
 https://leetcode.com/problems/swap-nodes-in-pairs
 https://leetcode.com/problems/linked-list-cycle [OK-2021-01-08往完全巡回数思考]
 https://leetcode.com/problems/linked-list-cycle-ii [OK-2021-01-11寻找环口]
-https://leetcode.com/problems/reverse-nodes-in-k-group/
+https://leetcode.com/problems/reverse-nodes-in-k-group/ [OK-2021-01-17数组头指针的巧妙应用]
 课后作业
 https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array/
 https://leetcode-cn.com/problems/rotate-array/
