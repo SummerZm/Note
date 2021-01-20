@@ -15,7 +15,7 @@
 	B. 更复杂的声明
 		eg1: 函数 ===> void (*signal(int sig, void(*func)(int)))(int)
 		eg2: 数组 ===> char (*pstr[20])(int)
-		eg3: 函数指针 ===> char* const* (*next)(int)
+		eg3: 函数指针 ===> char* const (*next)(int)
 		eg4: 数组指针 ===> char (*j)[20]
 
 	C. 声明分析基础优先级知识
@@ -60,7 +60,7 @@
 		a. 找到第一个标志符: next
 			----> 标志符是什么【类型】?  
 		
-		b. 根据优先级与左边的*配对:  char* const* (*next)(int)  是一个指针 
+		b. 根据优先级与左边的*配对:  char* const (*next)(int)  是一个指针 
 			----> 类型是指针，所以关注它的【指向】
 
 		c. 根据优先级与右边的()配对: (*next)(int)  
@@ -69,7 +69,7 @@
 		d. 根据优先级与左边的*配对: *(*next)(int) 
 			----> 返回是指针, 所以关注它的【指向】
 
-		e. 根据优先级与左边的char* const配对: char* const* (*next)(int)
+		e. 根据优先级与左边的char* const配对: char* const (*next)(int)
 			----> 指向char* const 即返回一个指针,这个指针的指向不能被修改
 
 

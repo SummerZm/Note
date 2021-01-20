@@ -78,6 +78,9 @@
         player_name varchar(255) NOT NULL
     );
 
+    -- 删除表数据
+    -- DELETE FROM video_device;
+
     -- SQL语句的组织顺序 【很重要】
     -- SELECT ... FROM ... WHERE ... GROUP BY ... HAVING ... ORDER BY ...
 
@@ -85,6 +88,7 @@
     ALTER TABLE player ADD (age int(11));
     -- 修改字段
     ALTER TABLE player RENAME COLUMN age to player_age3. 
+    ALTER TABLE `video_device` ADD COLUNM `type` tiny(int) DEFUALT '0' COMMENT '0:local 1:thirdpart' AFTER `is_online`;
     -- 修改字段的数据类型
     MODIFY (player_age float(3,1));4. 
     -- 删除字段
