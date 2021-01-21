@@ -46,6 +46,7 @@
 ### **C. H264视频流用RTP传输**
 ![H264onRTP.png](H264onRTP.png)  
 **纠正：FU-Header type(5 bit)的取值范围：1-23**
+![层次的码流结构](./rtpVideoCodeLevel.png)
 
 [参考链接](https://www.huaweicloud.com/articles79999bf7e4235d59927366e0dd1ca267.html)
 
