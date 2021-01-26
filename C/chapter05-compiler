@@ -13,7 +13,7 @@
 			----> 因为它运行时才被加载进内存
 			----> 所有动态链接到某一动态库的可执行程序，可以共享该函数库的一个单独拷贝
 
-		b. 动态链接的程序，可以不比因为库的更新或者系统的变动而重新链接，只需要更新动态库就可以了
+		b. 动态链接的程序，可以不必因为库的更新或者系统的变动而重新链接，只需要更新动态库就可以了
         c. 如何查看动态库? ldconfig -p | grep lib
         d. 如何安装动态库?
             法1: ln -s /where/you/install/lib/*.so  /usr/lib; sudo ldconfig
@@ -85,6 +85,43 @@
             0000000000400600 T _start
             0000000000601068 D __TMC_END__
                              U write@@GLIBC_2.2.5
+
+            nm 选项：
+            -a/--debug-syms：显示所有符号，包括debugger-only symbols
+            -B：等同于 --format=bsd，兼容 MIPS nm
+            -C/--demangle：将低级符号名解析成用户级名字。这样可以使得C++函数名具有可读性。
+            --no-demangle：默认选项，不将低级符号名解析成用户级名字。
+            -D/--dynamic：显示动态符号。这个选项只对动态目标（比如特定类型的共享库）有意义。
+            -f format/--format=format：使用format格式输出。format可以选取bsd、sysv或posix，该选项在GNU的nm中有用。默认为bsd
+            -g/--extern-only：只显示外部符号
+            -l/--line-numbers：对于每一个符号，使用debug信息找到文件名和行号。
+            -n/-v/--numeric-sort：按符号对应地址的顺序排序，而不是按符号名字符顺序排序
+            -p/--no-sort：按照目标文件中遇到的符号顺序显示，不排序
+            -P/--portability：按照POSIX2.0标准格式输出，等同于使用 -f posix
+            -r/--reverse-sort：反转排序
+            -s/--print-armap：当列出库中成员的符号时，包含索引。索引的内容包括：哪些模块包含哪些名字的映射
+            -u/--undefined-only：只显示未定义符号
+            --defined-only：只显示定义的符号
+
+            A：该符号的值是绝对的，在以后的链接过程中，不允许改变。这样的符号，常常出现在中断向量表中，例如用符号来表示各个中断向量函数在中断向量表中的位置。
+            B：该符号的值出现在非初始化数据段BSS中。例如，一个文件中定义全局 static int s_int。则符号s_int 类型为b，位于bss section中。其值表示该符号在bss段的偏移。一般而言，bss段分配于RAM中。
+            C：该符号为common。common symbol是未初始化数据段。该符号没有包含于一个普通section中。只有在链接过程中才进行分配。符号的值表示要分配的字节数。例如，在一个c文件中，定义 int g_no_init，并且该符号在别的地方会被引用，则该符号类型就是C，否则为B。
+            D：该符号位于初始化数据段中。一般来说，分配到data section中。比如，全局变量 int g_init = 2;
+            G：该符号也位于初始化数据段。主要用于small object，提高访问small data object的一种方式。
+            I：该符号是对另一个符号的间接引用。
+            N：该符号是一个debugging符号
+            R：该符号位于只读数据区。比如，全局变量 const int const_int = 0; 如果在一个函数中定义 const char* test = "abc"; const int a = 2; 使用nm都不会得到符号信息。但是字符串"abc"分配于只读存储器中，test 在rodata section中，大小为4
+            S：符号位于非初始化数据区，用于 small object
+            T：符号位于代码区 text section
+            U：符号在当前文件中是未定义的，即该符号的定义在别的文件中。比如，当前文件中调用另一个文件中的函数，在这个本目标文件中，函数就是未定义的。但是在定义它的文件中，类型为T。但是对于全局变量来说，在定义它的文件中，符号类型是C，在使用它的文件中，类型是U。
+            V：该符号是一个weak object
+            ？：该符号类型没有定义
+
+
+
+
+
+
 
 
 
