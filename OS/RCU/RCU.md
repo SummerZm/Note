@@ -61,7 +61,7 @@
     ```
 
 ### **RCU API实现分析**
-- **RCU API实现分析**
+- **RCU API实现分析: [相关知识(内存屏障)](https://blog.csdn.net/world_hello_100/article/details/50131497)**
     ```C
     #define rcu_read_lock() __rcu_read_lock() 
     #define rcu_read_unlock() __rcu_read_unlock() 
