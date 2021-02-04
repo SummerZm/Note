@@ -30,33 +30,67 @@
     # 1. 读者会禁用上下文切换。所有CPUi经过一次上下文切换，说明读者已经全部退出。【CPU之间的上下文切换应该是不一致的，这样写者的回写速度很很慢】
     ```
 
-### **RCU内核使用例程**
-```C
-struct foo {
-int a;
-    char b;
-    long c;
-};
+### **RCU内核使用例程**  
+- **RCU内核使用例程**
+    ```C
+    struct foo {
+    int a;
+        char b;
+        long c;
+    };
 
-DEFINE_SPINLOCK(foo_mutex);
-struct foo *gbl_foo;
+    DEFINE_SPINLOCK(foo_mutex);
+    struct foo *gbl_foo;
 
-void foo_update_a(int new_a)
-{
-    struct foo *new_fp;
-    struct foo *old_fp;
-    new_fp = kmalloc(sizeof(*new_fp), GFP_KERNEL);
-    // 内核编程中经常要使用到自旋锁，因为不像用户态有虚拟内存空间保护。
-    // 若此处发生了抢占，则内存数据很容易，被修改。
-    spin_lock(&foo_mutex);
-    old_fp = gbl_foo;
-    *new_fp = *old_fp;
-    new_fp->a = new_a;
-    rcu_assign_pointer(gbl_foo, new_fp);
-    spin_unlock(&foo_mutex);
-    synchronize_rcu();
-    kfree(old_fp);
-}
-```
+    void foo_update_a(int new_a)
+    {
+        struct foo *new_fp;
+        struct foo *old_fp;
+        new_fp = kmalloc(sizeof(*new_fp), GFP_KERNEL);
+        // 内核编程中经常要使用到自旋锁，因为不像用户态有虚拟内存空间保护。
+        // 若此处发生了抢占，则内存数据很容易，被修改。
+        spin_lock(&foo_mutex);
+        old_fp = gbl_foo;
+        *new_fp = *old_fp;
+        new_fp->a = new_a;
+        rcu_assign_pointer(gbl_foo, new_fp);
+        spin_unlock(&foo_mutex);
+        synchronize_rcu();
+        kfree(old_fp);
+    }
+    ```
 
+### **RCU API实现分析**
+- **RCU API实现分析**
+    ```C
+    #define rcu_read_lock() __rcu_read_lock() 
+    #define rcu_read_unlock() __rcu_read_unlock() 
+    // 保持一个读者的RCU临界区.在该临界区内不允许发生上下文切换 
+    #define __rcu_read_lock() 
+    do { 
+        preempt_disable();  // 禁止抢占
+        __acquire(RCU);     // 编译性选择函数
+        rcu_read_acquire(); // 编译性选择函数
+    } while (0) 
+    #define __rcu_read_unlock() 
+    do { 
+        rcu_read_release(); // 编译性选择函数
+        __release(RCU);     // 编译性选择函数
+        preempt_enable();   // 开启抢占
+    } while (0)
 
+    // 保护一个指针
+    #define rcu_dereference(p) ({ 
+        typeof(p) _________p1 = ACCESS_ONCE(p); // 编译时 volatile
+        smp_read_barrier_depends();             // 内存屏障 
+        (_________p1); 
+    }) 
+    // 修改一个指针
+    #define rcu_assign_pointer(p, v) 
+    ({ 
+        if (!__builtin_constant_p(v) || ((v) != NULL))  
+            smp_wmb();  // 内存屏障 - 解决内存乱序访问问题，保证cache的一致性
+        (p) = (v); 
+    })
+    // 上面两个函数同时使用了内存屏障，可以让读者和写者同时看到指针的最新值
+    ```
