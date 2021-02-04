@@ -58,14 +58,19 @@
 ================================================
 
 - registar 
-	1. AccountThread
-	2. ConnectionThread
-	3. SubscriptionThread
-	4. QueueThread
-	5. BookThread
+	1. AccountThread    -- accountList
+	2. ConnectionThread -- connectionList
+	3. SubscriptionThread -- subscriptionList
+	4. QueueThread  -- regQueue
+	5. BookThread   -- abookList
 	6. McuVerifyLB
 	7. cpuThread
 	8. HeartBeatsThread
+    9. aliveThread
+    10. serverList
+    11. isnatip [NAT]
+    12. conn [MySql]
+
 
 
 
