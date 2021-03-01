@@ -8,7 +8,14 @@
 
 ### **个人理解与问题**
 - **A. 数据是保存内存或者cache中的，CPU读取被RCU保护的数据时，为什么不能发生上下文切换？**
-- **B. 对的**
+- **B. RCU读写竞争状态简析**
+    1. 当没有发生读写竞争时，用不到以下这些冗长的介绍 。
+    2. 发生读写竞争时需要注册处理函数等待 graceperiod 。
+    3. graceperiod 在文中被理解为‘所有CPU都经过一次上下文切换’，我觉得这是不合理。
+    5. 因为假若有4个CPU，由于CPU之间是异步的，那么结果可能是 cpu1: 1，cpu2: 1，cpu3: 2，cpu4: 1; 甚至的当前cpu3正处于第三次RCU读取状态 。
+    6. 所以其理解是片面的。应该是当在某一CPU进行RCU读之前先设置对应的标志位，如果标志字段表示当前没有CPU进行读时，则进行回写操作 。
+    7. 那么如果一个内核进程A读走RCU数据后，另外一个内核进程B回写RCU数据, 那么如何保证AB两个内核进程之间的数据一致？A再重新一次RCU数据吗？还是AB内核进程在读数据的时候用的是同一片内存？
+    8. 由上可得数据是有状态的，数据保持一致性，以及如何处理数据在流动过程中的突变很重要。【可以加入数据库的锁级别进一步了解】
 
 ### **RCU简介**
 - **A. RCU是一种内核数据保护机制**
@@ -28,13 +35,15 @@
 - **F. 写者等待回写的时机称为grace period; CPU发生上下文切换称为quiescent state; grace period就是所有CPU都是经过一次quiescent state所需等待的时间**
     ```sh
     # 1. 读者会禁用上下文切换。所有CPUi经过一次上下文切换，说明读者已经全部退出。【CPU之间的上下文切换应该是不一致的，这样写者的回写速度很很慢】
+    # 2. 所有的CPU都被禁用上下文切换吗？ 
+    # 3. 数据被读到哪里？ 从内核空间被到了用户空间对应的进程里
     ```
 
 ### **RCU内核使用例程**  
 - **RCU内核使用例程**
     ```C
     struct foo {
-    int a;
+        int a;
         char b;
         long c;
     };
@@ -51,7 +60,7 @@
         // 若此处发生了抢占，则内存数据很容易，被修改。
         spin_lock(&foo_mutex);
         old_fp = gbl_foo;
-        *new_fp = *old_fp;
+        new_fp = old_fp;
         new_fp->a = new_a;
         rcu_assign_pointer(gbl_foo, new_fp);
         spin_unlock(&foo_mutex);
@@ -94,7 +103,7 @@
     })
     // 上面两个函数同时使用了内存屏障，可以让读者和写者同时看到指针的最新值
 
-    /*  */
+    /**/
     void synchronize_rcu(void) 
     { 
         struct rcu_synchronize rcu; 
@@ -107,10 +116,10 @@
     ```
 
 - **RCU API实现分析2 - 注册函数框架**  
-
+    **A. 把钥匙放到指定的地方等待知道的这个地方的人在适合的时机去取**  
     ![RCUsynchronize](./RCUsynchronize.png)
 
-    **每一个CPU都有一个rcu_data.每个调用call_rcu()/synchronize_rcu()进程的进程都会将一个rcu_head都会挂到rcu_data的nxttail链表上**
+    **B. 每一个CPU都有一个rcu_data.每个调用call_rcu()/synchronize_rcu()进程的进程都会将一个rcu_head都会挂到rcu_data的nxttail链表上**
     ```c
     // 1. 写者进行写同步时将要做的工作以回调函数形式注册到CPU的rcu_data对象上面等待合适的时机。
     // 2. 将工作委托出去的代码结构可以学习，对于具体CPU上下文切换的考虑细节可以了解，完善自己认知思维上漏洞。
@@ -150,8 +159,36 @@
         complete(&rcu->completion); 
     }
     ```
+- **RCU API实现分析3 - 关于RCU初始化**
+> **所有的CPU都进过了一次上下文切换,就说明所有读者已经退出了**
+    ```C
+    // 注册RCU_SOFTIRQ软中断处理函数rcu_process_callbacks
+    static void __cpuinit rcu_online_cpu(int cpu) 
+    { 
+        struct rcu_data *rdp = &per_cpu(rcu_data, cpu); 
+        struct rcu_data *bh_rdp = &per_cpu(rcu_bh_data, cpu); 
+    
+        rcu_init_percpu_data(cpu, &rcu_ctrlblk, rdp); 
+        rcu_init_percpu_data(cpu, &rcu_bh_ctrlblk, bh_rdp); 
+        open_softirq(RCU_SOFTIRQ, rcu_process_callbacks, NULL); 
+    }
 
-- **RCU API实现分析3 - 关于等待期的考量**
+    struct rcu_ctrlblk { 
+        ...
+        // cur和completed是系统级别的记录信息，也即系统实时经历的grace编号
+        // 一般情况下，新开一个graceperiod等待周期的话，cur会加1，当graceperiod结束后，会将completed置为cur，所以通常情况下，都是completed追着cur跑
+        long cur;  
+        long completed;  
+        cpumask_t  cpumask; // 标识当前系统中的所有cpu，以便标记哪些cpu发生过上下文切换(经历过一个quiescent state)
+        ...  
+    }
+    // rcu写者的整体流程，假设系统中出现rcu写者阻塞，那么流程如下【写者不一定会出现阻塞】
+    // 调用synchronize_rcu，将代表写者的rcu_head添加到CPU[n]每cpu变量rcu_data的nxtlist，这个链表代表有需要提交给rcu处理的回调(但还没有提交)。
+    // CPU[n]每次时钟中断时检测自己的nxtlist是否为null，若不为空，因此则唤醒rcu软中断。【CPU时间中断唤起rcu软中断】
+    // RCU的软中断处理函数rcu_process_callbacks会挨个检查本CPU的三个链表。
+    ```
+
+- **RCU API实现分析4 - 关于等待期的考量**
     > **通过这个看见内核编程要考量的一些细节问题**    
 
     ```C
