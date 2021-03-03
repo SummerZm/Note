@@ -3,15 +3,25 @@
 
 ### **PS流的组成**
 > **PS流由众多PS包构成。PS包基本构成形式：固定包头 + 系统头 + 映射头 + PES头 + 负载**
+- 针对H264 做如下PS 封装：
+    1. 每个IDR NALU 前一般都会包含SPS、PPS 等NALU，因此将SPS、PPS、IDR 的NALU 封装为一个PS 包，包括ps 头，然后加上PS system header，PS system map，PES header+h264 raw data。
+    2. 一个IDR NALU PS 包由外到内顺序是：PSheader| PS system header | PS system Map | PES header | h264 raw data。
+    3. 对于其它非关键帧的PS 包，就简单多了，直接加上PS头和PES 头就可以了。顺序为：PS header | PES header | h264raw data。
+    4. 以上是对只有视频video的情况，当有音频数据时，将数据加上PES header 放到视频PES 后就可以了。顺序如下：PS 包=PS头|PES(video)|PES(audio)，再用RTP 封装发送就可以了。
+
+- PS包使用的是RTP负载
+    1. GB28181 对RTP 传输的数据负载类型有规定（参考GB28181 附录B），负载类型中96-127
+    2. RFC2250 建议96 表示PS 封装，建议97 为MPEG-4，建议98 为H264
+    3. 即我们接收到的RTP 包首先需要判断负载类型，若负载类型为96，则采用PS 解复用，将音视频分开解码。若负载类型为98，直接按照H264 的解码类型解码。
 
 - **A. PS Header**
-1. 包起始码字段 pack_start_code：值为’0000 0000 0000 0000 0000 0001 1011 1010’ (0x000001BA)的位串，用来标志一个包的开始。
-2. 系统时钟参考字段 system_clock_reference_base 和 system_clock_reference_extenstion
-3. 标记位字段 marker_bit：1位字段，固定值 ‘1’。
-4. 节目复合速率字段 program_mux_rate：一个22位整数，规定P-STD在包含该字段的包期间接收节目流的速率。其值以50字节/秒为单位。不允许取0值。
-5. 包填充长度字段 pack_stuffing_length：3位整数，规定该字段后填充字节的个数。
-6. 填充字节字段 stuffing_byte
-7. 8位字段，取值恒为’1111 1111’
+    1. 包起始码字段 pack_start_code：值为’0000 0000 0000 0000 0000 0001 1011 1010’ (0x000001BA)的位串，用来标志一个包的开始。
+    2. 系统时钟参考字段 system_clock_reference_base 和 system_clock_reference_extenstion
+    3. 标记位字段 marker_bit：1位字段，固定值 ‘1’。
+    4. 节目复合速率字段 program_mux_rate：一个22位整数，规定P-STD在包含该字段的包期间接收节目流的速率。其值以50字节/秒为单位。不允许取0值。
+    5. 包填充长度字段 pack_stuffing_length：3位整数，规定该字段后填充字节的个数。
+    6. 填充字节字段 stuffing_byte
+    7. 8位字段，取值恒为’1111 1111’
 
 - **B. SYS Header**
 
