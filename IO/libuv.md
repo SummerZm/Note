@@ -14,6 +14,12 @@
 - 因为当回调被 call 的时候，libuv 保证你有事可做
 - 这样 EAGAIN 和 EWOULDBLOCK 之类的 handle 就不是程序员的工作了，libuv 会默默的帮你搞定。
 
+
+    ![sss](./libuv.jpg)
+- 【重要】Libuv使用各平台提供的事件驱动模块实现异步（epoll, kqueue, IOCP, eventports）来支持上层非文件io的模块。
+- 【重要】Libuv实现一个线程池用来支持上层文件io、dns以及用户层耗cpu的任务。
+
+
 ### libev vs libuv
 - 读写事件上的差异 
     1. libev 在 socket 发生读写事件时，只告诉你，“XX socket 可以读/写了，自己看着办吧”。我们需要自己申请内存并调用 read(3) 或者 write(3) 来响应 I/O 事件。
@@ -30,7 +36,7 @@
 
     3. 没有闭包，所以确定读写上下文是 libuv 的使用者需要面对的问题。否则程序面对汹涌而来的 buffer 也不能分得清哪个是哪个的数据。
         ```sh
-        # 这里隐晦的潜台词是: 闭包是解决上下文问题的一种方式, 如果，用C言语阶实现闭包功能
+        # 这里隐晦的潜台词是: 【闭包是解决上下文问题的一种方式, 如果，用C言语阶实现闭包功能】
 
         # 在这一点的处理上，libuv 跟 libev 一样，都是使用了一个 void *data 来解决问题。 
         # 可以用 data 这个 member 存储任何东西，这样当 buffer 来的时候，只需要简单的把 data cast 到你需要的类型就 OK 了。 
