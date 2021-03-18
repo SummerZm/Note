@@ -11,13 +11,14 @@ public:
         int n = 0;
         int len = nums.size();
         if (len==0) return 0;
-
+        /* 快慢指针初始化有前后关系. - 不是都在0这个位置起步. */
         for (int i=1; i<len; i++) {
+            /* 去重，出现不一样时，慢指针往前走一步，然后覆盖.*/
             if (nums[i]!=nums[n]) {
-                n++;
+                n++;    /*  */
                 nums[n] = nums[i];
             }
         }
-        return n+1;
+        return n+1; /* 返回新数组的长度，用于覆盖多余的数据. */
     }
 };
