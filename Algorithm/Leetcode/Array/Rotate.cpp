@@ -28,6 +28,31 @@ public:
                 count++;
             } while (start != current);
         }
+
+        /*
+            一个错误会产生遗漏的处理方法
+            k 与 数组长度成 公倍数，以下算法失败
+            相关知识： 完全巡回数        
+        */
+            int len = nums.size();
+            k = k%len;
+            for (int i=0; i<k; i++) {
+                int cur =i;
+                do {               
+                    int tmp = nums[(cur+k)%len];
+                    nums[(cur+k)%len] = nums[i];
+                    nums[i] = tmp;
+                    cur = (cur+k)%len;
+                } while (cur!=i);
+
+                printf("[");   
+                for (int m=0; m<len; m++) {
+                    printf("%d,", nums[m]);
+                }
+                printf("]\n");     
+            }
+        
+        */
     }
 
 
