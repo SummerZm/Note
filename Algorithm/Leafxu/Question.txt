@@ -11,9 +11,9 @@ https://leetcode.com/problems/linked-list-cycle-ii [OK-2021-01-11Ѱ�һ���
 https://leetcode.com/problems/reverse-nodes-in-k-group/ [OK-2021-01-17����ͷָ�������Ӧ��]
 �κ���ҵ
 https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array/ [OK-2021-03-18:双指针法]
-https://leetcode-cn.com/problems/rotate-array/
+https://leetcode-cn.com/problems/rotate-array/	[OK]
 https://leetcode-cn.com/problems/merge-two-sorted-lists/
-https://leetcode-cn.com/problems/merge-sorted-array/
+https://leetcode-cn.com/problems/merge-sorted-array/ [OK]
 https://leetcode-cn.com/problems/two-sum/
 https://leetcode-cn.com/problems/move-zeroes/
 https://leetcode-cn.com/problems/plus-one/
