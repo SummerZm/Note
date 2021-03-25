@@ -15,7 +15,7 @@ https://leetcode-cn.com/problems/rotate-array/	[OK]
 https://leetcode-cn.com/problems/merge-two-sorted-lists/
 https://leetcode-cn.com/problems/merge-sorted-array/ [OK]
 https://leetcode-cn.com/problems/two-sum/
-https://leetcode-cn.com/problems/move-zeroes/
+https://leetcode-cn.com/problems/move-zeroes/   [ok]
 https://leetcode-cn.com/problems/plus-one/
 
 =======================================================================================
