@@ -19,6 +19,13 @@
 	3. registar
 	4. rtspServer
 	5. cfg
+    6. EventQueue
+    7. LiveEventQueue
+    8. telnetServer
+    9. OTFcontrol
+    10. httpd
+    11. plugmgr
+    12. log
 
 ================================================
 
@@ -70,10 +77,9 @@
     11. isnatip [NAT]
     12. conn [MySql]
 
-
-
-
-
+### **相关问题**
+1. SIP注册逻辑如何与视频会议结合
+2. Rstp,Srs如何参与视频会议
 
 
 
