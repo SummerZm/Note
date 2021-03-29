@@ -14,6 +14,7 @@
 
 ### ***4. 类结构图**
 - openmcu
+> **SIP 注册机制如何与会议连接起来？**
 	1. conferenceManager 
 	2. sipendpoint
 	3. registar
@@ -62,6 +63,9 @@
 	5. 设置分屏器的视频输入
 
 ================================================
+
+- sipendpoint
+
 
 - registar 
 	1. AccountThread    -- accountList
