@@ -113,6 +113,27 @@
     openssl pkcs12 -export -in client.crt -inkey client.key -out client.pfx
     ```
 
+### **五、如何颁发SDK证书**
+- **生成ｐ１２格式的证书（利用生成的CA根证书和服务证书的ｃｒｔ和ｋｅｙ文件生成P１２文件）**
+    ```sh
+    # 这里的password 和 xx.crt文件的password 不一样
+    openssl pkcs12 -export -in xxx.com.crt -inkey xxx.com.key -passin pass:changeit -name *.xxx.com -chain -CAfile CA.crt -password pass:changeit -caname *.xxx.com -out xxx.com.p12
+    ```
+
+- **使用jdk keytool工具进行生成tomcat/jboss端使用的证书文件（window下执行）**
+    ```sh
+    # 查看p12证书
+    keytool -rfc -list -keystore xxx.com.p12 -storetype pkcs12
+    # 转换p12证书为jks证书文件
+    keytool -importkeystore -srckeystore xxx.com.p12 -srcstoretype PKCS12 -deststoretype JKS -destkeystore xxx.com.jks
+    # 利用jks证书生成cer证书
+    keytool -export -alias *.xxx.com -keystore xxx.com.jks -storepass changeit -file xxx.com.cer
+    # 利用cer证书文件生成jdk所使用的文件
+    keytool -import -alias *.xxx.com -keystore cacerts -file xxx.com.cer
+    # 合并证书
+    keytool -import -alias *. xxx.com -file D:\java\jdk1.7.0_67\xxx.com\ xxx.com.cer -storepass changeit -keystore D:\java\jdk1.7.0_67\ xxx.com\cacerts
+    ```
+
 ### **五、其他相关命令**
 - **查看自签名CA证书：openssl x509 -text -in ca.cert**
 - **证书格式转换：openssl x509 -in server.crt -out server.pem**
