@@ -66,9 +66,8 @@
 
 - sipendpoint
 
-
 - registar 
-	1. AccountThread    -- accountList
+	1. AccountThread    -- accountList          【注册登录队列】
 	2. ConnectionThread -- connectionList
 	3. SubscriptionThread -- subscriptionList
 	4. QueueThread  -- regQueue
@@ -82,8 +81,11 @@
     12. conn [MySql]
 
 ### **相关问题**
-1. SIP注册逻辑如何与视频会议结合
-2. Rstp,Srs如何参与视频会议
+- SIP注册逻辑如何与视频会议结合
+    1. 把成员加入会议列表，然后发起会议.
+
+- Rtsp,Srs如何参与视频会议
+    1. 把Rtsp模拟一个会议成员参与会议
 
 
 
