@@ -219,6 +219,10 @@
 
     -- 如何比较SQL中的时间段
     select * from table where timestamp(create_time)='2020-12-09 21:01:20';
+
+    -- 数据库升级过程中更新表数据
+    ALTER TABLE `conference_history` ADD COLUMN `device_ip` varchar(15) NOT NULL DEFAULT '';
+    UPDATE conference_history a JOIN video_device b ON a.device_serial_number = b.serial_number SET a.device_ip = b.ip_addr;
     ```
     
 - <b>SQL函数</b>
