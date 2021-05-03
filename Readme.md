@@ -127,7 +127,8 @@
 ### **Dir: Architecture**
 |File|Comment|
 |:---|:---|
-|MicroPrespective.md|宏观架构|
+|[MicroPrespective.md](./Architecture/MicroPrespective.md)|宏观架构|
+|[2_smallestComputer.md](./Architecture/MicroPrespective.md)|最简计算机需求分析|
 |||
 
 ### **Dir: Audio**
