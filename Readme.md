@@ -173,6 +173,7 @@
 |reload.txt|C++重载操作符|
 |template.txt|C++模板编程|
 
+
 ### **Dir: History** ###
 |File|Comment|
 |:---|:---|
@@ -255,13 +256,15 @@
 |||
 
 
-### **Dir: Work** ###
+### **Dir: Experience** ###
 > **工作设计总结**
 
 |File|Comment|
 |:--|:--|
 |[C.md](Experience/C.md)|C语言泛型编程与工程思想|
-|Experience/VerionInfoInProtocol.md|协议中的版本号|
+|[Debug.md](Experience/Debug.md)|没有Rebuild导致的问题|
+|[Design.md](Experience/Design.md)|接口设计相关问题|
+|[Version/InfoProtocol.md](Experience/VerionInfoInProtocol.md)|协议中的版本号|
 |[NatQuestion.md](Experience/NatQuestion.md)|openmcu局域网穿透问题|
 
 ### **Dir: Video** ###
