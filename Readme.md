@@ -136,6 +136,7 @@
 |:--|:--|
 |[info.md](Audio/info.md)|音频基础知识|
 |[Audio.md](Audio/Audio.md)|PCM音频数据处理|
+|[Resample.md](Audio/Resample.md)|声音重采样基础知识|
 |[simplest_acc_parser.md](Audio/simplest_acc_parser.md)|ACC码流解析|
 |||
 
@@ -174,12 +175,22 @@
 |template.txt|C++模板编程|
 
 
+
+
+
+
 ### **Dir: History** ###
 |File|Comment|
 |:---|:---|
 |History_computerTheory|计算机数学理论历史|
 |History_math_part1|中世纪前数学史|
 |History_math_part2|中世纪~费马数学史|
+
+### **Dir: Hardware** ###
+|File|Comment|
+|:---|:---|
+|[Latency.md](Hardware/Latency.md)|延时|
+
 
 ### **Dir: SQL** ###
 |File|Comment|
