@@ -133,9 +133,14 @@
     }
     ```
 
-
-
-
+### **其他**
+- 为了避免 Model 知道 View 的实现细节，可以让 Model 耦合 GDI 接口。
+- 模块间通信如果避免不了耦合，就耦合稳定的模块，这个模块最好是系统的，因为系统模块相对于业务模块通常更加稳定；
+- ViewModel 持有 Model，并由 Controller 来更新 Model/ViewModel；
+- ViewModel 定义 Controller 的行为规则，但并不关心 Controller 的具体行为。Controller 可以选择性的接管 ViewModel 的事件；
+- ViewModel 协调 Model 和 Controller，启到承上启下的作用，所以 ViewModel 职责的划分对程序的结构有比较大的影响；
+- 避免 Controller 之间的耦合，可以使用 ViewModel 作为通信中介者；
+- 相同的 Model 可能在 Controller 层有不同的展现方法；
 
 
 
