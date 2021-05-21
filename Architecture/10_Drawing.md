@@ -113,6 +113,14 @@
 1. Model 层支持的图形只有 QLine、QRect、QEllipse、QPath 等四种，
 2. 但是界面表现有六种：Line、Rect、Ellipse、Circle、Path、FreePath 等等。这是非常正常的现象。
 
+- **撤销绘制事件**
+1. onControllerReset 事件是创建图形的 Controller（例如 QPathCreator、QRectCreator 等）发出，并由 Menu 这个 Controller 接收。
+2. 涉及了 View 层事件机制的设计问题
+    ```sh
+    # 要不要支持任意的事件?
+    # 监听事件是支持单播还是多播？
+    ```
+
 - **相关代码设计：**
     ```js
     class QPathCreator {
@@ -133,6 +141,42 @@
     }
     ```
 
+### **联网画图版本要考虑的问题**
+- **编辑版本ID号**
+    1. **DisplayId**: 带t开头，表示这篇文档从它被创建开始，从未与服务器同步过，是一篇临时的文档。一旦它完成与服务端的同步后，就会改用服务端返回的文档 ID。
+    2. **LocalId**: 在文档还没有和服务端同步时，它和 displayID 是有关系的。文档第一次保存到服务端后，它的 displayID 会变化，而 localID 则并不改变。
+    3. **SharpId**:
+        ```sh 
+        #a. 当 Shape 发生变化，比如修改图形样式、移动，我们修改 shapeID => shapeJsonData。
+        #b. 请注意，在浏览器的 localStorage 里面，shapeID 是要全局唯一的，我们实际存储的是 QPaintDoc.localID + ":" + shape.id。
+        ```
+    4. **DocumentId**:  
+
+- **数据变更**
+    - **数据变更分为了两级**
+    1. shapeChanged有三种
+        ```sh
+        # 修改一个 shape 的图形样式（setProp）
+        # 移动一个 shape 的位置（move）
+        # 增加一个图形（addShape）
+        ```
+    2.  documentChanged有两种
+        ```sh
+        # 增加一个图形（addShape），它会导致文档的图形数量增加一个，发生 documentChanged；
+        # 删除一个图形（deleteShape），它会导致文档的图形数量减少一个，发生 documentChanged。
+        ```
+
+- **存储的容量限制与安全**
+    1. 本地内存不够时，淘汰最远历史存储
+    2. 用户登录退出时清空浏览器本地数据库
+
+- **重试的友好性**
+    1. 因为网络是不稳定的。这意味着，在发生一次网络请求失败时，在一些场景下你不一定能确定请求的真实状态。
+    2. 解决：请求上携带ID
+
+- **版本升级**
+    1. 带上版本信息
+
 ### **其他**
 - 为了避免 Model 知道 View 的实现细节，可以让 Model 耦合 GDI 接口。
 - 模块间通信如果避免不了耦合，就耦合稳定的模块，这个模块最好是系统的，因为系统模块相对于业务模块通常更加稳定；
@@ -141,57 +185,6 @@
 - ViewModel 协调 Model 和 Controller，启到承上启下的作用，所以 ViewModel 职责的划分对程序的结构有比较大的影响；
 - 避免 Controller 之间的耦合，可以使用 ViewModel 作为通信中介者；
 - 相同的 Model 可能在 Controller 层有不同的展现方法；
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
