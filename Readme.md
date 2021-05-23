@@ -123,13 +123,19 @@
 |**[Dir] Leetcode/Tree** | <b>目录：树题目</b> |
 |||
 
-
-
 ### **Dir: Architecture**
 |File|Comment|
 |:---|:---|
-|[MicroPrespective.md](./Architecture/MicroPrespective.md)|宏观架构|
-|[2_smallestComputer.md](./Architecture/MicroPrespective.md)|最简计算机需求分析|
+|[1_MicroPrespective.md](./Architecture/1_MicroPrespective.md)|宏观架构|
+|[2_smallestComputer.md](./Architecture/2_smallestComputer.md)|最简计算机需求分析|
+|[3_operationSystemApi.md](./Architecture/3_operationSystemApi.md)|最简计算机需求分析|
+|[4_mutilTask.md](./Architecture/4_mutilTask.md)|最简计算机需求分析|
+|[5_processSyn.md](./Architecture/5_processSyn.md)|最简计算机需求分析|
+|[6_security.md](./Architecture/6_security.md)|最简计算机需求分析|
+|[7_desktopDev.md](./Architecture/7_desktopDev.md)|最简计算机需求分析|
+|[8_MVC.md](./Architecture/8_MVC.md)|最简计算机需求分析|
+|[9_Web.md](./Architecture/9_Web.md)|最简计算机需求分析|
+|[10_Drawing.md](./Architecture/10_Drawing.md)|最简计算机需求分析|
 |||
 
 ### **Dir: Audio**
