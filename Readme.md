@@ -293,23 +293,28 @@
 ### **Dir: Video** ###
 |File|Comment|
 |:---|:---|
-|[Dir]flv| <b>flv简介</b> |
-|[Video/flv](Video/flv/flv.md)|flv封装格式|
-|[Dir]H264| <b>H264简介</b> |
-|[Video/h264/](Video/h264/H264Info.md)|H264封装格式|
+|[Dir]Application|音视频相关应用|
 |[Dir]Openmcu| <b>Openmcu介绍</b> |
-|[classInfo](Openmcu/ClassInfo.md)|Openmcu 类结构信息|
-|[FrameWorkInfo.md](Openmcu/FrameWorkInfo.md)|Openmcu 类结构信息|
+|[classInfo](Video/Application/Openmcu/ClassInfo.md)|Openmcu 类结构信息|
+|[FrameWorkInfo.md](Video/Application/Openmcu/FrameWorkInfo.md)|Openmcu 框架信息|
+|[Question.md](Video/Application/Openmcu/Question.md)|Openmcu 问题处理|
+|[Dir]Transfer|音视频传输|
+|[Dir]flv| <b>flv简介</b> |
+|[flv](Video/Transfer/flv/flv.md)|flv封装格式|
 |[Dir]ps|多媒体ps流简介|
-|[intro.md](ps/intro.md)|多媒体ps流简介|
+|[intro.md](Video/Transfer/ps/intro.md)|多媒体ps流简介|
 |[Dir]rtp|(多媒体rtp流简介|
-|[rtp.md](rtp/rtp.md)|多媒体rtp流简介|
+|[rtp.md](Video/Transfer/rtp/rtp.md)|多媒体rtp流简介|
 |[Dir]SDP|(多媒体SDP简介|
-|[intro.md](SDP/intro.md)|多媒体SDP协议简介|
+|[intro.md](Video/Transfer/SDP/intro.md)|多媒体SDP协议简介|
 |[Dir]SIP|(多媒体SIP协议流简介|
-|[SipIntro.md](SIP/SipIntro.md)|多媒体SIP协议流简介|
+|[SipIntro.md](Video/Transfer/SIP/SipIntro.md)|多媒体SIP协议流简介|
+|[Dir]Code|音视频编码|
+|[Dir]H264| <b>H264简介</b> |
+|[Video/h264/](Video/Code/h264/H264Info.md)|H264封装格式|
+|[Dir]Base|音视频基础|
 |[Dir]YUV|(多媒体YUV简介|
-|[Readme.md](YUV/Readme.md)|视频YUV数据简介|
+|[Readme.md](Video/Base/YUV/Readme.md)|视频YUV数据简介|
 |||
 
 
