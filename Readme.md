@@ -311,7 +311,13 @@
 |[SipIntro.md](Video/Transfer/SIP/SipIntro.md)|多媒体SIP协议流简介|
 |[Dir]Code|音视频编码|
 |[Dir]H264| <b>H264简介</b> |
-|[Video/h264/](Video/Code/h264/H264Info.md)|H264封装格式|
+|[H264Info.md](Video/Code/h264/H264Info.md)|H264封装格式|
+|[nal.md](Video/Code/h264/nal.md)|NAL数据包格式|
+|[libx264_commadline.md](Video/Code/h264/libx264/libx264_commadline.md)|H264命令行工具信息|
+|[libx264_intro.md](Video/Code/h264/libx264/libx264_intro.md)|x264源代码简单分析：概述|
+|[libx264_trunk.md](Video/Code/h264/libx264/libx264_trunk.md)|主干部分代码简介|
+|[libx264_trunk1.md](Video/Code/h264/libx264/libx264_trunk1.md)|libx264主干接口代码调用|
+|[libx264_trunk2.md](Video/Code/h264/libx264/libx264_trunk2.md)|libx264主干接口代码调用2|
 |[Dir]Base|音视频基础|
 |[Dir]YUV|(多媒体YUV简介|
 |[Readme.md](Video/Base/YUV/Readme.md)|视频YUV数据简介|
