@@ -4,7 +4,10 @@
 - H.264标准协议定义了两种不同的类型。
 - **VCL**: Video Coding Layer. 编码器吐出来的原始编码数据，没有考虑传输和存储问题。
 - **NAL**: Network Abstraction Layer. 对VCL输出的slice片数据进行了封装为NALUs(NAL  Units)便于网络传输。
-
+    1. 平时的每帧数据就是一个NAL单元（SPS与PPS除外）
+    2. 在实际的H264数据帧中，往往帧前面带有00 00 00 01 或 00 00 01分隔符
+    3. 一般来说编码器编出的首帧数据为PPS与SPS，接着为I帧……
+    
 ### **B. NALU数据包格式**
 > **NALU 数据包通常通过RTP进行传输**
 
@@ -43,9 +46,9 @@
 |31|未指定，保留||
 ||||
 
-### **C. H264视频流用RTP传输**
+### **C. H264视频流用RTP传输**  
 ![H264onRTP.png](H264onRTP.png)  
-**纠正：FU-Header type(5 bit)的取值范围：1-23**
+**纠正：FU-Header type(5 bit)的取值范围：1-23**  
 ![层次的码流结构](./rtpVideoCodeLevel.png)
 
 [参考链接](https://www.huaweicloud.com/articles79999bf7e4235d59927366e0dd1ca267.html)
