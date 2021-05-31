@@ -1,6 +1,9 @@
 ## **libx264主干接口代码调用**
 > **[雷神](https://blog.csdn.net/leixiaohua1020/article/details/45644367)**
 
+### **libx264框架图**
+![libx264_trunk1.png](./libx264_trunk1.png)
+
 ### **x264_encoder_open()** 
 - x264_sps_init()：根据输入参数生成H.264码流的SPS信息。
 - x264_pps_init()：根据输入参数生成H.264码流的PPS信息。
