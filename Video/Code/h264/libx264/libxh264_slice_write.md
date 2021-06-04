@@ -448,12 +448,12 @@ cont:
 ```
 
 ### **C. 重要的数据结构**
-- X264在宏块编码方面涉及到下面几个比较重要的结构体：
+- 【总纲】X264在宏块编码方面涉及到下面几个比较重要的结构体：
     1. 宏块像素存储缓存fenc_buf[]和fdec_buf[]——位于x264_t.mb.pic中，用于存储宏块的亮度和色度像素。
     2. 宏块各种信息的缓存Cache——位于x264_t.mb.pic中，用于存储宏块的信息例如4x4帧内预测模式、DCT的非0系数个数、运动矢量、参考帧序号等。
     3. 图像半像素点存储空间filtered[]——位于x264_frame_t中，用于存储半像素插值后的点。
 
-- 宏块像素存储缓存fenc_buf[]和fdec_buf[]
+- 【宏块】宏块像素存储缓存fenc_buf[]和fdec_buf[]
     1. fenc_buf[] 和 fdec_buf[] 为x264_t.mb.cache中的结构体，用于存储一个宏块的像素数据。
     2. fenc_buf[] 用于存储宏块编码像素数据
     3. fdec_buf[] 用于存储宏块重建像素数据。他们的定义如下所示。
@@ -467,7 +467,7 @@ cont:
         // 从定义可以看出，fenc_buf[]每行16个数据；而fdec_buf[]每行32个数据。
         // 在x264_t.mb.cache中和fenc_buf[]和fdec_buf[]相关的指针数组还有p_fenc[3]和p_fdec[3]，它们中的3个元素[0]、[1]、[2]分别指向分别指向对应缓存buf的Y、U、V分量。
         ```
-    4. 宏块编码像素格式为YUV420P的时候fenc_buf[]的存储示意图  
+    4. 宏块编码像素格式为YUV420P的时候fenc_buf[]的存储示意图    
     ![fenc.png](fenc.png)
 
         ```sh
@@ -475,13 +475,253 @@ cont:
         # p_fenc[0]指向Y的存储区域，p_fenc[1]指向U的存储区域，p_fenc[2]指向V的存储区域，在图中以方框的形式标注了出来。
         ```
 
-    5. 宏块重建像素格式为YUV420P的时候fdec_buf[]的存储示意图
+    5. 宏块重建像素格式为YUV420P的时候fdec_buf[]的存储示意图  
     ![fdec.png](fdec.png)  
         ```sh
         # 图中灰色区域存储Y，蓝色区域存储U，粉红区域存储V。
         # p_fenc[0]指向Y的存储区域，p_fenc[1]指向U的存储区域，p_fenc[2]指向V的存储区域。
         # fdec_buf[]和fenc_buf[]主要的区别在于fdec_buf[]像素块的左边和上边包含了左上方相邻块用于预测的像素。
         ```
+- 【宏块缓存】宏块各种信息的缓存Cache
+    1. 在x264中x264_t.mb.cache结构体中包含了存储宏块信息的各种各样的缓存Cache。
+        ```sh
+        # intra4x4_pred_mode：Intra4x4帧内预测模式的缓存
+        # non_zero_count：DCT的非0系数个数的缓存
+        # mv：运动矢量缓存
+        # ref：运动矢量参考帧的缓存
+        ```
+    2. 几个Cache的定义
+        ```C
+        /* 宏块信息缓存cache */
+        struct
+        {
+            /* real intra4x4_pred_mode if I_4X4 or I_8X8, I_PRED_4x4_DC if mb available, -1 if not */
+        	/*
+			 * mb.cache.intra4x4_pred_mode[]格式如下
+			 *   |
+			 * --+--------------
+			 *   | 0 0 0 y y y y y
+			 *   | 0 0 0 y Y Y Y Y
+			 *   | 0 0 0 y Y Y Y Y
+			 *   | 0 0 0 y Y Y Y Y
+			 *   | 0 0 0 y Y Y Y Y
+			 */
+            ALIGNED_8( int8_t intra4x4_pred_mode[X264_SCAN8_LUMA_SIZE] );
+ 
+            /* i_non_zero_count if available else 0x80 */
+            /*
+             * mb.cache.non_zero_count[]格式如下
+             *   |
+             * --+--------------
+             *   | 0 0 0 y y y y y
+             *   | 0 0 0 y Y Y Y Y
+             *   | 0 0 0 y Y Y Y Y
+             *   | 0 0 0 y Y Y Y Y
+             *   | 0 0 0 y Y Y Y Y
+             *   | 0 0 0 u u u u u
+             *   | 0 0 0 u U U U U
+             *   | 0 0 0 u U U U U
+             *   | 0 0 0 u U U U U
+             *   | 0 0 0 u U U U U
+             *   | 0 0 0 v v v v v
+             *   | 0 0 0 v V V V V
+             *   | 0 0 0 v V V V V
+             *   | 0 0 0 v V V V V
+             *   | 0 0 0 v V V V V
+             */
+            ALIGNED_16( uint8_t non_zero_count[X264_SCAN8_SIZE] );
+ 
+            /* -1 if unused, -2 if unavailable */
+            /*
+             * mb.cache.ref[0][]格式如下
+             *   |
+             * --+--------------
+             *   | 0 0 0 y y y y y
+             *   | 0 0 0 y Y Y Y Y
+             *   | 0 0 0 y Y Y Y Y
+             *   | 0 0 0 y Y Y Y Y
+             *   | 0 0 0 y Y Y Y Y
+             */
+            ALIGNED_4( int8_t ref[2][X264_SCAN8_LUMA_SIZE] );
+ 
+            /* 0 if not available */
+            /*
+             * mb.cache.mv[0][]格式如下
+             *   |
+             * --+--------------
+             *   | 0 0 0 y y y y y
+             *   | 0 0 0 y Y Y Y Y
+             *   | 0 0 0 y Y Y Y Y
+             *   | 0 0 0 y Y Y Y Y
+             *   | 0 0 0 y Y Y Y Y
+             */
+            ALIGNED_16( int16_t mv[2][X264_SCAN8_LUMA_SIZE][2] );
+            ALIGNED_8( uint8_t mvd[2][X264_SCAN8_LUMA_SIZE][2] );
+ 
+            /* 1 if SKIP or DIRECT. set only for B-frames + CABAC */
+            ALIGNED_4( int8_t skip[X264_SCAN8_LUMA_SIZE] );
+ 
+            ALIGNED_4( int16_t direct_mv[2][4][2] );
+            ALIGNED_4( int8_t  direct_ref[2][4] );
+            int     direct_partition;
+            ALIGNED_4( int16_t pskip_mv[2] );
+ 
+            /* number of neighbors (top and left) that used 8x8 dct */
+            int     i_neighbour_transform_size;
+            int     i_neighbour_skip;
+ 
+            /* neighbor CBPs */
+            int     i_cbp_top;
+            int     i_cbp_left;
+ 
+            /* extra data required for mbaff in mv prediction */
+            int16_t topright_mv[2][3][2];
+            int8_t  topright_ref[2][3];
+ 
+            /* current mb deblock strength */
+            uint8_t (*deblock_strength)[8][4];
+        } cache;
+
+        /* 
+            观察上面的定义，会发现Cache都是一个包含x*8个元素的一维数组（x取15或者5）。Cache使用一维数组比较形象的存储了二维图像的信息。
+            从上面的代码可以看出Cache中存储有效数据的地方是一个位于右下角的“方形区域”，这一部分实际上对应一维数组中第12-15，20-23，28-31，36-39的元素。
+            这个“方形区域”代表了一个宏块的亮度相关的信息，其中一共包含16个元素。
+            由于1个宏块的亮度数据是1个16x16的块，所以这个“方形区域”里面1个元素实际上代表了一个4x4的块的信息（“4x4”的亮度块应该也是H.264压缩编码中最小的处理单元）。
+            如果我们使用12-15，20-23，28-31，36-39这些范围内的下标引用Cache中的元素，实在是不太方便。由此也引出了x264中另一个关键的变量——scan8[]数组。
+        */
+        ```
+    3. scan8[]存储的是缓存的序号值，它一般情况下是与前面提到的Cache配合使用的
+        ```C
+        // scan8[]的定义位于libavcodec\h264.h，如下所示:
+        /* Scan8 organization:
+        *    0 1 2 3 4 5 6 7
+        * 0  DY    y y y y y
+        * 1        y Y Y Y Y
+        * 2        y Y Y Y Y
+        * 3        y Y Y Y Y
+        * 4        y Y Y Y Y
+        * 5  DU    u u u u u
+        * 6        u U U U U
+        * 7        u U U U U
+        * 8        u U U U U
+        * 9        u U U U U
+        * 10 DV    v v v v v
+        * 11       v V V V V
+        * 12       v V V V V
+        * 13       v V V V V
+        * 14       v V V V V
+        * DY/DU/DV are for luma/chroma DC.
+        */
+        /*
+        * 扫描方式：
+        * o-o o-o
+        *  / / /
+        * o-o o-o
+        *  ,---'
+        * o-o o-o
+        *  / / /
+        * o-o o-o
+        */
+        /*
+        * 关于多次出现的scan8
+        *
+        * cache是一个表格。表格中存储了一整个宏块的信息，每一个元素代表了一个“4x4块”（H.264中最小的处理单位）。
+        * scan8[]则存储了宏块信息在cache中的索引值
+        *
+        * scan8[]中的“8”，意思应该是按照8x8为单元来扫描？
+        * 因此可以理解为“按照8x8为单元来扫描4x4的块”？
+        *
+        * scan8中按照顺序分别存储了Y，U，V的索引值。具体的存储还是在相应的cache中。
+        *
+        * cache中首先存储Y，然后存储U和V。cache中的存储方式如下所示。
+        * 其中数字代表了scan8[]中元素的索引值
+        *
+        * +---+---+---+---+---+---+---+---+---+
+        * |   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+        * +---+---+---+---+---+---+---+---+---+
+        * | 0 | 48|   |   |   |  y|  y|  y|  y|
+        * | 1 |   |   |   |  y|  0|  1|  4|  5|
+        * | 2 |   |   |   |  y|  2|  3|  6|  7|
+        * | 3 |   |   |   |  y|  8|  9| 12| 13|
+        * | 4 |   |   |   |  y| 10| 11| 14| 15|
+        * | 5 | 49|   |   |   |  u|  u|  u|  u|
+        * | 6 |   |   |   |  u| 16| 17| 20| 21|
+        * | 7 |   |   |   |  u| 18| 19| 22| 23|
+        * | 8 |   |   |   |  u| 24| 25| 28| 29|
+        * | 9 |   |   |   |  u| 26| 27| 30| 31|
+        * |10 | 50|   |   |   |  v|  v|  v|  v|
+        * |11 |   |   |   |  v| 32| 33| 36| 37|
+        * |12 |   |   |   |  v| 34| 35| 38| 39|
+        * |13 |   |   |   |  v| 40| 41| 44| 45|
+        * |14 |   |   |   |  v| 42| 43| 46| 47|
+        * |---+---+---+---+---+---+---+---+---+
+        * |   |
+        *
+        */
+        
+        #define LUMA_DC   48
+        #define CHROMA_DC 49
+        
+        static const uint8_t x264_scan8[16*3 + 3] =
+        {
+            4+ 1*8, 5+ 1*8, 4+ 2*8, 5+ 2*8,
+            6+ 1*8, 7+ 1*8, 6+ 2*8, 7+ 2*8,
+            4+ 3*8, 5+ 3*8, 4+ 4*8, 5+ 4*8,
+            6+ 3*8, 7+ 3*8, 6+ 4*8, 7+ 4*8,
+            4+ 6*8, 5+ 6*8, 4+ 7*8, 5+ 7*8,
+            6+ 6*8, 7+ 6*8, 6+ 7*8, 7+ 7*8,
+            4+ 8*8, 5+ 8*8, 4+ 9*8, 5+ 9*8,
+            6+ 8*8, 7+ 8*8, 6+ 9*8, 7+ 9*8,
+            4+11*8, 5+11*8, 4+12*8, 5+12*8,
+            6+11*8, 7+11*8, 6+12*8, 7+12*8,
+            4+13*8, 5+13*8, 4+14*8, 5+14*8,
+            6+13*8, 7+13*8, 6+14*8, 7+14*8,
+            0+ 0*8, 0+ 5*8, 0+10*8
+        };
+
+        /*
+        可以看出scan8[]数组中元素的值都是以“a+b*8”的形式写的，我们不妨计算一下前面16个元素的值：
+        scan8[0]=12
+        scan8[1]= 13
+        scan8[2]= 20
+        scan8[3]= 21
+        scan8[4]= 14
+        scan8[5]= 15
+        scan8[6]= 22
+        scan8[7]= 23
+        scan8[8]= 28
+        scan8[9]= 29
+        scan8[10]= 36
+        scan8[11]= 37
+        scan8[12]= 30
+        scan8[13]= 31
+        scan8[14]= 38
+        scan8[15]= 39
+        */
+        ```  
+        把scan8[]数组这些元素的值，作为Cache（例如mv[]，ref[]等）的序号，会发现他们的在Cache中代表的元素的位置如下图所示。   
+        ![Scan8onCache](../image/Scan8onCache.jpg)  
+        上图中灰色背景的元素即为Cache中有效的元素（不使用左边的空白区域的元素可能是由于历史原因）。
+        直接使用Cache元素序号可能感觉比较抽象，下图使用scan8[]数组元素序号表示Cache中存储的数据，则结果如下图所示。  
+        ![Scan8onCache1](../image/Scan8onCache1.jpg)  
+        旧版的cache存储分布：  
+        ![cache](../image/cache.jpg)  
+
+- 图像半像素点存储缓存filtered[]
+    1. X264中在图像运动搜索的过程中，需要使用1/4像素精度的运动补偿。
+    2. 其中半像素点的内插工作是提前完成的。每一帧的半像素点存储在x264_frame_t的filtered[3][4]变量中。其
+    3. 中前面的“[3]”代表Y，U，V三个分量，后面的“[4]”分别存储了整像素, H半像素, V半像素, C（对角线）半像素的数据。
+    4. 下面的图以4x4图像块为例演示了filtered[][4]中几种半像素点与整像素点之间的位置关系。图中灰色的点为整像素点，黄色的点为半像素点。   
+        ![HalfPix](../image/HalfPixel.jpg)
+
+
+
+
+
+
+
+
+
 
 
 
