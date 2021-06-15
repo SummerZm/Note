@@ -13,11 +13,16 @@
 - 客观音视频质量评价 (Objective Quality Assessment，OQA)
     ```sh
     # 全参考(FullReference，FR)
+        # A. 均方差 MSE      【原始视频和参考视频的保真度】
+        # B. 峰值信噪比 PSNR 【均方差的对数表示形式】
+        # C. SSIM           【模拟人体视觉器官，对视频质量的损失进行评估】
     # 部分参考(ReducedReference，RR)
     # 无参考(No Reference，NR)
     ```
-    ![assessment](./image/Assessment.jpg)
-
+    ![assessment](./image/Assessment.jpg)  
+    ![MSE](./image/MSE.jpg)
+    ![PSNR](./image/PSNR.jpg)
+    ![SSIM](./image/SSIM.jpg)
 
 ### **C. 质量评价涉及到的其它知识**
 - 1. 视频数据处理

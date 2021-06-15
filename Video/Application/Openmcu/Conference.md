@@ -11,7 +11,7 @@
 
 - **ConferenceMember**
     1. Dial()：拨号呼叫逻辑
-    2. 视频流读写：通过conference的MCUVideoMixerList操作音频流
+    2. 视频流读写：通过conference的MCUVideoMixerList操作视频流
     3. 内置conference指针，通过conferencez指针操作音频流
 
 - **ConferenceMonitor**
