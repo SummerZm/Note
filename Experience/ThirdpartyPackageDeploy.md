@@ -39,6 +39,16 @@
              </IfModule>
         #  
         ```
+    3. **关于服务器线程环境变量的解决办法**
+        ```sh
+        # 对于Ubuntu系统，找到环境变量配置文件，通常在/etc/apache2/envvars或者/usr/local/apache/bin/envvars(lamp.sh安装)中。
+        # 打开envvars文件，在文件末尾export系统和用户环境变量，一般：
+        #   A. 系统变量在/etc/environment中
+        #   B. 所有用户的环境变量在/etc/profile中
+        #   C. 单个用户的环境变量在~/.bashrc中
+        export PATH=/home/XXXXXX/soft/anaconda2/bin:/usr/local/cuda-8.0/......
+        export PYTHONPATH=.......
+        ```
 
 - **目录权限配置**
     1. apache 服务程序以某个系统用户运行时，会出现权限不足导致一些读写问题。
@@ -47,4 +57,6 @@
     1. php代码执行shell文件,环境变量问题导致无法找到要执行的命令工具：在shell文件中设置路径环境变量。
     2. 在命令行中终端执行shell脚本，能成功执行；但是在php却报出执行错误编码问题：在shell文件中设置语言环境变量。
     3. php代码执行shell文件，如果shell文件中有重定向 '>log ' 语句，其内容会在 respone 消息体中出现。
+
+
 
