@@ -540,7 +540,422 @@
         ![../image/HalfPixInsertAll.jpg](../image/HalfPixelInsertAll.jpg)
 
 - **x264_pixel_ssd_wxh()：PSNR计算**  
+1. **PSNR知识**
+    ```sh
+    # PSNR（Peak Signal to Noise Ratio，峰值信噪比）是最基础的视频质量评价方法。它的取值一般在20-50之间，值越大代表受损图片越接近原图片。  
+    # PSNR通过对原始图像和失真图像进行像素的逐点对比，计算两幅图像像素点之间的误差，并由这些误差最终确定失真图像的质量评分。  
+    # 
+    # 一幅MxN尺寸的图像的PSNR的计算公式如下所示：   
+    # xij 和yij 分别表示失真图像和原始图像对应像素点的灰度值；i，j 分别代表图像的行和列；  
+    # L 是图像灰度值可到达的动态范围，8位的灰度图像的L=2^8-1=255。
+    ```
+    ![../image/MES.jpg](../image/MES.jpg)  
+    如果已知SSD，MxN尺寸图像的PSNR公式如下所示。
+    
+    ```sh
+    MSE=SSD*1/(M*N)
+    PSNR=10*lg(255^2/MSE)
+    ```
+    PSNR仅仅计算了图像像素点间的绝对误差，没有考虑像素点间的视觉相关性，更没顾及人类视觉系统的感知特性，所以其评价结果与主观感受往往相差较大。  
+    例如下图两张图片的PSNR取值都在23.6左右，但是给人的感觉却是（a）图比（b）图清晰得多。  
+    ![../image/PSNR.jpg](../image/PSNR.jpg)   
+    正是由于PSNR方法存在上述的问题，人们才开始研究与人类视觉系统特性相关的质量评价方法。  
+    SSIM就是一种典型的与人类视觉系统特性结合的质量评价方法。
+
+2. **PSNR代码**
+    ```C
+        /*
+    * 计算SSD（可用于计算PSNR）
+    * pix1: 受损数据
+    * pix2: 原始数据
+    * i_width: 图像宽
+    * i_height: 图像高
+    */
+    uint64_t x264_pixel_ssd_wxh( x264_pixel_function_t *pf, pixel *pix1, intptr_t i_pix1,
+                                pixel *pix2, intptr_t i_pix2, int i_width, int i_height )
+    {
+        //计算结果都累加到i_ssd变量上
+        uint64_t i_ssd = 0;
+        int y;
+        int align = !(((intptr_t)pix1 | (intptr_t)pix2 | i_pix1 | i_pix2) & 15);
+    
+    #define SSD(size) i_ssd += pf->ssd[size]( pix1 + y*i_pix1 + x, i_pix1, \
+                                            pix2 + y*i_pix2 + x, i_pix2 );
+    
+    
+        /*
+        * SSD计算过程：
+        * 从左上角开始，绝大部分块使用16x16的SSD计算
+        * 右边边界部分可能用16x8的SSD计算
+        * 下边边界可能用8x8的SSD计算
+        * 注意：这么做主要是出于汇编优化的考虑
+        *
+        * +----+----+----+----+----+----+----+----+----+----+-+
+        * |                   |                   |         |
+        * +                   +                   +         +
+        * |                   |                   |         |
+        * +      16x16        +       16x16       +  8x16   +
+        * |                   |                   |         |
+        * +                   +                   +         +
+        * |                   |                   |         |
+        * +----+----+----+----+----+----+----+----+----+----+-+
+        * |         |
+        * +   8x8   +
+        * |         |
+        * +----+----+
+        * +         +
+        */
+        for( y = 0; y < i_height-15; y += 16 )
+        {
+            int x = 0;
+            //大部分使用16x16的SSD
+            if( align )
+                for( ; x < i_width-15; x += 16 )
+                    SSD(PIXEL_16x16);        //i_ssd += pf->ssd[PIXEL_16x16]();
+            //右边边缘部分可能用8x16的SSD
+            for( ; x < i_width-7; x += 8 )
+                SSD(PIXEL_8x16);             //i_ssd += pf->ssd[PIXEL_8x16]();
+        }
+        //下边边缘部分可能用到8x8的SSD
+        if( y < i_height-7 )
+            for( int x = 0; x < i_width-7; x += 8 )
+                SSD(PIXEL_8x8);              //i_ssd += pf->ssd[PIXEL_8x8]();
+    #undef SSD
+    
+    #define SSD1 { int d = pix1[y*i_pix1+x] - pix2[y*i_pix2+x]; i_ssd += d*d; }
+    
+        //如果像素不是16/8的整数倍，边界上的点需要单独算
+        if( i_width & 7 )
+        {
+            for( y = 0; y < (i_height & ~7); y++ )
+                for( int x = i_width & ~7; x < i_width; x++ )
+                    SSD1;
+        }
+        if( i_height & 7 )
+        {
+            for( y = i_height & ~7; y < i_height; y++ )
+                for( int x = 0; x < i_width; x++ )
+                    SSD1;
+        }
+    #undef SSD1
+    
+        return i_ssd;
+    }
+    ```
+
 - **x264_pixel_ssim_wxh()：SSIM计算** 
+1. **SSIM知识**
+    ```sh
+    # SSIM（Structural SIMilarity，结构相似度）是一种结合了亮度信息，对比度信息以及结构信息的视频质量评价方法。
+    # 它的取值在0-1之间，值越大代表受损图片越接近原图片。该方法的模型图如下所示。
+    ```
+    ![../image/SSIM.jpg](../image/SSIM.jpg)    
+    ```sh
+    # 从模型图可以看出，SSIM 评价方法中的结构相似度由三个层次的结构信息共同决定。  
+    # 首先假设 x、y 分别是原始图像信号和失真图像信号，然后分别计算这两个信号的亮度比较函数l(x,y)、对比度比较函数c(x,y)以及结构比较函数s(x,y)，  
+    # 最后经过加权合并计算得出图像结构相似度评价结果。这3个比较函数具体的公式如下所示。  
+    ```
+    **A. 亮度比较函数l(x,y)** 亮度均值μx如下所示。    
+    ![../image/SSIM_L.jpg](../image/SSIM_L.jpg)        
+    亮度比较函数的公式如下所示。其中C1为常量。    
+    ![../image/SSIM_L2.jpg](../image/SSIM_L2.jpg)         
+    </br> 
+    **B. 对比度比较函数c(x,y)**  亮度标准差σx如下所示。  
+    ![../image/SSIM_C.jpg](../image/SSIM_C.jpg)          
+    对比度比较函数的公式如下所示。其中C2为常量。   
+    ![../image/SSIM_C2.jpg](../image/SSIM_C2.jpg)  
+    </br>      
+    **C. 结构比较函数s(x,y)** 两个图像信号的相关系数σxy如下所示。  
+    ![../image/SSIM_S.jpg](../image/SSIM_S.jpg)     
+    结构比较函数定义如下所示。其中C3为常量。  
+    ![../image/SSIM_S2.jpg](../image/SSIM_S2.jpg)       
+    </br> 
+
+    **SSIM就是将上述三个公式相乘，公式如下所示**  
+    ![../image/SSIM_T.jpg](../image/SSIM_T.jpg)       
+    **为了便于计算，将α、β、γ的值都设为 1，并且令C3=C2/2，则上式的简化为下式。**  
+    ![../image/SSIM_T2.jpg](../image/SSIM_T2.jpg)     
+      
+    实际经验中，对整幅图像直接使用 SSIM 模型，不如局部分块使用最后综合的效果好。
+    因此SSIM的计算都是按照一个一个的小方块（例如8x8这种的方块）进行计算的。
+
+2. **SSIM代码**
+    ```c
+    /*
+    * 计算SSIM
+    * pix1: 受损数据
+    * pix2: 原始数据
+    * i_width: 图像宽
+    * i_height: 图像高
+    */
+    float x264_pixel_ssim_wxh( x264_pixel_function_t *pf,
+                            pixel *pix1, intptr_t stride1,
+                            pixel *pix2, intptr_t stride2,
+                            int width, int height, void *buf, int *cnt )
+    {
+        /*
+        * SSIM公式
+        * SSIM = ((2*ux*uy+C1)(2*σxy+C2))/((ux^2+uy^2+C1)(σx^2+σy^2+C2))
+        *
+        * 其中
+        * ux=E(x)
+        * uy=E(y)
+        * σxy=cov(x,y)=E(XY)-ux*uy
+        * σx^2=E(x^2)-E(x)^2
+        *
+        */
+        int z = 0;
+        float ssim = 0.0;
+        //这是数组指针，注意和指针数组的区别
+        //数组指针就是指向数组的指针
+        int (*sum0)[4] = buf;
+        /*
+        * sum0是一个数组指针，其中存储了一个4元素数组的地址
+        * 换句话说，sum0[]中每一个元素对应一个4x4块的信息（该信息包含4个元素）。
+        *
+        * 4个元素中：
+        * [0]原始像素之和
+        * [1]受损像素之和
+        * [2]原始像素平方之和+受损像素平方之和
+        * [3]原始像素*受损像素的值的和
+        *
+        */
+        int (*sum1)[4] = sum0 + (width >> 2) + 3;
+        //除以4，编程以“4x4块”为单位
+        width >>= 2;
+        height >>= 2;
+        //以8*8的块为单位计算SSIM值。然后以4个像素为step滑动窗口
+        for( int y = 1; y < height; y++ )
+        {
+            //下面这个循环，只有在第一次执行的时候执行2次，处理第1行和第2行的块
+            //后面的都只会执行一次
+            for( ; z <= y; z++ )
+            {
+                //执行完XCHG()之后，sum1[]存储上1行块的值（在上面），而sum0[]等待ssim_4x4x2_core()计算当前行的值（在下面）
+                XCHG( void*, sum0, sum1 );
+                //获取4x4块的信息（这里并没有代入公式计算SSIM结果）
+                //结果存储在sum0[]中。从左到右每个4x4的块依次存储在sum0[0]，sum0[1]，sum0[2]...
+                //每次x前进2个块
+                /*
+                * ssim_4x4x2_core()：计算2个4x4块
+                * +----+----+
+                * |    |    |
+                * +----+----+
+                */
+                for( int x = 0; x < width; x+=2 )
+                    pf->ssim_4x4x2_core( &pix1[4*(x+z*stride1)], stride1, &pix2[4*(x+z*stride2)], stride2, &sum0[x] );
+            }
+            //x每次增加4，前进4个块
+            //以8*8的块为单位计算
+            /*
+            * sum1[]为上一行4x4块信息，sum0[]为当前行4x4块信息
+            * 示例（line以4x4块为单位）
+            * 第1次运行
+            *       +----+----+----+----+
+            * 1line |   sum1[]
+            *       +----+----+----+----+
+            * 2line |   sum0[]
+            *       +----+----+----+----+
+            *
+            * 第2次运行
+            *       +
+            * 1line |
+            *       +----+----+----+----+
+            * 2line |   sum1[]
+            *       +----+----+----+----+
+            * 3line |   sum0[]
+            *       +----+----+----+----+
+            */
+            for( int x = 0; x < width-1; x += 4 )
+                ssim += pf->ssim_end4( sum0+x, sum1+x, X264_MIN(4,width-x-1) );//累加
+        }
+        *cnt = (height-1) * (width-1);
+        return ssim;
+    }
+
+    // 计算SSIM这段代码虽然看上去比较短，但是却不太容易理解。
+    // 总体说来这段代码实现的SSIM的计算是以8x8的块为单元，而以4为滑动窗口的滑动步长。
+    // 计算的示意图如下所示，图中每一个小方块代表一个4x4的像素块，绿色方块是正在计算区域。
+    ```
+    ![../image/SSIM_Calculation.jpg](../image/SSIM_Calculation.jpg)
+
+    ```C
+    /****************************************************************************
+     * structural similarity metric
+    * 获取2个4x4的块的信息
+    ****************************************************************************/
+    static void ssim_4x4x2_core( const pixel *pix1, intptr_t stride1,
+                                const pixel *pix2, intptr_t stride2,
+                                int sums[2][4] )
+    {
+        //计算2个块，分别存在sums[0]和sums[1]
+        for( int z = 0; z < 2; z++ )
+        {
+            uint32_t s1 = 0, s2 = 0, ss = 0, s12 = 0;
+            /*
+            * 计算4x4块
+            * +----+
+            * |    |
+            * +----+
+            */
+            for( int y = 0; y < 4; y++ )
+                for( int x = 0; x < 4; x++ )
+                {
+                    //两个图像上分别取一个点
+                    int a = pix1[x+y*stride1];
+                    int b = pix2[x+y*stride2];
+                    //累加
+                    s1  += a;
+                    s2  += b;
+                    //平方累加
+                    ss  += a*a;
+                    ss  += b*b;
+                    //相乘累加
+                    s12 += a*b;
+                }
+            /*
+            * [0]原始像素之和
+            * [1]受损像素之和
+            * [2]原始像素平方之和+受损像素平方之和
+            * [3]原始像素*受损像素的值的和
+            *
+            * [0]为a00+a01+a02....
+            * [1]为b00+b01+b02....
+            * [2]为a00^2 +a01^2+...+b00^2+b01^2+...
+            * [3]为a00*b00+a01*b01+...
+            */
+            sums[z][0] = s1;
+            sums[z][1] = s2;
+            sums[z][2] = ss;
+            sums[z][3] = s12;
+            //右移4个像素
+            pix1 += 4;
+            pix2 += 4;
+        }
+    }
+
+    // ssim_4x4x2_core()计算了2个4x4的下列信息：
+    // s1: 原始像素之和
+    // s2: 受损像素之和
+    // ss: 原始像素平方之和+受损像素平方之和
+    // s12: 原始像素*受损像素的值的和
+    ```
+    ssim_end4()用于计算SSIM，它的定义如下所示。
+    ```c
+    //width一般取4
+    static float ssim_end4( int sum0[5][4], int sum1[5][4], int width )
+    {
+        float ssim = 0.0;
+        //循环计算8x8块的SSIM（通过4个4x4块），并且累加
+        /*
+        * 	    +----+----+----+----+----+
+        * sum1 | 0  | 1  | 2  | 3  | 4  |
+        *      +----+----+----+----+----+
+        * sum0 | 0  | 1  | 2  | 3  | 4  |
+        *      +----+----+----+----+----+
+        *
+        *      +----+----+
+        * sum1 | 0  | 1  |
+        *      +----+----+
+        * sum0 | 0  | 1  |
+        *      +----+----+
+        *
+        *           +----+----+
+        * sum1      | 1  | 2  |
+        *           +----+----+
+        * sum0      | 1  | 2  |
+        *           +----+----+
+        *
+        *                +----+----+
+        * sum1           | 2  | 3  |
+        *                +----+----+
+        * sum0           | 2  | 3  |
+        *                +----+----+
+        *
+        *                     +----+----+
+        * sum1                | 3  | 4  |
+        *                     +----+----+
+        * sum0                | 3  | 4  |
+        *                     +----+----+
+        *
+        */
+        for( int i = 0; i < width; i++ )
+            ssim += ssim_end1( sum0[i][0] + sum0[i+1][0] + sum1[i][0] + sum1[i+1][0],
+                            sum0[i][1] + sum0[i+1][1] + sum1[i][1] + sum1[i+1][1],
+                            sum0[i][2] + sum0[i+1][2] + sum1[i][2] + sum1[i+1][2],
+                            sum0[i][3] + sum0[i+1][3] + sum1[i][3] + sum1[i+1][3] );
+        return ssim;
+    }
+    ```
+    ssim_end1()根据SSIM的公式计算1个块的SSIM。该函数的定义如下所示。
+    ```c
+    //计算1个块的SSIM
+    static float ssim_end1( int s1, int s2, int ss, int s12 )
+    {
+    /* Maximum value for 10-bit is: ss*64 = (2^10-1)^2*16*4*64 = 4286582784, which will overflow in some cases.
+    * s1*s1, s2*s2, and s1*s2 also obtain this value for edge cases: ((2^10-1)*16*4)^2 = 4286582784.
+    * Maximum value for 9-bit is: ss*64 = (2^9-1)^2*16*4*64 = 1069551616, which will not overflow. */
+    #if BIT_DEPTH > 9
+    #define type float
+        static const float ssim_c1 = .01*.01*PIXEL_MAX*PIXEL_MAX*64;
+        static const float ssim_c2 = .03*.03*PIXEL_MAX*PIXEL_MAX*64*63;
+    #else
+    #define type int
+        //常量C1,C2
+        static const int ssim_c1 = (int)(.01*.01*PIXEL_MAX*PIXEL_MAX*64 + .5);
+        static const int ssim_c2 = (int)(.03*.03*PIXEL_MAX*PIXEL_MAX*64*63 + .5);
+    #endif
+    
+        /*
+        * SSIM公式
+        * SSIM = ((2*ux*uy+C1)(2*σxy+C2))/((ux^2+uy^2+C1)(σx^2+σy^2+C2))
+        * 其中
+        * ux=E(x)
+        * uy=E(y)
+        * σxy=cov(x,y)=E(XY)-ux*uy
+        * σx^2=E(x^2)-E(x)^2
+        *
+        * 4个元素中：
+        * [0]原始像素之和
+        * [1]受损像素之和
+        * [2]原始像素平方之和+受损像素平方之和
+        * [3]原始像素*受损像素的值的和
+        *
+        */
+        //注意：这里都没有求平均值
+        //E(x)
+        type fs1 = s1;
+        //E(y)
+        type fs2 = s2;
+        type fss = ss;
+        type fs12 = s12;
+        //E(x^2)-E(x)^2+E(y^2)-E(y)^2
+        type vars = fss*64 - fs1*fs1 - fs2*fs2;
+        //cov(x,y)
+        type covar = fs12*64 - fs1*fs2;
+    
+        //计算公式在这里
+        return (float)(2*fs1*fs2 + ssim_c1) * (float)(2*covar + ssim_c2)
+            / ((float)(fs1*fs1 + fs2*fs2 + ssim_c1) * (float)(vars + ssim_c2));
+        #undef type
+    }
+    // 从源代码可以看出，ssim_end1()实现了上文所述的SSIM计算公式。
+    ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
