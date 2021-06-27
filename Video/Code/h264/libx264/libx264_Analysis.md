@@ -1813,100 +1813,100 @@ x264_mb_analyse_inter_b16x8()：B16x8宏块帧间预测模式分析。
         } x264_pixel_function_t;
         ```
     3. x264_pixel_sad_4x4(); x264_pixel_ssd_4x4(); x264_pixel_satd_4x4()
-        ```C
-        static int x264_pixel_sad_4x4( pixel *pix1, intptr_t i_stride_pix1, pixel *pix2, intptr_t i_stride_pix2 )
-        {
-            int i_sum = 0;
-            for( int y = 0; y < 4; y++ ) //4个像素
-            {
-                for( int x = 0; x < 4; x++ ) //4个像素
-                {
-                    i_sum += abs( pix1[x] - pix2[x] );//相减之后求绝对值，然后累加
-                }
-                pix1 += i_stride_pix1;
-                pix2 += i_stride_pix2;
-            }
-            return i_sum;
-        }
+    ```C
+    static int x264_pixel_sad_4x4( pixel *pix1, intptr_t i_stride_pix1, pixel *pix2, intptr_t i_stride_pix2 )
+	{
+		int i_sum = 0;
+		for( int y = 0; y < 4; y++ ) //4个像素
+		{
+			for( int x = 0; x < 4; x++ ) //4个像素
+			{
+				i_sum += abs( pix1[x] - pix2[x] );//相减之后求绝对值，然后累加
+			}
+			pix1 += i_stride_pix1;
+			pix2 += i_stride_pix2;
+		}
+		return i_sum;
+	}
 
-        static int x264_pixel_ssd_4x4( pixel *pix1, intptr_t i_stride_pix1, pixel *pix2, intptr_t i_stride_pix2 )
-        {
-            int i_sum = 0;
-            for( int y = 0; y < 4; y++ ) //4个像素
-            {
-                for( int x = 0; x < 4; x++ ) //4个像素
-                {
-                    int d = pix1[x] - pix2[x]; //相减
-                    i_sum += d*d;              //平方之后，累加
-                }
-                pix1 += i_stride_pix1;
-                pix2 += i_stride_pix2;
-            }
-            return i_sum;
-        }
+    static int x264_pixel_ssd_4x4( pixel *pix1, intptr_t i_stride_pix1, pixel *pix2, intptr_t i_stride_pix2 )
+	{
+		int i_sum = 0;
+		for( int y = 0; y < 4; y++ ) //4个像素
+		{
+			for( int x = 0; x < 4; x++ ) //4个像素
+			{
+				int d = pix1[x] - pix2[x]; //相减
+				i_sum += d*d;              //平方之后，累加
+			}
+			pix1 += i_stride_pix1;
+			pix2 += i_stride_pix2;
+		}
+		return i_sum;
+	}
 
-        //SAD（Sum of Absolute Difference）=SAE（Sum of Absolute Error)即绝对误差和
-        //SATD（Sum of Absolute Transformed Difference）即hadamard变换后再绝对值求和
-        //
-        //为什么帧内模式选择要用SATD？
-        //SAD即绝对误差和，仅反映残差时域差异，影响PSNR值，不能有效反映码流的大小。
-        //SATD即将残差经哈德曼变换的4x4块的预测残差绝对值总和，可以将其看作简单的时频变换，其值在一定程度上可以反映生成码流的大小。
-        //4x4的SATD
-        static NOINLINE int x264_pixel_satd_4x4( pixel *pix1, intptr_t i_pix1, pixel *pix2, intptr_t i_pix2 )
+    //SAD（Sum of Absolute Difference）=SAE（Sum of Absolute Error)即绝对误差和
+    //SATD（Sum of Absolute Transformed Difference）即hadamard变换后再绝对值求和
+    //
+    //为什么帧内模式选择要用SATD？
+    //SAD即绝对误差和，仅反映残差时域差异，影响PSNR值，不能有效反映码流的大小。
+    //SATD即将残差经哈德曼变换的4x4块的预测残差绝对值总和，可以将其看作简单的时频变换，其值在一定程度上可以反映生成码流的大小。
+    //4x4的SATD
+    static NOINLINE int x264_pixel_satd_4x4( pixel *pix1, intptr_t i_pix1, pixel *pix2, intptr_t i_pix2 )
+    {
+        sum2_t tmp[4][2];
+        sum2_t a0, a1, a2, a3, b0, b1;
+        sum2_t sum = 0;
+    
+        for( int i = 0; i < 4; i++, pix1 += i_pix1, pix2 += i_pix2 )
         {
-            sum2_t tmp[4][2];
-            sum2_t a0, a1, a2, a3, b0, b1;
-            sum2_t sum = 0;
-        
-            for( int i = 0; i < 4; i++, pix1 += i_pix1, pix2 += i_pix2 )
-            {
-                a0 = pix1[0] - pix2[0];
-                a1 = pix1[1] - pix2[1];
-                b0 = (a0+a1) + ((a0-a1)<<BITS_PER_SUM);
-                a2 = pix1[2] - pix2[2];
-                a3 = pix1[3] - pix2[3];
-                b1 = (a2+a3) + ((a2-a3)<<BITS_PER_SUM);
-                tmp[i][0] = b0 + b1;
-                tmp[i][1] = b0 - b1;
-            }
-            for( int i = 0; i < 2; i++ )
-            {
-                HADAMARD4( a0, a1, a2, a3, tmp[0][i], tmp[1][i], tmp[2][i], tmp[3][i] );
-                a0 = abs2(a0) + abs2(a1) + abs2(a2) + abs2(a3);
-                sum += ((sum_t)a0) + (a0>>BITS_PER_SUM);
-            }
-            return sum >> 1;
+            a0 = pix1[0] - pix2[0];
+            a1 = pix1[1] - pix2[1];
+            b0 = (a0+a1) + ((a0-a1)<<BITS_PER_SUM);
+            a2 = pix1[2] - pix2[2];
+            a3 = pix1[3] - pix2[3];
+            b1 = (a2+a3) + ((a2-a3)<<BITS_PER_SUM);
+            tmp[i][0] = b0 + b1;
+            tmp[i][1] = b0 - b1;
         }
-        ```
-        4. mbcmp_init()  
-        Intra宏块帧内预测模式的分析函数x264_mb_analyse_intra()中并没有直接调用x264_pixel_function_t 中sad[]/satd[]的函数  
-        而是调用了x264_pixel_function_t的mbcmp[]中的函数。mbcmp[]中实际上就是存储的sad[]/satd[]中的函数。
-        ```C
-        //决定了像素比较的时候用SAD还是SATD
-        static void mbcmp_init( x264_t *h )
+        for( int i = 0; i < 2; i++ )
         {
-            //b_lossless一般为0
-            //主要看i_subpel_refine，大于1的话就使用SATD
-            int satd = !h->mb.b_lossless && h->param.analyse.i_subpel_refine > 1;
-        
-            //sad或者satd赋值给mbcmp
-            memcpy( h->pixf.mbcmp, satd ? h->pixf.satd : h->pixf.sad_aligned, sizeof(h->pixf.mbcmp) );
-            memcpy( h->pixf.mbcmp_unaligned, satd ? h->pixf.satd : h->pixf.sad, sizeof(h->pixf.mbcmp_unaligned) );
-            h->pixf.intra_mbcmp_x3_16x16 = satd ? h->pixf.intra_satd_x3_16x16 : h->pixf.intra_sad_x3_16x16;
-            h->pixf.intra_mbcmp_x3_8x16c = satd ? h->pixf.intra_satd_x3_8x16c : h->pixf.intra_sad_x3_8x16c;
-            h->pixf.intra_mbcmp_x3_8x8c  = satd ? h->pixf.intra_satd_x3_8x8c  : h->pixf.intra_sad_x3_8x8c;
-            h->pixf.intra_mbcmp_x3_8x8 = satd ? h->pixf.intra_sa8d_x3_8x8 : h->pixf.intra_sad_x3_8x8;
-            h->pixf.intra_mbcmp_x3_4x4 = satd ? h->pixf.intra_satd_x3_4x4 : h->pixf.intra_sad_x3_4x4;
-            h->pixf.intra_mbcmp_x9_4x4 = h->param.b_cpu_independent || h->mb.b_lossless ? NULL
-                                    : satd ? h->pixf.intra_satd_x9_4x4 : h->pixf.intra_sad_x9_4x4;
-            h->pixf.intra_mbcmp_x9_8x8 = h->param.b_cpu_independent || h->mb.b_lossless ? NULL
-                                    : satd ? h->pixf.intra_sa8d_x9_8x8 : h->pixf.intra_sad_x9_8x8;
-            satd &= h->param.analyse.i_me_method == X264_ME_TESA;
-            memcpy( h->pixf.fpelcmp, satd ? h->pixf.satd : h->pixf.sad, sizeof(h->pixf.fpelcmp) );
-            memcpy( h->pixf.fpelcmp_x3, satd ? h->pixf.satd_x3 : h->pixf.sad_x3, sizeof(h->pixf.fpelcmp_x3) );
-            memcpy( h->pixf.fpelcmp_x4, satd ? h->pixf.satd_x4 : h->pixf.sad_x4, sizeof(h->pixf.fpelcmp_x4) );
+            HADAMARD4( a0, a1, a2, a3, tmp[0][i], tmp[1][i], tmp[2][i], tmp[3][i] );
+            a0 = abs2(a0) + abs2(a1) + abs2(a2) + abs2(a3);
+            sum += ((sum_t)a0) + (a0>>BITS_PER_SUM);
         }
-        ```
+        return sum >> 1;
+    }
+    ```
+    4. mbcmp_init()  
+    Intra宏块帧内预测模式的分析函数x264_mb_analyse_intra()中并没有直接调用x264_pixel_function_t 中sad[]/satd[]的函数  
+    而是调用了x264_pixel_function_t的mbcmp[]中的函数。mbcmp[]中实际上就是存储的sad[]/satd[]中的函数。
+    ```C
+    //决定了像素比较的时候用SAD还是SATD
+    static void mbcmp_init( x264_t *h )
+    {
+        //b_lossless一般为0
+        //主要看i_subpel_refine，大于1的话就使用SATD
+        int satd = !h->mb.b_lossless && h->param.analyse.i_subpel_refine > 1;
+    
+        //sad或者satd赋值给mbcmp
+        memcpy( h->pixf.mbcmp, satd ? h->pixf.satd : h->pixf.sad_aligned, sizeof(h->pixf.mbcmp) );
+        memcpy( h->pixf.mbcmp_unaligned, satd ? h->pixf.satd : h->pixf.sad, sizeof(h->pixf.mbcmp_unaligned) );
+        h->pixf.intra_mbcmp_x3_16x16 = satd ? h->pixf.intra_satd_x3_16x16 : h->pixf.intra_sad_x3_16x16;
+        h->pixf.intra_mbcmp_x3_8x16c = satd ? h->pixf.intra_satd_x3_8x16c : h->pixf.intra_sad_x3_8x16c;
+        h->pixf.intra_mbcmp_x3_8x8c  = satd ? h->pixf.intra_satd_x3_8x8c  : h->pixf.intra_sad_x3_8x8c;
+        h->pixf.intra_mbcmp_x3_8x8 = satd ? h->pixf.intra_sa8d_x3_8x8 : h->pixf.intra_sad_x3_8x8;
+        h->pixf.intra_mbcmp_x3_4x4 = satd ? h->pixf.intra_satd_x3_4x4 : h->pixf.intra_sad_x3_4x4;
+        h->pixf.intra_mbcmp_x9_4x4 = h->param.b_cpu_independent || h->mb.b_lossless ? NULL
+                                : satd ? h->pixf.intra_satd_x9_4x4 : h->pixf.intra_sad_x9_4x4;
+        h->pixf.intra_mbcmp_x9_8x8 = h->param.b_cpu_independent || h->mb.b_lossless ? NULL
+                                : satd ? h->pixf.intra_sa8d_x9_8x8 : h->pixf.intra_sad_x9_8x8;
+        satd &= h->param.analyse.i_me_method == X264_ME_TESA;
+        memcpy( h->pixf.fpelcmp, satd ? h->pixf.satd : h->pixf.sad, sizeof(h->pixf.fpelcmp) );
+        memcpy( h->pixf.fpelcmp_x3, satd ? h->pixf.satd_x3 : h->pixf.sad_x3, sizeof(h->pixf.fpelcmp_x3) );
+        memcpy( h->pixf.fpelcmp_x4, satd ? h->pixf.satd_x4 : h->pixf.sad_x4, sizeof(h->pixf.fpelcmp_x4) );
+    }
+    ```
 
 
 
