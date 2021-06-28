@@ -1,7 +1,7 @@
 ## **libx264: 滤波（Filter）部分**
 ![../image/libx264.jpg](../image/libx264_filter.jpg)
 
-- **x264_frame_deblock_row()：去块效应滤波器**  
+- **【解码】x264_frame_deblock_row()：去块效应滤波器**  
 1. **264的重建帧（通过解码得到）一般情况下会出现方块效应。产生这种效应的原因主要有两个：**
     ```sh
     # A. DCT变换后的量化造成误差（主要原因）
@@ -324,7 +324,7 @@
         #   由于QP越大表明压缩的程度越大，所以也可以得知高压缩比的情况下更需要进行环路滤波
         ```
 
-- **x264_frame_filter()：半像素插值【运动补偿】**
+- **【编码】x264_frame_filter()：半像素插值【运动补偿】**
     1. **1/4像素内插: 把原先的1个像素点拓展成4x4一共16个点**
         ```sh
         # 《H.264标准》中规定，运动估计为1/4像素精度。
@@ -539,7 +539,7 @@
         ```
         ![../image/HalfPixInsertAll.jpg](../image/HalfPixelInsertAll.jpg)
 
-- **x264_pixel_ssd_wxh()：PSNR计算**  
+- **【视频质量评估】x264_pixel_ssd_wxh()：PSNR计算**  
 1. **PSNR知识**
     ```sh
     # PSNR（Peak Signal to Noise Ratio，峰值信噪比）是最基础的视频质量评价方法。它的取值一般在20-50之间，值越大代表受损图片越接近原图片。  
@@ -643,7 +643,7 @@
     }
     ```
 
-- **x264_pixel_ssim_wxh()：SSIM计算** 
+- **【视频质量评估】x264_pixel_ssim_wxh()：SSIM计算** 
 1. **SSIM知识**
     ```sh
     # SSIM（Structural SIMilarity，结构相似度）是一种结合了亮度信息，对比度信息以及结构信息的视频质量评价方法。
