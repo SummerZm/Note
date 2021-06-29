@@ -1725,3 +1725,80 @@
 
 
 
+- **其他划分模式的帧间预测源代码**
+1. x264_mb_analyse_inter_p8x8()源代码：
+    ```C
+    /*
+    * 8x8帧间预测宏块分析
+    * +--------+
+    * |        |
+    * |        |
+    * |        |
+    * +--------+
+    */
+    static void x264_mb_analyse_inter_p8x8( x264_t *h, x264_mb_analysis_t *a )
+    {
+        /* Duplicate refs are rarely useful in p8x8 due to the high cost of the
+        * reference frame flags.  Thus, if we're not doing mixedrefs, just
+        * don't bother analysing the dupes. */
+        const int i_ref = h->mb.ref_blind_dupe == a->l0.me16x16.i_ref ? 0 : a->l0.me16x16.i_ref;
+        const int i_ref_cost = h->param.b_cabac || i_ref ? REF_COST( 0, i_ref ) : 0;
+        pixel **p_fenc = h->mb.pic.p_fenc;
+        int i_mvc;
+        int16_t (*mvc)[2] = a->l0.mvc[i_ref];
+    
+        /* XXX Needed for x264_mb_predict_mv */
+        h->mb.i_partition = D_8x8;
+    
+        i_mvc = 1;
+        CP32( mvc[0], a->l0.me16x16.mv );
+        //处理4个8x8块
+        for( int i = 0; i < 4; i++ )
+        {
+            x264_me_t *m = &a->l0.me8x8[i];
+            int x8 = i&1;
+            int y8 = i>>1;
+            //设定像素分块大小
+            m->i_pixel = PIXEL_8x8;
+            m->i_ref_cost = i_ref_cost;
+    
+            LOAD_FENC( m, p_fenc, 8*x8, 8*y8 );
+            LOAD_HPELS( m, h->mb.pic.p_fref[0][i_ref], 0, i_ref, 8*x8, 8*y8 );
+            LOAD_WPELS( m, h->mb.pic.p_fref_w[i_ref], 0, i_ref, 8*x8, 8*y8 );
+    
+            x264_mb_predict_mv( h, 0, 4*i, 2, m->mvp );
+            //调用x264_me_search_ref()
+            //进行运动估计
+            x264_me_search( h, m, mvc, i_mvc );
+    
+            x264_macroblock_cache_mv_ptr( h, 2*x8, 2*y8, 2, 2, 0, m->mv );
+    
+            CP32( mvc[i_mvc], m->mv );
+            i_mvc++;
+    
+            a->i_satd8x8[0][i] = m->cost - m->cost_mv;
+    
+            /* mb type cost */
+            m->cost += i_ref_cost;
+            if( !h->param.b_cabac || (h->param.analyse.inter & X264_ANALYSE_PSUB8x8) )
+                m->cost += a->i_lambda * i_sub_mb_p_cost_table[D_L0_8x8];
+        }
+        //保存开销。4个8x8块开销累加
+        a->l0.i_cost8x8 = a->l0.me8x8[0].cost + a->l0.me8x8[1].cost +
+                        a->l0.me8x8[2].cost + a->l0.me8x8[3].cost;
+        /* theoretically this should include 4*ref_cost,
+        * but 3 seems a better approximation of cabac. */
+        if( h->param.b_cabac )
+            a->l0.i_cost8x8 -= i_ref_cost;
+        h->mb.i_sub_partition[0] = h->mb.i_sub_partition[1] =
+        h->mb.i_sub_partition[2] = h->mb.i_sub_partition[3] = D_L0_8x8;
+    }
+    // 从源代码可以看出，x264_mb_analyse_inter_p8x8()中包含一个4次的for()循环，用于分别处理4个8x8的块。
+    // 在函数的结尾将4个8x8块的开销累加起来作为该宏块的开销。
+    ```
+
+
+
+
+
+
