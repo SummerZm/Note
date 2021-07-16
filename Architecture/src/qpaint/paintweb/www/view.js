@@ -6,7 +6,7 @@ var _onCurrentViewChangeds = []
 function onCurrentViewChanged(handle) {
     _onCurrentViewChangeds.push(handle)
 }
-
+//  初始化当前图形已经完成的操作 -- 在线离线重绘
 function setCurrentView(view) {
     let old = qview
     qview = view
@@ -27,7 +27,7 @@ var _onViewAddeds = []
 function onViewAdded(handle) {
     _onViewAddeds.push(handle)
 }
-
+// 添加已经绘制的图形 -- 在线离线重绘
 function fireViewAdded(view) {
     for (let i in _onViewAddeds) {
         let handle = _onViewAddeds[i]

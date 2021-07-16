@@ -1,15 +1,15 @@
 ## **怎么设计一个“画图”程序？**
 > [相关链接](https://time.geekbang.org/column/article/108887)
 
-### **Model层设计**
-> **能直观体现业务**
+### **Model层设计 【功能实现】**
+> **能直观体现业务： 浏览器端的 Model 层，代码就是一个 dom.js 文件**
 - 1. 添加图形（Shape），可以是 QLine，QRect，QEllipse，QPath 等等。
 - 2. 绘制（onpaint）
     ```sh
-    # 方案1：为了 View 层能够绘制，需要让 DOM 层把自己的数据暴露给 View 层。
-    # 方案2：从简洁的方式来说，是让 Model 层自己来绘制，这样就避免暴露 DOM 层的实现细节。
+    # 方案1：为了 View 层能够绘制，需要让 DOM 层把自己的数据暴露给 View 层。【Model只产生数据】
+    # 方案2：从简洁的方式来说，是让 Model 层自己来绘制，这样就避免暴露 DOM 层的实现细节。【Model产生数据和UI | 绘图是单一的UI可以使用方案2】
     # 取舍：
-    #   a. 耦合 GDI 比暴露 DOM 的数据细节要好，因为 GDI 的接口通常来说更稳定。
+    #   a. 耦合 GDI 比暴露 DOM 的数据细节要好，因为 GDI 的接口通常来说更稳定。如果是复杂呈现逻辑，应交由view层去实现。
     #   b. 在依赖选择上，我们会更倾向于依赖接口更为稳定的组件，因为这意味着我们的接口也更稳定。
     ```
 - 3. 示例代码
@@ -42,7 +42,7 @@
     }
     ```
 
-### **View and ViewModel层设计**
+### **View and ViewModel层设计 【界面框架、绘制整体呈现】**
 > **View 要做的工作一般已浏览器完成**
 
 - ViewModel 层相关内容细节
@@ -53,6 +53,7 @@
         ```
     2. 屏蔽平台的差异：
         ```sh
+        # 如果我们把实际绘制（onpaint）的工作交给 Model 层，那么 View 基本上就只是胶水层了。但是就算如此，View 层仍然承担了极其重要的责任。
         # A. Model 层很容易做到平台无关，除了 GDI 会略微费劲一点；
         # B. Controller 层除了有少量的界面需要处理平台差异外，大部分代码都是响应事件处理业务逻辑
         # C. View 层对事件的抽象得当，也是跨平台的。
@@ -101,10 +102,10 @@
         ```
 
 - View 层相关内容细节
-    1. View 层并不关心具体的 Controller 都有些什么，但是会对它们的行为规则进行定义。[各种onXxxx()事件]
-    2. 事件委托（delegate）：允许 Controller 选择自己感兴趣的事件进行响应。[controller实现的onXxxx()事件]
+    1. View 层并不关心具体的 Controller 都有些什么，但是会对它们的行为规则进行定义。[各种onXxxx()事件：业务规则数据信息的呈现]
+    2. 事件委托（delegate）：允许 Controller 选择自己感兴趣的事件进行响应。[controller实现的onXxxx()事件：在绘图的项目中已经被DOM标准规定好了]
 
-### **Controller层设计**
+### **Controller层设计 【业务逻辑、基于Mode层实现的路径组合】**
 
 - **避免了两类 Controller 相互耦合**
 1. 菜单并不直接和各类创建图形的 Controller 打交道，而是调用 qview.invokeController 来激活对应的 Controller，
@@ -140,6 +141,9 @@
         // ....
     }
     ```
+
+- **结构图解释**  
+![MVC.png](MVC.png)
 
 ### **联网画图版本要考虑的问题**
 - **编辑版本ID号**
