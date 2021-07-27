@@ -1,64 +1,57 @@
-// ----------------------------------------------------------
-
 class QShapeSelector {
-    constructor(view) {
+    constructor() {
         this.started = false
         this.pt = {x: 0, y: 0}
         this.ptMove = {x: 0, y: 0}
-        this.view = view
         let ctrl = this
-        view.onmousedown = function(event) { ctrl.onmousedown(event) }
-        view.onmousemove = function(event) { ctrl.onmousemove(event) }
-        view.onmouseup = function(event) { ctrl.onmouseup(event) }
-        view.onkeydown = function(event) { ctrl.onkeydown(event) }
+        qview.onmousedown = function(event) { ctrl.onmousedown(event) }
+        qview.onmousemove = function(event) { ctrl.onmousemove(event) }
+        qview.onmouseup = function(event) { ctrl.onmouseup(event) }
+        qview.onkeydown = function(event) { ctrl.onkeydown(event) }
     }
     stop() {
-        let view = this.view
-        view.onmousedown = null
-        view.onmousemove = null
-        view.onmouseup = null
-        view.onkeydown = null
-        view.drawing.style.cursor = "auto"
+        qview.onmousedown = null
+        qview.onmousemove = null
+        qview.onmouseup = null
+        qview.onkeydown = null
+        qview.drawing.style.cursor = "auto"
     }
 
     reset() {
         this.started = false
-        this.view.invalidateRect(null)
+        invalidate(null)
     }
 
     onmousedown(event) {
-        let view = this.view
-        this.pt = this.ptMove = view.getMousePos(event)
+        this.pt = this.ptMove = qview.getMousePos(event)
         this.started = true
-        let ht = view.doc.hitTest(this.pt)
-        if (view.selection != ht.hitShape) {
-            view.selection = ht.hitShape
-            view.invalidateRect(null)
+        let ht = qview.doc.hitTest(this.pt)
+        if (qview.selection != ht.hitShape) {
+            qview.selection = ht.hitShape
+            invalidate(null)
         }
     }
     onmousemove(event) {
-        let view = this.view
-        let pt = view.getMousePos(event)
+        let pt = qview.getMousePos(event)
         if (this.started) {
             this.ptMove = pt
-            view.invalidateRect(null)
+            invalidate(null)
         } else {
-            let ht = view.doc.hitTest(pt)
+            let ht = qview.doc.hitTest(pt)
             if (ht.hitCode > 0) {
-                view.drawing.style.cursor = "move"
+                qview.drawing.style.cursor = "move"
             } else {
-                view.drawing.style.cursor = "auto"
+                qview.drawing.style.cursor = "auto"
             }
         }
     }
     onmouseup(event) {
         if (this.started) {
-            let view = this.view
-            let selection = view.selection
+            let selection = qview.selection
             if (selection != null) {
-                let pt = view.getMousePos(event)
+                let pt = qview.getMousePos(event)
                 if (pt.x != this.pt.x || pt.y != this.pt.y) {
-                    selection.move(view.doc, pt.x - this.pt.x, pt.y - this.pt.y)
+                    selection.move(qview.doc, pt.x - this.pt.x, pt.y - this.pt.y)
                 }
             }
             this.reset()
@@ -68,9 +61,8 @@ class QShapeSelector {
         switch (event.keyCode) {
         case 8:  // keyBackSpace
         case 46: // keyDelete
-            let view = this.view
-            view.doc.deleteShape(view.selection)
-            view.selection = null
+            qview.doc.deleteShape(qview.selection)
+            qview.selection = null
         case 27: // keyEsc
             this.reset()
             break
@@ -78,7 +70,7 @@ class QShapeSelector {
     }
 
     onpaint(ctx) {
-        let selection = this.view.selection
+        let selection = qview.selection
         if (selection != null) {
             let bound = selection.bound()
             if (this.started) {
@@ -96,10 +88,6 @@ class QShapeSelector {
     }
 }
 
-onViewAdded(function(view) {
-    view.registerController("ShapeSelector", function() {
-        return new QShapeSelector(view)
-    })
+qview.registerController("ShapeSelector", function() {
+    return new QShapeSelector()
 })
-
-// ----------------------------------------------------------

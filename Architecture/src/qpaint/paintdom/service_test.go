@@ -1,101 +1,75 @@
 package paintdom
 
 import (
+	"bytes"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
-
-	"github.com/qiniu/http/restrpc"
-	"github.com/qiniu/qiniutest/httptest"
-	"github.com/qiniu/x/mockhttp"
-	"gopkg.in/mgo.v2"
 )
 
-func newTestingDocument(t *testing.T) *Document {
-	DBName = "testQPaint"
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		t.Fatal("mgo.Dial failed:", err)
+func TestRoute(t *testing.T) {
+	req := newRequest("POST", "http://localhost/drawings", nil)
+	route, _ := getRoute(req)
+	if route != "POST/drawings" {
+		t.Error("TestRoute: POST /drawings")
 	}
-	session.DB(DBName).DropDatabase()
-	return NewDocument(session)
+
+	req = newRequest("GET", "http://localhost/drawings/<DrawingID>", nil)
+	route, _ = getRoute(req)
+	if route != "GET/drawings/*" {
+		t.Error("TestRoute: GET /drawings/<DrawingID>")
+	}
+
+	req = newRequest("GET", "http://localhost/drawings/<DrawingID>/shapes/<ShapeID>", nil)
+	route, _ = getRoute(req)
+	if route != "GET/drawings/*/shapes/*" {
+		t.Error("TestRoute: GET /drawings/<DrawingID>/shapes/<ShapeID>")
+	}
 }
 
-func TestService(t *testing.T) {
+func newRequest(method, url string, data interface{}) *http.Request {
+	b, _ := json.Marshal(data)
+	body := bytes.NewReader(b)
+	req, _ := http.NewRequest(method, url, body)
+	return req
+}
 
-	doc := newTestingDocument(t)
+func newServer() *httptest.Server {
+	doc := NewDocument()
 	service := NewService(doc)
+	return httptest.NewServer(service)
+}
 
-	transport := mockhttp.NewTransport()
-	router := restrpc.Router{}
-	transport.ListenAndServe("qpaint.com", router.Register(service, routeTable))
+func Post(ret interface{}, url, body string) (err error) {
+	b := strings.NewReader(body)
+	resp, err := http.Post(url, "application/json", b)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	if (ret != nil) {
+		err = json.NewDecoder(resp.Body).Decode(ret)
+	}
+	return
+}
 
-	ctx := httptest.New(t)
-	ctx.SetTransport(transport)
+type idRet struct {
+	ID string `json:"id"`
+}
 
-	ctx.Exec(
-	`
-	post http://qpaint.com/drawings
-	header Authorization 'QPaintStub 1'
-	ret 200
-	json '{
-		"id": $(id1)
-	}'
+func TestNewDrawing(t *testing.T) {
 
-	match $(line1) '{
-		"id": "1",
-		"line": {
-			"pt1": {"x": 2.0, "y": 3.0},
-			"pt2": {"x": 15.0, "y": 30.0},
-			"style": {
-				"lineWidth": 3,
-				"lineColor": "red"
-			}
-		}
-	}'
+	ts := newServer()
+	defer ts.Close()
 
-	match $(line1v2) '{
-		"id": "1",
-		"line": {
-			"pt1": {"x":152,"y":333},
-			"pt2": {"x":158,"y":324},
-			"style": {"lineWidth":1,"lineColor":"black"}
-		}
-	}'
-
-	match $(line2) '{
-		"id": "2",
-		"line": {
-			"pt1": {"x":152,"y":133},
-			"pt2": {"x":358,"y":324},
-			"style": {"lineWidth":1,"lineColor":"black","fillColor":"white"}
-		}
-	}'
-
-	post http://qpaint.com/drawings/$(id1)/shapes
-	header Authorization 'QPaintStub 1'
-	json $(line1)
-	ret 200
-
-	get http://qpaint.com/drawings/$(id1)/shapes/1
-	header Authorization 'QPaintStub 1'
-	ret 200
-	json $(line1)
-
-	post http://qpaint.com/drawings/$(id1)/sync
-	header Authorization 'QPaintStub 1'
-	json '{
-		"changes": [$(line1v2), $(line2)],
-		"shapes": ["1", "2"]
-	}'
-	ret 200
-
-	get http://qpaint.com/drawings/$(id1)/shapes/1
-	header Authorization 'QPaintStub 1'
-	ret 200
-	json $(line1v2)
-
-	get http://qpaint.com/drawings/$(id1)/shapes/2
-	header Authorization 'QPaintStub 1'
-	ret 200
-	json $(line2)
-	`)
+	var ret idRet
+	err := Post(&ret, ts.URL + "/drawings", "")
+	if err != nil {
+		t.Fatal("Post /drawings failed:", err)
+	}
+	if ret.ID != "10001" {
+		t.Log("new drawing id:", ret.ID)
+	}
 }

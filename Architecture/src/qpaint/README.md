@@ -1,19 +1,5 @@
 # QPaint (by Qiniu.com)
 
-[![Build Status](https://travis-ci.org/qiniu/qpaint.svg?branch=master)](https://travis-ci.org/qiniu/qpaint) [![GoDoc](https://godoc.org/github.com/qiniu/qpaint?status.svg)](https://godoc.org/github.com/qiniu/qpaint)
-
-[![Qiniu Logo](http://open.qiniudn.com/logo.png)](http://www.qiniu.com/)
-
-## 辅助界面元素
-
-### 接口规格 (第 31 讲)
-
-| 类型 | 属性 | 方法 | 事件 |
-| ------------- | ---------- | ------ | ------------- |
-| BaseLineWidthPicker | id: string<br>value: number | blur() | onchange(event: Event) |
-| BaseColorPicker | id: string<br>value: Color<br>palette: string | blur() | onchange(event: Event) |
-| ColorPicker | id: string<br>palette: string<br>value: Color | blur() | onchange(event: Event) |
-
 ## QPaint DOM (第 30 讲)
 
 ### 网络协议

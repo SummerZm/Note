@@ -1,204 +1,215 @@
 package paintdom
 
 import (
-	"syscall"
-	"strconv"
-	"strings"
+	"bytes"
+	"encoding/json"
 	"log"
 	"net/http"
-
-	"gopkg.in/mgo.v2"
-	"github.com/qiniu/http/httputil"
-	"github.com/qiniu/http/restrpc"
-	"github.com/qiniu/x/jsonutil"
+	"io"
+	"strconv"
+	"strings"
+	"syscall"
 )
 
 // ---------------------------------------------------
 
-var (
-	errNotImpl  = httputil.NewError(499, "not impl")
-	errBadToken = httputil.NewError(401, "bad token")
-)
+type M map[string]interface{}
+type RouteTable map[string]func(w http.ResponseWriter, req *http.Request, args []string)
 
-func mgoError(err error) error {
-	if err == nil {
-		return nil
-	}
-	if err == mgo.ErrNotFound {
-		return syscall.ENOENT
-	}
-	if mgo.IsDup(err) {
-		return syscall.EEXIST
-	}
-	return err
-}
-
-// ---------------------------------------------------
-
-// Env 代表 RPC 请求的环境。
-type Env struct {
-	restrpc.Env
-	UID UserID
-}
-
-// OpenEnv 初始化环境。
-func (p *Env) OpenEnv(rcvr interface{}, w *http.ResponseWriter, req *http.Request) error {
-	auth := req.Header.Get("Authorization")
-	pos := strings.Index(auth, " ")
-	if pos < 0 || auth[:pos] != "QPaintStub" {
-		return errBadToken
-	}
-	uid, err := strconv.Atoi(auth[pos+1:])
-	if err != nil {
-		return errBadToken
-	}
-	p.UID = UserID(uid)
-	return p.Env.OpenEnv(rcvr, w, req)
-}
-
-// ---------------------------------------------------
-
-// Service 提供 RESTful API 层访问接口。
 type Service struct {
-	doc *Document
+	doc        *Document
+	routeTable RouteTable
 }
 
-// NewService 创建Service实例。
 func NewService(doc *Document) (p *Service) {
 	p = &Service{doc: doc}
+	p.routeTable = RouteTable{
+		"POST/drawings":              p.PostDrawings,
+		"GET/drawings/*":             p.GetDrawing,
+		"DELETE/drawings/*":          p.DeleteDrawing,
+		"POST/drawings/*/sync":       p.PostDrawingSync,
+		"POST/drawings/*/shapes":     p.PostShapes,
+		"GET/drawings/*/shapes/*":    p.GetShape,
+		"POST/drawings/*/shapes/*":   p.PostShape,
+		"DELETE/drawings/*/shapes/*": p.DeleteShape,
+	}
 	return
 }
 
-var routeTable = [][2]string{
-	{"POST /drawings", "PostDrawings"},
-	{"GET /drawings/*", "GetDrawing"},
-	{"DELETE /drawings/*", "DeleteDrawing"},
-	{"POST /drawings/*/sync", "PostDrawingSync"},
-	{"POST /drawings/*/shapes", "PostShapes"},
-	{"GET /drawings/*/shapes/*", "GetShape"},
-	{"POST /drawings/*/shapes/*", "PostShape"},
-	{"DELETE /drawings/*/shapes/*", "DeleteShape"},
-}
+func (p *Service) PostDrawingSync(w http.ResponseWriter, req *http.Request, args []string) {
+	b := bytes.NewBuffer(nil)
+	io.Copy(b, req.Body)
+	log.Println(req.Method, req.URL, b.String())
 
-// PostDrawingSync 同步客户端的修改。
-func (p *Service) PostDrawingSync(ds *serviceDrawingSync, env *Env) (err error) {
-	log.Println(env.Req.Method, env.Req.URL, jsonutil.Stringify(ds))
+	var ds serviceDrawingSync
+	err := json.NewDecoder(b).Decode(&ds)
+	if err != nil {
+		ReplyError(w, err)
+		return
+	}
 
 	changes := make([]Shape, len(ds.Changes))
 	for i, item := range ds.Changes {
 		changes[i] = item.Get()
 	}
 
-	id := env.Args[0]
-	drawing, err := p.doc.Get(env.UID, id)
+	id := args[0]
+	drawing, err := p.doc.Get(id)
 	if err != nil {
+		ReplyError(w, err)
 		return
 	}
-	return drawing.Sync(ds.Shapes, changes)
-}
-
-// PostDrawings 创建新drawing。
-func (p *Service) PostDrawings(env *Env) (ret M, err error) {
-	log.Println(env.Req.Method, env.Req.URL)
-	drawing, err := p.doc.Add(env.UID)
+	err = drawing.Sync(ds.Shapes, changes)
 	if err != nil {
+		ReplyError(w, err)
 		return
 	}
-	return M{"id": drawing.GetID()}, nil
+	ReplyCode(w, 200)
 }
 
-// GetDrawing 取得drawing的内容。
-func (p *Service) GetDrawing(env *Env) (ret M, err error) {
-	log.Println(env.Req.Method, env.Req.URL)
-	id := env.Args[0]
-	drawing, err := p.doc.Get(env.UID, id)
+func (p *Service) PostDrawings(w http.ResponseWriter, req *http.Request, args []string) {
+	log.Println(req.Method, req.URL)
+	drawing, err := p.doc.Add()
 	if err != nil {
+		ReplyError(w, err)
+		return
+	}
+	Reply(w, 200, M{"id": drawing.ID})
+}
+
+func (p *Service) GetDrawing(w http.ResponseWriter, req *http.Request, args []string) {
+	log.Println(req.Method, req.URL)
+	id := args[0]
+	drawing, err := p.doc.Get(id)
+	if err != nil {
+		ReplyError(w, err)
 		return
 	}
 	shapes, err := drawing.List()
 	if err != nil {
+		ReplyError(w, err)
 		return
 	}
-	return M{"shapes": shapes}, nil
+	Reply(w, 200, M{"shapes": shapes})
 }
 
-// DeleteDrawing 删除drawing。
-func (p *Service) DeleteDrawing(env *Env) (err error) {
-	id := env.Args[0]
-	return p.doc.Delete(env.UID, id)
-}
-
-// PostShapes 创建新shape。
-func (p *Service) PostShapes(aShape *serviceShape, env *Env) (err error) {
-	id := env.Args[0]
-	drawing, err := p.doc.Get(env.UID, id)
+func (p *Service) DeleteDrawing(w http.ResponseWriter, req *http.Request, args []string) {
+	id := args[0]
+	err := p.doc.Delete(id)
 	if err != nil {
+		ReplyError(w, err)
 		return
 	}
-	return drawing.Add(aShape.Get())
+	ReplyCode(w, 200)
 }
 
-// GetShape 取得一个shape的内容。
-func (p *Service) GetShape(env *Env) (shape Shape, err error) {
-	id := env.Args[0]
-	drawing, err := p.doc.Get(env.UID, id)
+func (p *Service) PostShapes(w http.ResponseWriter, req *http.Request, args []string) {
+	id := args[0]
+	drawing, err := p.doc.Get(id)
 	if err != nil {
+		ReplyError(w, err)
 		return
 	}
 
-	shapeID := env.Args[1]
-	return drawing.Get(shapeID)
+	var aShape serviceShape
+	err = json.NewDecoder(req.Body).Decode(&aShape)
+	if err != nil {
+		ReplyError(w, err)
+		return
+	}
+
+	err = drawing.Add(aShape.Get())
+	if err != nil {
+		ReplyError(w, err)
+		return
+	}
+	ReplyCode(w, 200)
 }
 
-// PostShape 修改一个shape。
-func (p *Service) PostShape(shapeOrZorder *serviceShapeOrZorder, env *Env) (err error) {
-	id := env.Args[0]
-	drawing, err := p.doc.Get(env.UID, id)
+func (p *Service) GetShape(w http.ResponseWriter, req *http.Request, args []string) {
+	id := args[0]
+	drawing, err := p.doc.Get(id)
 	if err != nil {
+		ReplyError(w, err)
 		return
 	}
 
-	shapeID := env.Args[1]
+	shapeID := args[1]
+	shape, err := drawing.Get(shapeID)
+	if err != nil {
+		ReplyError(w, err)
+		return
+	}
+	Reply(w, 200, shape)
+}
+
+func (p *Service) PostShape(w http.ResponseWriter, req *http.Request, args []string) {
+	id := args[0]
+	drawing, err := p.doc.Get(id)
+	if err != nil {
+		ReplyError(w, err)
+		return
+	}
+
+	var shapeID = args[1]
+	var shapeOrZorder serviceShapeOrZorder
+	err = json.NewDecoder(req.Body).Decode(&shapeOrZorder)
+	if err != nil {
+		ReplyError(w, err)
+		return
+	}
+
 	if shapeOrZorder.Zorder != "" {
-		return drawing.SetZorder(shapeID, shapeOrZorder.Zorder)
+		err = drawing.SetZorder(shapeID, shapeOrZorder.Zorder)
+	} else {
+		err = drawing.Set(shapeID, shapeOrZorder.Get())
 	}
-	return drawing.Set(shapeID, shapeOrZorder.Get())
+	if err != nil {
+		ReplyError(w, err)
+		return
+	}
+	ReplyCode(w, 200)
 }
 
-// DeleteShape 删除一个shape。
-func (p *Service) DeleteShape(env *Env) (err error) {
-	id := env.Args[0]
-	drawing, err := p.doc.Get(env.UID, id)
+func (p *Service) DeleteShape(w http.ResponseWriter, req *http.Request, args []string) {
+	id := args[0]
+	drawing, err := p.doc.Get(id)
 	if err != nil {
+		ReplyError(w, err)
 		return
 	}
 
-	shapeID := env.Args[1]
-	return drawing.Delete(shapeID)
+	shapeID := args[1]
+	err = drawing.Delete(shapeID)
+	if err != nil {
+		ReplyError(w, err)
+		return
+	}
+	ReplyCode(w, 200)
 }
 
 // ---------------------------------------------------
 
 type serviceShape struct {
 	ID      string       `json:"id"`
-	Path    *PathData    `json:"path,omitempty"`
-	Line    *LineData    `json:"line,omitempty"`
-	Rect    *RectData    `json:"rect,omitempty"`
-	Ellipse *EllipseData `json:"ellipse,omitempty"`
+	Path    *pathData    `json:"path"`
+	Line    *lineData    `json:"line"`
+	Rect    *rectData    `json:"rect"`
+	Ellipse *ellipseData `json:"ellipse"`
 }
 
 func (p *serviceShape) Get() Shape {
 	if p.Path != nil {
-		return &Path{ShapeBase: ShapeBase{p.ID}, PathData: *p.Path}
+		return &Path{shapeBase: shapeBase{p.ID}, pathData: *p.Path}
 	}
 	if p.Line != nil {
-		return &Line{ShapeBase: ShapeBase{p.ID}, LineData: *p.Line}
+		return &Line{shapeBase: shapeBase{p.ID}, lineData: *p.Line}
 	}
 	if p.Rect != nil {
-		return &Rect{ShapeBase: ShapeBase{p.ID}, RectData: *p.Rect}
+		return &Rect{shapeBase: shapeBase{p.ID}, rectData: *p.Rect}
 	}
 	if p.Ellipse != nil {
-		return &Ellipse{ShapeBase: ShapeBase{p.ID}, EllipseData: *p.Ellipse}
+		return &Ellipse{shapeBase: shapeBase{p.ID}, ellipseData: *p.Ellipse}
 	}
 	return nil
 }
@@ -215,16 +226,61 @@ type serviceDrawingSync struct {
 
 // ---------------------------------------------------
 
-// Main 是 paintdom 程序的 main 入口。
-func Main() {
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		log.Fatal(err)
+func Reply(w http.ResponseWriter, code int, data interface{}) {
+	b, _ := json.Marshal(data)
+	header := w.Header()
+	header.Set("Content-Type", "application/json")
+	header.Set("Content-Length", strconv.Itoa(len(b)))
+	w.WriteHeader(code)
+	w.Write(b)
+	log.Println("REPLY", code, string(b))
+}
+
+func ReplyCode(w http.ResponseWriter, code int) {
+	header := w.Header()
+	header.Set("Content-Length", "0")
+	w.WriteHeader(code)
+	log.Println("REPLY", code)
+}
+
+func ReplyError(w http.ResponseWriter, err error) {
+	if err == syscall.ENOENT {
+		Reply(w, 404, M{"error": "entry not found"})
+	} else if err == syscall.EINVAL {
+		Reply(w, 400, M{"error": "invalid arguments"})
+	} else if err == syscall.EEXIST {
+		Reply(w, 409, M{"error": "entry already exists"})
+	} else {
+		Reply(w, 500, M{"error": err.Error()})
 	}
-	doc := NewDocument(session)
+}
+
+// ---------------------------------------------------
+
+func (p *Service) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	route, args := getRoute(req)
+	if handle, ok := p.routeTable[route]; ok {
+		handle(w, req, args)
+	}
+}
+
+func getRoute(req *http.Request) (route string, args []string) {
+	parts := strings.Split(req.URL.Path, "/")
+	parts[0] = req.Method
+	for i := 2; i < len(parts); i += 2 {
+		args = append(args, parts[i])
+		parts[i] = "*"
+	}
+	route = strings.Join(parts, "/")
+	return
+}
+
+// ---------------------------------------------------
+
+func Main() {
+	doc := NewDocument()
 	service := NewService(doc)
-	router := restrpc.Router{}
-	http.ListenAndServe(":9999", router.Register(service, routeTable))
+	http.ListenAndServe(":9999", service)
 }
 
 // ---------------------------------------------------

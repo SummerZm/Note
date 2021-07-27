@@ -1,44 +1,6 @@
-// ----------------------------------------------------------
-
-var qview = null
-var _onCurrentViewChangeds = []
-
-function onCurrentViewChanged(handle) {
-    _onCurrentViewChangeds.push(handle)
-}
-//  初始化当前图形已经完成的操作 -- 在线离线重绘
-function setCurrentView(view) {
-    let old = qview
-    qview = view
-    for (let i in _onCurrentViewChangeds) {
-        let handle = _onCurrentViewChangeds[i]
-        handle(old)
-    }
-}
-
-function invalidate(reserved) {
-    qview.invalidateRect(reserved)
-}
-
-// ----------------------------------------------------------
-
-var _onViewAddeds = []
-
-function onViewAdded(handle) {
-    _onViewAddeds.push(handle)
-}
-// 添加已经绘制的图形 -- 在线离线重绘
-function fireViewAdded(view) {
-    for (let i in _onViewAddeds) {
-        let handle = _onViewAddeds[i]
-        handle(view)
-    }
-}
-
-// ----------------------------------------------------------
-
 class QPaintView {
-    constructor(drawingID) {
+    constructor() {
+        this.style = new QShapeStyle(1, "black", "white")
         this.controllers = {}
         this._currentKey = ""
         this._current = null
@@ -50,7 +12,7 @@ class QPaintView {
         this.onkeydown = null
         this.onSelectionChanged = null
         this.onControllerReset = null
-        let drawing = document.getElementById(drawingID)
+        let drawing = document.getElementById("drawing")
         let view = this
         drawing.onmousedown = function(event) {
             event.preventDefault()
@@ -73,9 +35,6 @@ class QPaintView {
             if (view.ondblclick != null) {
                 view.ondblclick(event)
             }
-        }
-        drawing.onmouseenter = function(event) {
-            setCurrentView(view)
         }
         document.onkeydown = function(event) {
             switch (event.keyCode) {
@@ -167,4 +126,8 @@ class QPaintView {
     }
 }
 
-// ----------------------------------------------------------
+var qview = new QPaintView()
+
+function invalidate(reserved) {
+    qview.invalidateRect(null)
+}
