@@ -1,0 +1,39 @@
+﻿A. Typedef 函数指针的使用
+	int i[] = {10,20,30,40};
+	int m[] = {11,22,33,44};
+	int (*(t[]))[] = {&i, &m};  // 指向int数组的指针数组
+	===>
+	typedef int(*intArrayP)[]  // 不能够用sizeof
+	typedef int(*intArrayP)[]  // 能够用sizeof
+	数组名与地址
+	1. printf("sizeof &m %d  ==== %p\n", sizeof(&m), &m);
+	2. printf("sizeof m %d ===== %p\n", sizeof(m), m); 		// sizeof(&m) 与  sizeof(m) 不一样； &m与m一样
+	3. printf("sizeof *(&m) %d  ==== %p\n", sizeof(*(&m)), &m);   // sizeof(*(&m)) 与  sizeof(m) 一样
+	4. printf("sizeof m[0] %d ===== %p\n", sizeof(m[0]), m);
+
+
+系统说明：
+kernel : Linux version 4.4.83  (gcc version 4.9 20150123 (prerelease) (GCC) ) #487 SMP PREEMPT Thu Sep 12 11:05:33 CST 2019
+system: Android
+Platform:	RK3399
+
+问题描述：
+1. 网络状态：设备和电脑PC直连。设备提供web服务，
+2. 现象：
+    PC端浏览器访问设备web服务时频繁出现连接挂死；
+    抓包发现设备一直向PC发送TCP重传报文，直到服务超时socket被关闭。
+    通过以下命令，关闭硬件校验功能，则没有上述问题：
+     ethTool  -K eth0 rx off
+     ethTool  -K eth0 rx off 
+
+咨询内容：
+    1. 请问，什么原因导致要关闭发送和接的包头校验码传输才正常？
+    2. 关闭硬件校验功能可能会影响性能，有更好的解决方式吗？
+
+相关链接：
+网上其他相似现象：https://blog.csdn.net/cdxdrg/article/details/82714541
+使用ethTool解决问题的帖子： https://github.com/MichaIng/DietPi/issues/2028
+
+
+     
+   
