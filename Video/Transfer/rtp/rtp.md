@@ -5,7 +5,7 @@
 
 - **RTP:  实时传输协议(Real-time Transport Procotol): 一种网络传输协议，负责音视频数据的封包和传输**
 - **RTCP: 实时传输控制协议(Read-time Transport Control Protocol): 流量和拥塞控制，媒体间的同步**
-- **RTSP: 实时传输流协议(Real Time Streaming Procotol)**
+- **RTSP: 实时传输流协议(Real Time Streaming Procotol)**  
 ![RTP网络模型图](./rtpNetworkModel.jpg)
 
 ### **RTP连接的建立**
