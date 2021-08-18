@@ -5,6 +5,7 @@
 - c. openssl.0.2版本不会出现这问题，openssl.1.1.1出现此问题
 - d. openssl1.1.1k + 谷歌浏览器会出现这个问题，搜狗不会出现问题
 - e. 猜测：openssl1.1.1k + 谷歌浏览器每个请求都会创建一个连接。发送了keepalive的单字节包后，立刻关闭连接. 导致服务器大量的CLOSE_WAIT
+- f. 收尾：抓包排查发现TLS秘钥协商时出现 Certificate Unknow. 浏览器断开连接，但是服务器ssl没有没有close socket 
 
 
 
