@@ -9,3 +9,20 @@
 
 ### **锁问题**
 - 在函数调用里递归使用互斥锁会导致线程锁死
+
+### **stack smashing detected**
+- **原因：堆栈溢出**
+    ```C
+    // ex1: ...
+    AES_KEY* aes; /* error*/
+    AES_set_encrypt_key(key, 128, &aes);  // write something to aes-pointer without alloc memory. 
+    HTTP_AES_cfb1_crypt_file(infile, outfile, 0, &aes);
+    return 0   /* stack smashing*/
+
+    // ex2: ...
+    AES_KEY aes;    /* OK */
+    AES_set_encrypt_key(key, 128, &aes);
+    HTTP_AES_cfb1_crypt_file(infile, outfile, 0, &aes);
+    return 0        /* stack smashing*/
+
+    ```
