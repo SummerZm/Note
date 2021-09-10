@@ -84,7 +84,10 @@ int SSL_recovery_sha512_file(char* filename, unsigned char* o_shamd, int len)
 		fseek(fp, 0, SEEK_END);
 		filesize = ftell(fp);
 		fseek(fp, filesize-len, SEEK_SET);
-		ftruncate(fp, filesize-len);
+        {
+            int fpNo = fileno(fp);
+		    ftruncate(fpNo, filesize-len);
+        }
 		fclose(fp);
 	}
 	return 0;
