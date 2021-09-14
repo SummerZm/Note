@@ -27,6 +27,8 @@
 3. 效果：公钥是由消息发送者加密提供而不是内置在电脑中，避免第三方恶意病毒替换公钥，冒充消息发送者
 
 - **五、图解**  
+    ![https.png](https.png)
+
     ![cert.png](cert.png)  
 
     ![cert_process.png](cert_process.png)  
