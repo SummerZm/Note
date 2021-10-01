@@ -1,0 +1,52 @@
+MySQL创建用户与授权
+CREATE USER 'username'@'host' IDENTIFIED BY 'password';
+example:
+CREATE USER 'dog'@'localhost' IDENTIFIED BY '123456';
+
+删除用户:
+DROP USER 'username'@'host';
+
+====================================================================================
+
+授权:
+GRANT privileges ON databasename.tablename TO 'username'@'host'
+
+说明:
+privileges：用户的操作权限，如SELECT，INSERT，UPDATE等，如果要授予所的权限则使用ALL
+databasename：数据库名
+tablename：表名，如果要授予该用户对所有数据库和表的相应操作权限则可用*表示，如*.*
+example:
+GRANT privileges ON databasename.tablename TO 'username'@'host' WITH GRANT OPTION;
+
+撤销权限:
+REVOKE privilege ON databasename.tablename FROM 'username'@'host';
+=======================================================================================
+
+更改密码
+SET PASSWORD FOR 'username'@'host' = PASSWORD('newpassword');
+当前登陆用户用
+SET PASSWORD = PASSWORD("newpassword");
+
+==========================================================================================
+1. 修复mysql user表结构
+repair table mysql.user
+
+==========================================================================================
+mysql下的user表为空
+
+1. sql_mode=NO_ENGINE_SUBSTITUTION
+简单来说STRICT_TRANS_TABLES这个是启用严格模式，进入安全模式后如果启用了严格模式向表插入数据插入不了
+
+2. 安全模式启动MySQL  mysqld_safe –skip-grant-tables &
+
+3. 向user表插入root用户
+INSERT   INTO   user   (Host,User,Password)   VALUES( 'localhost', 'root',password( '123456'));
+
+4. 更新root用户权限
+update user set (所有权限列=Y) where user='root';commit;
+ 
+5. 重启mysql 
+
+
+
+
