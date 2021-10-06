@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ScappleDocument Version="1.1" ID="44B81990-E6D0-4009-8B89-2BFD134087C7">
+    <Notes>
+        <Note ID="0" FontSize="15.0" Position="257.0,166.0" Width="38.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.561855 0.71062 0.779401</Border>
+                <Fill>0.702319 0.888276 0.974252</Fill>
+            </Appearance>
+            <String>递归</String>
+            <ConnectedNoteIDs>1-2, 5, 7-8, 12</ConnectedNoteIDs>
+        </Note>
+        <Note ID="1" FontSize="12.0" Position="382.0,171.0" Width="200.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>只要遇到递归，就抽象成一个递推公式，不用想一层层的调用关系，不要试图用人脑去分解递归的每个步骤</String>
+            <ConnectedNoteIDs>0, 11</ConnectedNoteIDs>
+        </Note>
+        <Note ID="2" FontSize="12.0" Position="337.0,236.0" Width="80.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>警惕堆栈溢出</String>
+            <ConnectedNoteIDs>0, 3</ConnectedNoteIDs>
+        </Note>
+        <Note ID="3" FontSize="12.0" Position="437.0,250.0" Width="200.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>如果递归求解的数据规模很大，调用层次很深，一直压入栈就会有堆栈溢出的风险</String>
+            <ConnectedNoteIDs>2, 4</ConnectedNoteIDs>
+        </Note>
+        <Note ID="4" FontSize="12.0" Position="668.0,272.0" Width="152.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>在代码中限制最大递归深度
+超过深度就抛错</String>
+            <ConnectedNoteIDs>3</ConnectedNoteIDs>
+        </Note>
+        <Note ID="5" FontSize="12.0" Position="327.0,318.0" Width="80.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>警惕重复计算</String>
+            <ConnectedNoteIDs>0, 6</ConnectedNoteIDs>
+        </Note>
+        <Note ID="6" FontSize="12.0" Position="419.0,319.0" Width="188.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>通过比如散列表保存已求解的结果
+空间复杂度从 O(1) 变成 O(n)</String>
+            <ConnectedNoteIDs>5</ConnectedNoteIDs>
+        </Note>
+        <Note ID="7" FontSize="12.0" Position="125.0,222.0" Width="152.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>优缺点
+写起来逻辑清晰简洁代码断
+容易堆栈溢出，重复计算</String>
+            <ConnectedNoteIDs>0</ConnectedNoteIDs>
+        </Note>
+        <Note ID="8" FontSize="12.0" Position="281.0,137.0" Width="176.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>警惕生产环境脏数据导致死循环</String>
+            <ConnectedNoteIDs>0, 9</ConnectedNoteIDs>
+        </Note>
+        <Note ID="9" FontSize="12.0" Position="398.0,71.0" Width="200.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>如果 A 的推荐人是 B，B 的推荐人是 C，C 的推荐人是 A</String>
+            <ConnectedNoteIDs>8, 10</ConnectedNoteIDs>
+        </Note>
+        <Note ID="10" FontSize="12.0" Position="507.0,34.0" Width="104.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>解决方式是判断环</String>
+            <ConnectedNoteIDs>9</ConnectedNoteIDs>
+        </Note>
+        <Note ID="11" FontSize="12.0" Position="616.0,185.0" Width="116.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.794796 0.560965 0.58607</Border>
+                <Fill>0.993495 0.701207 0.732587</Fill>
+            </Appearance>
+            <String>写出正确的递推公式</String>
+            <ConnectedNoteIDs>1</ConnectedNoteIDs>
+        </Note>
+        <Note ID="12" FontSize="12.0" Position="124.622704,365.686584" Width="295.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>对于递归代码的时间复杂度，如果每次分区操作，都能正好把数组分成大小接近相等的两个小区间，时间复杂度也是 O(nlogn)。
+比如 快排、归并</String>
+            <ConnectedNoteIDs>0</ConnectedNoteIDs>
+        </Note>
+    </Notes>
+    <BackgroundShapes></BackgroundShapes>
+    <AutoFit>0, 2, 4-8, 10-11</AutoFit>
+    <NoteStyles>
+        <Style Name="Bubble (Blue)" ID="27E53F67-98CE-409C-A03F-C60DCAA5D462" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.561855 0.71062 0.779401</BorderColor>
+            <FillColor>0.702319 0.888276 0.974252</FillColor>
+        </Style>
+        <Style Name="Bubble (Green)" ID="3E9D40BB-6DF2-4C1C-9984-C74F7668548C" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.572684 0.758969 0.558154</BorderColor>
+            <FillColor>0.715855 0.948712 0.697692</FillColor>
+        </Style>
+        <Style Name="Bubble (Pink)" ID="A468C529-C680-4038-8B1A-9F8E451B5796" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.794796 0.560965 0.58607</BorderColor>
+            <FillColor>0.957566 0.766747 0.999616</FillColor>
+        </Style>
+        <Style Name="Bubble (Red)" ID="9AFB5E51-7EBC-46D3-8833-DE4DF517508B" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.794796 0.560965 0.58607</BorderColor>
+            <FillColor>0.993495 0.701207 0.732587</FillColor>
+        </Style>
+        <Style Name="Bubble (Yellow)" ID="6AEC55FD-B1CB-4B8B-B7B8-F4F0EF7B1325" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.798177 0.714184 0.522055</BorderColor>
+            <FillColor>0.997722 0.89273 0.652569</FillColor>
+        </Style>
+        <Style Name="Red Text" ID="41D08CD8-D4BF-419B-88B6-0288B02E996B" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="Yes" AffectNoteBody="No" AffectFade="No">
+            <TextColor>0.985948 0.0 0.026951</TextColor>
+        </Style>
+        <Style Name="Title Text" ID="99FDC3F7-640A-460E-9D35-28660AFE5775" AffectFontStyle="Yes" AffectAlignment="Yes" AffectTextColor="No" AffectNoteBody="No" AffectFade="No">
+            <FontSize>28.0</FontSize>
+            <IsBold>Yes</IsBold>
+        </Style>
+    </NoteStyles>
+    <UISettings>
+        <BackgroundColor>0.999767 0.98837 0.949907</BackgroundColor>
+        <DefaultFont>Helvetica</DefaultFont>
+    </UISettings>
+    <PrintSettings PaperSize="595.0,842.0" LeftMargin="72.0" RightMargin="72.0" TopMargin="90.0" BottomMargin="90.0" PaperType="iso-a4" Orientation="Portrait" HorizontalPagination="Clip" VerticalPagination="Auto" ScaleFactor="1.0" HorizontallyCentered="Yes" VerticallyCentered="Yes" Collates="Yes" PagesAcross="1" PagesDown="1"></PrintSettings>
+</ScappleDocument>

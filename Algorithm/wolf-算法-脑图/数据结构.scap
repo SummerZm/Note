@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ScappleDocument Version="1.1" ID="A28DF063-8C5B-43C0-BDC8-CAE549821568">
+    <Notes>
+        <Note ID="1" FontSize="16.0" Position="1051.0,288.0" Width="72.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>数据结构</String>
+            <ConnectedNoteIDs>2, 11, 17, 24, 30, 33</ConnectedNoteIDs>
+        </Note>
+        <Note ID="2" FontSize="12.0" Position="1196.0,226.0" Width="32.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>数组</String>
+            <ConnectedNoteIDs>1, 4, 7-10, 15</ConnectedNoteIDs>
+        </Note>
+        <Note ID="4" FontSize="12.0" Position="1329.0,105.0" Width="104.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>内存中连续的空间</String>
+            <ConnectedNoteIDs>2</ConnectedNoteIDs>
+        </Note>
+        <Note ID="7" FontSize="12.0" Position="1329.0,136.0" Width="104.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>存相同的数据类型</String>
+            <ConnectedNoteIDs>2</ConnectedNoteIDs>
+        </Note>
+        <Note ID="8" FontSize="12.0" Position="1329.0,167.0" Width="309.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>可以通过数组下标，算出数组元素在内存中的实际地址</String>
+            <ConnectedNoteIDs>2</ConnectedNoteIDs>
+        </Note>
+        <Note ID="9" FontSize="12.0" Position="1329.0,198.0" Width="32.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>O(1)</String>
+            <ConnectedNoteIDs>2</ConnectedNoteIDs>
+        </Note>
+        <Note ID="10" FontSize="12.0" Position="1329.0,226.0" Width="314.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>随机访问数据必须知道下标，否则遍历数组, 复杂度 O(n)</String>
+            <ConnectedNoteIDs>2</ConnectedNoteIDs>
+        </Note>
+        <Note ID="11" FontSize="12.0" Position="1196.0,350.0" Width="32.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>链表</String>
+            <ConnectedNoteIDs>1, 12-14, 16</ConnectedNoteIDs>
+        </Note>
+        <Note ID="12" FontSize="12.0" Position="1331.0,325.0" Width="152.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>用零散的内存空间存储数据</String>
+            <ConnectedNoteIDs>11</ConnectedNoteIDs>
+        </Note>
+        <Note ID="13" FontSize="12.0" Position="1331.0,356.0" Width="356.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>每个数据元素都必须包含一个指向下一个数据元素的内存地址指针</String>
+            <ConnectedNoteIDs>11</ConnectedNoteIDs>
+        </Note>
+        <Note ID="14" FontSize="12.0" Position="1331.0,390.0" Width="279.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>链表非连续存储，查找数据只能遍历, 复杂度 O(n)</String>
+            <ConnectedNoteIDs>11</ConnectedNoteIDs>
+        </Note>
+        <Note ID="15" FontSize="12.0" Position="1328.0,258.0" Width="338.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>增删元素会改变内存空间的大小，需要重新分配内存空间 O(n)</String>
+            <ConnectedNoteIDs>2</ConnectedNoteIDs>
+        </Note>
+        <Note ID="16" FontSize="12.0" Position="1331.0,421.0" Width="212.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>插入删除效率高, 只需要修改指针O(1)</String>
+            <ConnectedNoteIDs>11</ConnectedNoteIDs>
+        </Note>
+        <Note ID="17" FontSize="12.0" Position="1196.0,480.0" Width="49.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Hash表</String>
+            <ConnectedNoteIDs>1, 18-19, 21-22</ConnectedNoteIDs>
+        </Note>
+        <Note ID="18" FontSize="12.0" Position="1331.0,474.0" Width="152.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Key, Value 的方式存储数据</String>
+            <ConnectedNoteIDs>17</ConnectedNoteIDs>
+        </Note>
+        <Note ID="19" FontSize="12.0" Position="1332.0,508.0" Width="223.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>物理实现是数组, 根据 Key 算出数组下标</String>
+            <ConnectedNoteIDs>17</ConnectedNoteIDs>
+        </Note>
+        <Note ID="21" FontSize="12.0" Position="1332.0,541.0" Width="489.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Index = getHashCode(key) % hashArray.length 但可能产生 Hash 冲突，解决方法是链表法</String>
+            <ConnectedNoteIDs>17</ConnectedNoteIDs>
+        </Note>
+        <Note ID="22" FontSize="12.0" Position="1331.0,568.0" Width="500.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>事实上数组存放的是 Key Value 数据元素的地址指针, 一旦发生 Hash 冲突, 只需要将相同下标, 不同 Key 的元素添加到这个链表就可以了, 查找的时候再遍历这个链表, 匹配正确的 key</String>
+            <ConnectedNoteIDs>17</ConnectedNoteIDs>
+        </Note>
+        <Note ID="23" FontSize="12.0" Position="1331.0,616.0" Width="487.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>常规情况 O(1) 复杂情况 O(N)，因为下标重复的 Key, Value 太多 Hash表退化成了链表</String>
+        </Note>
+        <Note ID="24" FontSize="12.0" Position="1196.0,668.0" Width="20.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>栈</String>
+            <ConnectedNoteIDs>1, 25-29</ConnectedNoteIDs>
+        </Note>
+        <Note ID="25" FontSize="12.0" Position="1331.0,678.0" Width="319.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>线性表, 数据按照线性组织存放的，每个元素的前面只能有一个前驱数据元素，后面也只能有一个后继数据元素</String>
+            <ConnectedNoteIDs>24</ConnectedNoteIDs>
+        </Note>
+        <Note ID="26" FontSize="12.0" Position="1331.0,726.0" Width="365.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>数组和链表都是线性表，栈是在线性表基础上加上了操作限制条件:
+删除时“后进先出”</String>
+            <ConnectedNoteIDs>24</ConnectedNoteIDs>
+        </Note>
+        <Note ID="27" FontSize="12.0" Position="1330.0,773.0" Width="318.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>栈就像洗完碗叠盘子一样, 最后放上去的总是最先拿去使用</String>
+            <ConnectedNoteIDs>24</ConnectedNoteIDs>
+        </Note>
+        <Note ID="28" FontSize="12.0" Position="1330.0,804.0" Width="318.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>栈在线性表的基础上增加了操作限制，因为栈不需要随机访问，也不需要在中间添加、删除元素，所以可以使用数组实现，也可以使用链表实现</String>
+            <ConnectedNoteIDs>24</ConnectedNoteIDs>
+        </Note>
+        <Note ID="29" FontSize="12.0" Position="1330.0,869.0" Width="318.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>用栈来管理程序运行过程中的方法调用，栈顶元素始终是当前正在执行的方法的工作区</String>
+            <ConnectedNoteIDs>24</ConnectedNoteIDs>
+        </Note>
+        <Note ID="30" FontSize="12.0" Position="912.0,225.0" Width="36.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String> 队列</String>
+            <ConnectedNoteIDs>1, 31-32</ConnectedNoteIDs>
+        </Note>
+        <Note ID="31" FontSize="12.0" Position="625.0,164.0" Width="128.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>一种操作受限的线性表</String>
+            <ConnectedNoteIDs>30</ConnectedNoteIDs>
+        </Note>
+        <Note ID="32" FontSize="12.0" Position="498.0,195.0" Width="255.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>栈是后进先出, 队列是先进先出，跟排队一样</String>
+            <ConnectedNoteIDs>30</ConnectedNoteIDs>
+        </Note>
+        <Note ID="33" FontSize="12.0" Position="919.0,306.0" Width="20.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>树</String>
+            <ConnectedNoteIDs>1, 34-37</ConnectedNoteIDs>
+        </Note>
+        <Note ID="34" FontSize="12.0" Position="727.0,302.0" Width="44.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>非线性</String>
+            <ConnectedNoteIDs>33</ConnectedNoteIDs>
+        </Note>
+        <Note ID="35" FontSize="12.0" Position="619.0,337.0" Width="152.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>像部门组织结构就是一棵树</String>
+            <ConnectedNoteIDs>33</ConnectedNoteIDs>
+        </Note>
+        <Note ID="36" FontSize="12.0" Position="571.0,377.0" Width="200.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>程序在编译时，第一步就是将程序代码生成抽象语法树</String>
+            <ConnectedNoteIDs>33</ConnectedNoteIDs>
+        </Note>
+        <Note ID="37" FontSize="12.0" Position="595.0,418.0" Width="176.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>传统上树的遍历使用递归的方式</String>
+            <ConnectedNoteIDs>33</ConnectedNoteIDs>
+        </Note>
+    </Notes>
+    <BackgroundShapes></BackgroundShapes>
+    <Stacks>
+        <Stack>4, 7-10</Stack>
+        <Stack>12-13</Stack>
+        <Stack>14, 16</Stack>
+        <Stack>22-23</Stack>
+        <Stack>25-26</Stack>
+        <Stack>27-29</Stack>
+    </Stacks>
+    <AutoFit>1-2, 4, 7, 9, 11-13, 17-19, 21, 24, 30-31, 33-35, 37</AutoFit>
+    <NoteStyles>
+        <Style Name="Bubble (Blue)" ID="509165A7-4BD4-4BAE-9CD2-31C8E5FC6FCE" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.561855 0.71062 0.779401</BorderColor>
+            <FillColor>0.702319 0.888276 0.974252</FillColor>
+        </Style>
+        <Style Name="Bubble (Green)" ID="60B82897-F5C0-4CC2-9EBA-36C553805B9F" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.572684 0.758969 0.558154</BorderColor>
+            <FillColor>0.715855 0.948712 0.697692</FillColor>
+        </Style>
+        <Style Name="Bubble (Pink)" ID="300B9F67-E10D-4DAF-BBD3-5968A16334D6" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.794796 0.560965 0.58607</BorderColor>
+            <FillColor>0.957566 0.766747 0.999616</FillColor>
+        </Style>
+        <Style Name="Bubble (Red)" ID="A1260A08-8FF9-477C-BF40-1FE354A4035D" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.794796 0.560965 0.58607</BorderColor>
+            <FillColor>0.993495 0.701207 0.732587</FillColor>
+        </Style>
+        <Style Name="Bubble (Yellow)" ID="9096FFCA-9D1A-45C4-A68E-2AB4C24B97D8" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.798177 0.714184 0.522055</BorderColor>
+            <FillColor>0.997722 0.89273 0.652569</FillColor>
+        </Style>
+        <Style Name="Red Text" ID="522DC85E-6190-47A1-85D0-CF1012BD6D8C" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="Yes" AffectNoteBody="No" AffectFade="No">
+            <TextColor>0.985948 0.0 0.026951</TextColor>
+        </Style>
+        <Style Name="Title Text" ID="8641F958-1691-49EA-90E0-6F9445EEB196" AffectFontStyle="Yes" AffectAlignment="Yes" AffectTextColor="No" AffectNoteBody="No" AffectFade="No">
+            <FontSize>28.0</FontSize>
+            <IsBold>Yes</IsBold>
+        </Style>
+    </NoteStyles>
+    <UISettings>
+        <BackgroundColor>0.999767 0.98837 0.949907</BackgroundColor>
+        <DefaultFont>Helvetica</DefaultFont>
+    </UISettings>
+    <PrintSettings PaperSize="595.0,842.0" LeftMargin="72.0" RightMargin="72.0" TopMargin="90.0" BottomMargin="90.0" PaperType="iso-a4" Orientation="Portrait" HorizontalPagination="Clip" VerticalPagination="Auto" ScaleFactor="1.0" HorizontallyCentered="Yes" VerticallyCentered="Yes" Collates="Yes" PagesAcross="1" PagesDown="1"></PrintSettings>
+</ScappleDocument>

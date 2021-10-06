@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ScappleDocument Version="1.1" ID="7703111E-13D6-4E7B-B468-8C3F6F8E0AC1">
+    <Notes>
+        <Note ID="0" FontSize="13.0" Position="332.0,207.0" Width="47.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.561855 0.71062 0.779401</Border>
+                <Fill>0.702319 0.888276 0.974252</Fill>
+            </Appearance>
+            <String>哈希表</String>
+            <ConnectedNoteIDs>1, 3</ConnectedNoteIDs>
+        </Note>
+        <Note ID="1" FontSize="12.0" Position="372.0,239.0" Width="145.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>这个映射函数叫
+散列函数 (Hash Function)</String>
+            <ConnectedNoteIDs>0, 5-6</ConnectedNoteIDs>
+        </Note>
+        <Note ID="3" FontSize="12.0" Position="253.386078,265.092468" Width="116.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>散列表 (Hash Table)</String>
+            <ConnectedNoteIDs>0</ConnectedNoteIDs>
+        </Note>
+        <Note ID="5" FontSize="12.0" Position="373.115417,293.733002" Width="200.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>计算关键码值(Key value) 而直接进行访问的数据结构</String>
+            <ConnectedNoteIDs>1, 7</ConnectedNoteIDs>
+        </Note>
+        <Note ID="6" FontSize="12.0" Position="446.17038,185.992279" Width="200.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>它是通过把关键码值映射到表中一个位置来访问记录，以加快查找的速度</String>
+            <ConnectedNoteIDs>1</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Bold="Yes">0,32</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="7" FontSize="12.0" Position="373.0,344.027283" Width="200.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>哈希碰撞: 如果多个关键码值一致，则在表中的这个位置使用链表来存储</String>
+            <ConnectedNoteIDs>5, 8</ConnectedNoteIDs>
+        </Note>
+        <Note ID="8" FontSize="12.0" Position="371.580902,398.712311" Width="239.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>如果没有碰撞或碰撞较小, 访问元素为 O(1), 否则需要遍历链表，性能退化为 O(n)</String>
+            <ConnectedNoteIDs>7, 9</ConnectedNoteIDs>
+        </Note>
+        <Note ID="9" FontSize="12.0" Position="636.0,396.0" Width="159.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>碰撞几率取决于 
+1.Hash Function 实现的好坏
+2.Hash 容量越小越容易碰撞</String>
+            <ConnectedNoteIDs>8</ConnectedNoteIDs>
+        </Note>
+        <Note ID="10" FontSize="12.0" Position="287.0,480.0" Width="56.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1">0.561855 0.71062 0.779401</Border>
+                <Fill>0.702319 0.888276 0.974252</Fill>
+            </Appearance>
+            <String>工程应用</String>
+            <ConnectedNoteIDs>11-12</ConnectedNoteIDs>
+        </Note>
+        <Note ID="11" FontSize="12.0" Position="287.0,511.0" Width="170.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Map: key-value 对, key 不重复</String>
+            <ConnectedNoteIDs>10</ConnectedNoteIDs>
+        </Note>
+        <Note ID="12" FontSize="12.0" Position="287.0,542.0" Width="195.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Set:  单个 value, 不重复元素的集合</String>
+            <ConnectedNoteIDs>10</ConnectedNoteIDs>
+        </Note>
+    </Notes>
+    <BackgroundShapes></BackgroundShapes>
+    <Stacks>
+        <Stack>10-12</Stack>
+    </Stacks>
+    <AutoFit>0-1, 3, 9-12</AutoFit>
+    <NoteStyles>
+        <Style Name="Bubble (Blue)" ID="04DD2B4B-F4F8-4B60-80B9-D4AC22A4BB35" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.561855 0.71062 0.779401</BorderColor>
+            <FillColor>0.702319 0.888276 0.974252</FillColor>
+        </Style>
+        <Style Name="Bubble (Green)" ID="E43A4DF2-7EFA-4D79-B51A-11C2FEA6FC08" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.572684 0.758969 0.558154</BorderColor>
+            <FillColor>0.715855 0.948712 0.697692</FillColor>
+        </Style>
+        <Style Name="Bubble (Pink)" ID="EBA13A78-3E82-45BF-B45C-24C39D35936E" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.794796 0.560965 0.58607</BorderColor>
+            <FillColor>0.957566 0.766747 0.999616</FillColor>
+        </Style>
+        <Style Name="Bubble (Red)" ID="D6FCE8E5-B075-42F2-9383-7B284BF68105" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.794796 0.560965 0.58607</BorderColor>
+            <FillColor>0.993495 0.701207 0.732587</FillColor>
+        </Style>
+        <Style Name="Bubble (Yellow)" ID="F370BB89-CEFC-4AED-9D0A-CD0EAC48BF2E" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.798177 0.714184 0.522055</BorderColor>
+            <FillColor>0.997722 0.89273 0.652569</FillColor>
+        </Style>
+        <Style Name="Red Text" ID="BA08B986-77BB-4425-A1B2-411FB8D0E419" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="Yes" AffectNoteBody="No" AffectFade="No">
+            <TextColor>0.985948 0.0 0.026951</TextColor>
+        </Style>
+        <Style Name="Title Text" ID="8326FC85-8FCF-4479-8B89-ECB544DEDDDD" AffectFontStyle="Yes" AffectAlignment="Yes" AffectTextColor="No" AffectNoteBody="No" AffectFade="No">
+            <FontSize>28.0</FontSize>
+            <IsBold>Yes</IsBold>
+        </Style>
+    </NoteStyles>
+    <UISettings>
+        <BackgroundColor>0.999767 0.98837 0.949907</BackgroundColor>
+        <DefaultFont>Helvetica</DefaultFont>
+    </UISettings>
+    <PrintSettings PaperSize="595.0,842.0" LeftMargin="72.0" RightMargin="72.0" TopMargin="90.0" BottomMargin="90.0" PaperType="iso-a4" Orientation="Portrait" HorizontalPagination="Clip" VerticalPagination="Auto" ScaleFactor="1.0" HorizontallyCentered="Yes" VerticallyCentered="Yes" Collates="Yes" PagesAcross="1" PagesDown="1"></PrintSettings>
+</ScappleDocument>
