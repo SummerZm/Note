@@ -1,0 +1,102 @@
+1. JS 浏览器识别：
+===================================================
+	
+	A. 能力检测
+	--------------------
+		>. 检测某个属性是否存在并不能确定对象是否支持排序，更好的方式是检测sort是不是一个函数
+			function isSortable(object){
+				return typeof object.sort == "function";
+			}
+
+		>. 在浏览器环境下测试任何对象的某个特性是否存在
+			function isHostMethod(object,property){
+			    var t = typeof object[property];
+			    return t == "function" || (!!(t == "object" && object[property])) || t== "unknown";
+			}
+
+		>. 识别IE 7
+			IE7-浏览器中，获取特性节点将获得包括内置特性的所有特性，第0个特性节点是onmsanimationiteration，且其specified属性是false。而IE8+及其他浏览器仅仅可以获得经过设置的特性节点，且specified属性永远是true
+			function lteIE7(obj){
+			    var temp = obj.attributes[0];
+			    return (Boolean(temp) && !temp.specified);
+			}
+
+		>. 识别IE 10-
+			function lteIE10(){
+				if(window.ActiveXObject) return true;
+				return false;
+    		}
+ 		
+ 		>. 识别chrome、opera(chrome)
+ 			function ischromeOropera(){
+ 				if(window.chrome) return true;
+ 				return false;
+ 			}
+
+    B. 浏览器嗅探
+    -------------------
+    	> IE浏览器
+    	function isIE(){
+		    var ua = navigator.userAgent;
+		    //检测Trident引擎，IE8+
+		    if(/Trident/.test(ua)){
+		        //IE11+
+		        if(/rv:(\d+)/.test(ua)){
+		            return RegExp["$1"];
+		        }    
+		        //IE8-IE10    
+		        if(/MSIE (\d+)/.test(ua)){
+		            return RegExp["$1"];
+		        }        
+		    }
+		    //检测IE标识，IE7-
+		    if(/MSIE (\d+)/.test(ua)){
+		        return RegExp["$1"];
+		    }
+		   	return false;  
+		}
+
+		> Chrome
+		function isChrome(){
+		    var ua = navigator.userAgent;
+		    //先排除opera,因为opera只是在chrome的userAgent后加入了自己的标识
+		    if(!/OPR/.test(ua)){
+		        if(/Chrome\/(\S+)/.test(ua)){
+		            return RegExp["$1"];
+		        } 
+		    }
+		    return false;   
+		}
+
+		> Safari
+		function isSafari(){
+			var ua = navigator.userAgent;
+		    //先排除opera
+		    if(!/OPR/.test(ua)){
+		        //检测出chrome和safari浏览器
+		        if(/Safari/.test(ua)){
+		            //检测出safari
+		            if(/Version\/(\S+)/.test(ua)){
+		                return RegExp["$1"];
+		            }        
+		        }
+		    } 
+		    return false;   
+		}
+
+		> FireFox
+		function isFireFox(){
+		    if(/Firefox\/(\S+)/.test(navigator.userAgent)){
+		        return RegExp["$1"];
+		    }
+		    return false;    
+		}
+
+		> Opera
+		function isOpera(){
+		    var ua = navigator.userAgent;
+		    if(/OPR\/(\S+)/.test(ua)){
+		        return RegExp["$1"];
+		    } 
+		    return false;    
+		}

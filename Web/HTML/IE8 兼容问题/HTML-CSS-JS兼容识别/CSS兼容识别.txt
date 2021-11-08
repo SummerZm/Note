@@ -1,0 +1,117 @@
+1. CSS 浏览器识别
+=============================================
+	
+	A. 属性前缀法(只有IE支持)
+	--------------------------------------
+	> IE6- (下划线、中划线)(_color:blue;-color:blue;)
+		<style>
+		.box{
+		    height: 100px;
+		    width: 100px;
+		    _background-color: red;
+		}
+		</style> 
+  
+	> IE7- (星号、加号)(*color:blue;+color:blue;)
+		<style>
+			.box{
+			    height: 100px;
+			    *width: 500px;
+			    *background-color: red;
+			}
+		</style> 
+
+	> IE8+ (\0)(color:blue\0;)
+		<style>
+			.box{
+			    height: 100px;
+			    width: 100px;
+			    background-color: red\0;
+			}
+		</style> 
+
+ 	> IE9、IE10 (\9\0)(color:blue\9\0;)
+		<style>
+			.box{
+			    height: 100px;
+			    width: 100px;
+			    background-color: red\9\0;
+			}
+		</style> 
+ 
+	> IE10- (\9)(color:blue\9;)
+		<style>
+			.box{
+			    height: 100px;
+			    width: 100px;
+			    background-color: red\9;
+			}
+		</style> 
+
+	B. 选择器前缀法
+	--------------------------------------
+	> IE6- (*html)
+		*html .box{
+		    height: 100px;
+		    width: 100px;
+		    background-color: red;
+		}
+
+ 	> IE7 (*+html)
+		*+html .box{
+		    height: 100px;
+		    width: 100px;
+		    background-color: red;
+		}
+
+　　> IE8 (@media \0)
+		@media \0{
+		    .box{
+		        height: 100px;
+		        width: 100px;
+		        background-color: red;
+		    }
+		}
+
+　　> IE9+及其他非IE浏览器(:root)
+		:root .box{
+		    height: 100px;
+		    width: 100px;
+		    background-color: red;
+		}
+
+　　> firefox(x:-moz-any-link,)
+		x:-moz-any-link,.box{
+		    height: 100px;
+		    width: 100px;
+		    background-color: red;
+		}
+
+　　> chrome、safari、opera(@media screen and (-webkit-min-device-pixel-ratio:0))
+		@media screen and (-webkit-min-device-pixel-ratio:0) {
+		    .box{
+		        height: 100px;
+		        width: 100px;
+		        background-color: red;
+		    }    
+		}
+
+	C. 模板测试代码
+	--------------------------------------
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+		    <meta charset="UTF-8">
+		    <title>Document</title>
+			<style>
+			:root .box{
+			    height: 100px;
+			    width: 100px;
+			    background-color: red;
+			}
+			</style> 
+		</head>
+		<body>
+			<div class="box" id="box"></div>
+		</body>
+	</html>

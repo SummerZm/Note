@@ -1,0 +1,135 @@
+  
+  不论语言，还是Css样式，他们都是工具，诞生的原因有且仅是需求。产生需求是因为人们解决问题的欲望。
+学习使用工具前，应该明确要解决什么问题。这样才能事半功倍。
+ 
+问题1: 样式重复冲突时如何处理？
+
+	A. 不同样式文件：
+		a. CSS样式文件引入原理: 就近原则。
+		b. 内联样式优先级最高。
+
+	B. 同一样式文件：
+		a. 选择器的权值: 通配[1]; 标签[10]; class[100]; id[1000]
+		b. 就近原则: 权值相同，则根据样式声明的顺序使用就近原则
+		
+问题2: 如何合理的应用样式？
+	
+	A. 全局选择
+		a. *{}: 通配选择器可以清楚浏览器预设的属性 --- 浏览器兼容问题
+	
+	B. 横向/面选择
+		a. 标签{}: 指定标签设置样式 -- 批量设置。
+		b. class{}: 自定义类设置样式 -- 提供了标签{}所没有的灵活。
+	
+	C. 纵向/点选择
+		a. id{}: 指定元素设置样式 -- 定点设置。
+		b. 后代{}: 用空格分隔，指定标签|类|id设置样式 -- 定点批量灵活。
+	
+	D. 群组{}: 用逗号分隔，批量各类型{}设置样式 -- 多对一节省代码。 
+	E. 狭义上：*， 标签，class，id的适用范围逐个缩小，所以它们的权值逐个增大。
+	
+问题3: 如何书写逻辑清晰的样式代码？
+
+	A. 遵循盒子模型
+		a. 清浮动：clear(子元素), overflow(父元素), 等
+		b. 外边距: margin
+		c. 边框:   border
+		d. 内边距: padding
+		e. 内容:   font, height, width...
+		
+	B. 从外层往内层一层层往里面吃
+	
+问题4: 垂直水平居中总是无效 -- 网页布局？
+	A. 元素的属性用错
+		a. 网页主体最基本两类结构元素 
+		b. 块级元素 -- height/width，text-align，line-height，独占一行
+		c. 行内元素  
+			-- vertical-align， 不独占
+			-- 适合盒子模型，但heigth，width， margin/padding-top/bottom无效
+			
+	B. 基本概念
+		a. text-align: 属性规定元素中的文本的水平对齐方式; 
+			text-align:center: 设置文本或img标签等一些内联对象（或与之类似的元素）的居中。
+			注释：所有浏览器都支持 text-align 属性；任何的版本的 Internet Explorer （包括 IE8）都不支持属性值 "inherit"。
+
+		b. margin 是设置对象四边的外延边距，被称为外补丁或外边距。
+			margin:0 auto: 设置块元素（或与之类似的元素）的居中。
+
+	C. 兼容性问题
+		a. 设置body{text-align:center;} --- 区分好文本和对象
+			在IE中，段落P，图片img同时实现了居中对齐，也就是说text-align:center;同时作用于元素p与元素img。
+			在FF中，段落P，没有能实现居中对齐，而图片img实现了居中对齐，也就是说text-align:center;作用于img标签，而段落p标签没有起到居中的作用。
+
+		b. 设置段落 p {margin:0 auto;}。 在IE与FF中，段落P均实现了居中对齐。图片img由于不是作用对象，所以不会居中对齐。
+	
+	D. 常见情况： 
+		a. margin:0 auto;的选择器是作用对象，如div，p，而不是body。 如果设置：body { margin:0 auto; }将不会达到任何效果，除非你定义body的宽度，
+		b. 设置段落p {text-align:center;} 将要实现的并不是段落本身的对齐方式，而是段落内元素居中对齐。
+		c. 设置图片标签img {margin:0 auto;} 错误：img属于内联对象，不可以设置margin属性。 非要设置，则将它转变为块元素。 img {display:block; margin:0 auto;}。
+
+	E. 垂直水平居中的方法：
+		a. 垂直居中
+			父节点： {height:30px; line-height:30px}
+			子节点： {vertical-align: middle} -- 用于行内原始
+		b. 水平居中：
+			父节点： {text-align: center} -- <P>标签浏览器兼容
+			子节点： {margin: 0 auto}
+		c. 定位居中法：
+			{position: relative; top:50%; left:50%; margin-top:-heigth/2; margin-left: -width/2};
+
+问题5: 如何解决IE盒子模型的兼容性问题？
+	A. IE的盒子：height = content + padding
+	B. 解决: <!doctype html>
+	
+问题6: 背景如何相对浏览器固定？ 
+	A. background-attachment: fixed
+	B. 注: 题外话： 图片包括盒子的内边框。
+	
+问题7: float与文档流，元素补位的意义？
+	A. 元素与文档流的区别
+		a. 文档流：文本文字
+		b. 元素：标签
+		
+	B. float不占页面空间，后面元素补位
+	C. float不影响自身代码之前的布局
+	C. float浮动到左右边界或浮动元素边框
+	
+问题8: 书写样式时，需要时刻注意哪几个问题？
+	A. 盒子模型 -- 由外及内
+	B. 块行布局 -- 居中； 块行不并列；块行转化-display: inlne/block/inline-block 
+	C. 清浮动
+	D. 选择器的可读性
+	E. 样式属性的顺序，浏览器的兼容
+
+问题9: float, position, 盒子模型的应用。
+	A. float浮动布局(负边距)
+	B. 
+
+---------------------------------------------------------
+本质问题: 冲突
+1. 为了多样化CSS样式文件引入方式，导致的冲突
+	A. 多样化CSS引入方式
+		a. 内置
+		b. 内嵌 <stlye type="text/css"></stlye>
+		c. <stlye type="text/css"> @import url(xxx)</stlye> 
+		d. 外部文件 <link rel="sheet" type="text/css" href="xxx"/>
+		
+	B. 设计思路
+		a. 就近原则: 离HTML元素的远近, 便于维护阅读
+
+2. 为了方便coder定位，管理，书写CSS代码导致的冲突
+	A. 方便编码
+		a. 定位: *{}，标签{}，class{}, id{}
+		b. 管理: 后代{}
+		c. 书写: 群组{}
+		
+	B. 设计思路
+		a. 权值: 范围嵌套缩小，权值提高。
+		b. 优先级: 就近原则。
+		c. 选择: 全局，点面结合，精准批量定位
+		
+3. 拓展思考 
+	A. 以上是CSS为解决这些问题，给出的解决方案，假如我们要模拟的去实现这些解决方案，需要什么样的数据结构。
+
+
+========================================================
