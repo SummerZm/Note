@@ -1,0 +1,265 @@
+ 1. linux 查看文件修改日期
+ https://zhidao.baidu.com/question/1603352399434867107.html?fr=iks&word=linux+%B2%E9%BF%B4%CE%C4%BC%FE%D0%DE%B8%C4%C8%D5%C6%DA&ie=gbk
+
+ 2. MFC Tab Control控件的详细使用 
+ http://www.cnblogs.com/lzmfywz/archive/2012/04/07/2436571.html
+
+ 3. MFC  VS2005类向导工具脚本错误解决方法
+ http://blog.sina.com.cn/s/blog_48f93b530100ddww.html
+
+ 4. android 系统编译 
+ http://blog.csdn.net/koko7958/article/details/7955046
+
+ 5. 什么是DPI
+ http://blog.csdn.net/dinko321/article/details/7992776
+
+ 6. printf函数参数详解 
+ https://wenku.baidu.com/view/3927c41f964bcf84b9d57b74.html
+ 
+ 7. linux 安装源码包 rpm 
+ http://www.92csz.com/study/linux/11.htm
+ 
+ 8. linux 相关博客1
+ http://www.92csz.com/
+ mount -o remount rw /   
+ 
+ 9. linux 开机启动顺序
+ http://blog.chinaunix.net/uid-164687-id-2742411.html
+ 
+ 10. linux开机自动启动脚本 
+ http://blog.csdn.net/wwwxxlby520/article/details/4374079
+ 
+ 11. js 字符串操作
+ http://blog.csdn.net/yeping090815/article/details/45191411
+ 
+ 12. linux 系统时区调整
+ http://www.cnblogs.com/fatt/p/5036068.html
+ 
+ 13. linux 博客2
+ http://blog.csdn.net/jiang1013nan/article/category/598968
+ 
+ 14. jQuery插件编写方法
+ http://www.cnblogs.com/JustinYoung/archive/2010/03/30/jquery-chajian.html
+ 
+ 15. js 判断对象为空
+ http://www.cnblogs.com/yzenet/p/3581161.html
+ 
+ 16. 正则表达式
+ http://www.cnblogs.com/rubylouvre/archive/2010/03/09/1681222.html
+ 
+ 17. 深入理解js 系列教程
+ http://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html
+ 
+ 18. Android NDK编译中在libsarmeabi中加入第三方so库文件的方法
+ http://www.gimoo.net/t/1604/5701caa1d4bf7.html
+ 
+ 19. __stack_chk_fail栈检查失败  --> 数组越界写入
+ http://www.cnblogs.com/qq378829867/p/5978334.html
+ 
+ 20. Samba配置参数详解
+ http://blog.csdn.net/claytonzeng/article/details/19110713
+ 
+ 21. Linux/Unix下pid文件作用浅析
+ http://www.linuxidc.com/Linux/2012-12/76950.htm
+ 
+ 22. composer 安装以及更换源
+ http://blog.csdn.net/u013091013/article/details/73235153
+ 
+ 23. Linux下高并发socket最大连接数所受的各种限制 
+ http://blog.csdn.net/guowake/article/details/6615728
+ 
+ 24. linux setsockopt
+ http://www.cnblogs.com/qq78292959/archive/2012/03/22/2411387.html
+ 
+ 25. Linux中通过Socket文件描述符寻找连接状态介绍
+ http://www.cnblogs.com/web21/p/6520164.html
+ 
+ 26.  laravel 框架总结
+ https://www.bbsmax.com/R/Ae5R4KlNzQ/
+ 
+ 27. 如何使用 Laravel Facades 
+ https://yq.aliyun.com/articles/2338
+ 
+ 28. H5标签简介
+ http://blog.sina.com.cn/s/blog_7fb1495b0101634r.html
+ 
+ 29. c语言中static 函数和普通函数的区别？ 
+ http://blog.csdn.net/junboyboy/article/details/17921763
+ 
+ 30. PHP底层的运行机制与原理
+ http://www.nowamagic.net/librarys/veda/detail/102
+ 
+ 31. 如何整站开启php zlib(gzip)压缩
+ http://www.cnblogs.com/luzhang/archive/2011/11/05/2237789.html
+ 
+ 32. SQL 时间操作函数。按月，按周，按季统计
+ http://www.cnblogs.com/honghong75042/archive/2012/03/20/2408114.html
+ 
+ 33. Linux 多线程知识
+ http://www.cnblogs.com/chris-cp/p/3529699.html
+ 
+ 34. C与指针
+ http://www.cnblogs.com/rushuizhijing/archive/2011/08/26/2154737.html
+ 
+ 35. vs阅读php源码
+ http://www.cnblogs.com/mahatmasmile/p/4527495.html
+ 
+ 36. php sapi 《问底》
+ http://www.csdn.net/article/2014-09-26/2821885-exploring-of-the-php-2
+ 
+ 37. php 文件操作
+ http://www.cnblogs.com/eczhou/archive/2013/01/08/2851018.html
+ 
+ 38. MFC引用WPF 
+ http://blog.csdn.net/v2x222/article/details/6760096
+ 
+ 39. 编程哲学
+ http://www.cnblogs.com/findumars/p/7426229.html
+ 
+ 40. duilib题外话
+ 
+ 41. 怎么阅读技术书
+ http://www.cnblogs.com/findumars/p/7486866.html
+ 
+ /*42. js gbk big5 編碼解碼
+ http://www.cnblogs.com/xueduanyang/archive/2013/05/30/3108442.html*/
+ 
+ 43. Zepto源码之代码结构
+ https://zhuanlan.zhihu.com/p/28836732
+ 
+ 44. 标准IO的理解 
+ http://www.cnblogs.com/orlion/p/6258691.html
+ 
+ 45. 网络链路层通信
+ http://blog.csdn.net/yong61/article/details/8549645
+ 
+ 46. sed 大小写转换
+ http://blog.chinaunix.net/uid-10540984-id-2014878.html
+ http://man.linuxde.net/sed
+ 
+ 47.Apache主配置文件httpd.conf 详解
+ http://www.linuxidc.com/Linux/2015-02/113921.htm
+
+ 48. vim标记
+ http://blog.csdn.net/yangzhongxuan/article/details/7049143
+ 
+ 49. 用SQL语句创建数据库和表   
+ http://blog.csdn.net/u011672712/article/details/51628581
+ 
+ 50. ASC码对照表
+ http://doc.orz520.com/a/doc/2011/0726/1981583.html?from=haosou
+ 
+ 51. RTP学习（三）RTP/RTCP/RTSP数据包格式
+ http://blog.csdn.net/dreamxiang68/article/details/7209190
+ 
+ 52. 嵌入式 浅谈fcntl与ioctl函数
+ http://blog.csdn.net/skdkjzz/article/details/17412023
+ 
+ 53. 编写opensips自定义模块  
+ http://yeyingxian.blog.163.com/blog/static/344712420137265923623/
+ 
+ 54. 电信OPENSIPS
+ http://www.doc88.com/p-870818424629.html
+ 
+ 55. C语言知识
+ http://blog.csdn.net/earbao/article/details/53933594
+ 
+ 56. UE软件破解
+ https://jingyan.baidu.com/article/cb5d6105fc1a96005c2fe0db.html
+
+ 57. md5算法实现
+ http://blog.csdn.net/hla199106/article/details/45129963
+ 
+ 58. ONVIF简介
+ http://blog.sina.com.cn/s/blog_659ba74c0102woy6.html
+ 
+ 59. php socket
+ http://www.cnblogs.com/hanybblog/p/6126122.html
+ 
+ 60. laravel中的设计模式
+ https://phperzh.com/articles/1380
+ 
+ 61. laravel添加自己的类
+ http://blog.csdn.net/qyyl2013/article/details/45061253
+ 
+ 62. 嵌入式文件系统简介
+ http://blog.csdn.net/daofengdeba/article/details/7721340
+ 
+ 63. php 开发者文档
+ http://php.net/manual/en/function.socket-sendto.php
+ 
+ 64. 整型知识链接
+ http://www.cnblogs.com/A123456A/archive/2013/01/25/2876634.html
+ 
+ 65.tcp/udp常用端口：
+ https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
+ 
+ 66. 结构体初始化
+ http://blog.csdn.net/stone8761/article/details/50338999
+ 
+ 67. 三次握手 四次挥手
+ https://blog.csdn.net/Jungle_hello/article/details/51465119
+ 
+ 68. unix 进程间通信
+ http://blog.chinaunix.net/uid-22002972-id-1805602.html
+ 
+ 69. gcc 编译静态，动态库
+ https://www.cnblogs.com/a_bu/p/4447989.html
+ 
+ 70.C语言实现HTTP的GET和POST请求
+ https://www.cnblogs.com/diligenceday/p/6255788.html
+ 
+ 71. vim 替换命令
+ https://blog.csdn.net/glorin/article/details/6317098
+ 
+ 72. vim ubuntun 环境搭建
+ https://blog.csdn.net/ballack_linux/article/details/51855156
+ 
+ 73. vim 折叠代码
+ http://www.cnblogs.com/welkinwalker/archive/2011/05/30/2063587.html
+ 
+ 74. vim 配置
+ https://blog.csdn.net/l_tudou/article/details/51555305
+ 
+ 75. vim 源码阅读配置ctags cscopse
+ https://blog.csdn.net/augusdi/article/details/40085529
+ https://blog.csdn.net/dengxiayehu/article/details/6330200
+ https://www.cnblogs.com/tankblog/p/6814137.html
+ https://blog.csdn.net/exbob/article/details/7521142 // 内核阅读
+ 
+ 76. vim + ctags + taglist配置和使用 
+ http://www.cnblogs.com/tsingke/p/4214862.html
+ 
+ 77. vim高阶
+ https://blog.easwy.com/archives/advanced-vim-skills-catalog/
+ vim配置及插件安装管理（超级详细）
+ https://blog.csdn.net/namecyf/article/details/7787479
+ VIM NERDTree
+ http://www.cnblogs.com/derrck/p/4911001.html
+ 
+ 78 phabricator 搭建
+ https://www.jianshu.com/p/a0592a2f2afb
+ 
+ 79. Linux进程管理及while循环 
+ http://www.cnblogs.com/wangenzhi/p/6248679.html
+ 
+ 80. vim寄存器
+ http://blog.163.com/zyh_lnx/blog/static/129066412200991805829879/
+ 
+ 81 对C语言的写文件操作fwrite的一个初学者常见误解
+ https://blog.csdn.net/younggift/article/details/10587893
+ 
+ 82. 问个多线程写文件的问题，使用fwrite [问题点数：50分，结帖人yang79tao]
+ https://bbs.csdn.net/topics/390214759
+ 
+ apache虚拟主机配置详解
+ http://www.cnblogs.com/ylan2009/archive/2012/02/25/2368028.html
+ 
+ restfull 英文翻译
+ https://www.cnblogs.com/moonz-wu/p/4211626.html
+ 
+ restfull 文章介绍
+ https://www.cnblogs.com/artech/p/3506553.html
+ 
+ 
+ 
