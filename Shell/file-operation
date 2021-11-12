@@ -1,0 +1,65 @@
+#!/bin/bash
+#!/bin/bash
+printf "文件操作运算符\n"
+file="../test/file-operation-test"
+printf 'b 块设备文件\n'
+printf 'c 字符设备文件\n'
+printf 'l 链接文件\n'
+
+
+echo -e "file=$file\n"
+
+if [ -e $file ]
+then 
+	echo '文件存在 -e'
+else
+	echo -e '文件不存在 -e'
+fi
+
+if [ -r $file ]
+then 
+	echo '文件可读 -r'
+else
+	echo '文件不可读 -r'
+fi
+
+if [ -w $file ]
+then
+	echo '文件可写 -w'
+else 
+	echo '文件不可写 -w'
+fi
+
+if [ -x $file ]
+then 
+	echo '文件可执行 -x'
+else
+	echo '文件不可执行 -x'
+fi
+
+if [ -s $file ]
+then
+	echo '文件不为空 -s'
+else
+	echo '文件为空 -s'
+fi
+
+if [ -d $file ]
+then 
+	echo '文件为目录 -d'
+else
+	echo '文件不是目录 -d'
+fi
+
+if [ -f $file ]
+then 
+	echo '既不是目录文件，也不是设备文件 -f'
+else
+	echo '目录文件或设备文件 -f'
+fi
+
+
+
+
+
+

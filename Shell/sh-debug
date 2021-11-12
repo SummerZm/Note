@@ -1,0 +1,20 @@
+#!/bin/bash
+echo '1. shell调试方法1:  bash -x sh / sh -x sh'
+echo '2. shell调试方法2:  set -x  set +x'
+echo '3. 自定义shell调试函数'
+echo
+
+
+function DEBUG(){
+	[ ]
+}
+
+for i in {1..6}
+do
+	set -x
+	sleep 1
+	set +x
+	echo $i
+done
+echo "debug end"
+

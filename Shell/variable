@@ -1,0 +1,103 @@
+#!/bin/bash
+echo "1.echo转义输出"
+echo -e "打印换行符\n"
+
+echo "2.变量声明打印demo"
+v_test_1=demo
+#v_test_1="demo"
+#v_test_1='demo'
+#v_test_1={demo}
+#v_test_1 = demo
+echo ${v_test_1}
+#echo $(v_test_1)
+echo $v_test_1
+echo "\n"
+echo -e "${v_test_1}\n"
+
+echo "3.只读变量demo"
+v_test_2=demo
+readonly v_test_2
+v_test_2="demo2"
+echo \
+
+echo "4.删除变量demo"
+v_test_3="demo3"
+unset v_test_2
+unset v_test_3
+echo $v_test_2
+echo $v_test_3
+
+echo "5.获取变量长度demo"
+echo -e "变量v_test_1长度:${#v_test_1}\n"
+
+echo "6.拼接字符串demo"
+you_name="XWH"
+greet="Hello "$you_name" !"
+greet_1="Hello ${you_name} !"
+echo $greet $greet_1 
+echo \
+
+echo "7.提取字符串demo"
+echo -e '从5开始截取5个${greet_1:5:5} : \t'"${greet_1} =>  ${greet_1:5:5}"
+echo 
+
+echo "8.数组demo"
+test_arr=(1 2 3 4 $greet)
+echo '声明数组 test_arr=(1 2 3 4 $greet)'
+echo '打印元素个数 ${#test_arr[@]}' ${#test_arr[@]}
+echo '打印数组 ${test_arr[@]}:  '${test_arr[@]}
+echo '打印元素 ${test_arr[0]}:  '${test_arr[0]} 
+echo '添加元素 test_arr[7]=demo' 
+test_arr[7]=demo
+echo '打印元素 ${test_arr[7]}:  '${test_arr[7]} 
+echo '删除元素 unset test_arr[4]'
+unset test_arr[4]
+echo '删除后 ${test_arr[@]}:  '${test_arr[@]}
+echo \
+
+echo "9.字符串处理"
+echo -e "原始字符串 var=http://summer/zentao/baiduing.com \n"
+echo '9.1截取从左边开始的第一个//, 保留右边 ${var#*//}'
+var=http://summer/zentao/baiduing.com
+echo "  "${var#*//}
+echo \
+
+echo '9.2截取从左边开始的最后一个字符，保留右边 ${var##*/}'
+echo "  "${var##*/}
+echo \
+
+echo '9.3截取从右边开始的第一个/, 保留左边 ${var%*/}'
+echo " "${var%/*}
+echo \
+
+echo '9.4截取从右边开始的最后一个/, 保留左边 ${var%*/}'
+echo " "${var%%/*}
+echo \
+
+echo '9.5从左边第7个字符开始到最后 ${var:7}'
+echo " "${var:7}
+echo \
+
+echo '9.6从左边第7个字符开始截取6个字符 ${var:7:6}'
+echo " "${var:7:6}
+echo \
+
+
+echo '9.7从右边第3个字符开始往到右边 ${var:0-3}'
+echo " "${var:0-3}
+echo \
+
+echo '9.8从右边第12个字符开始往右边取8字符 ${var:0-12:8}'
+echo " "${var:0-12:8}
+echo \
+
+echo '判断参数是否为空 -n true|非空' 
+if [ -n "$r" ] 
+then
+	echo '参数不为空$r'
+else
+	echo "参数为空"
+fi
+
+
+

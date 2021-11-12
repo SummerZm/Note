@@ -1,0 +1,13 @@
+#!/bin/bash
+printf "右对齐\n"
+printf "%5s %10s %10s\n" Uid  Pid File
+printf "%5s %10s %10s\n" 101  55  summer
+printf "%5s %10s %10s\n" 103  55  fall
+printf "%5s %10.2f %10s\n" 102  55 winter 
+printf "\n"
+printf "左对齐\n"
+printf "%-5s %-10s %-10s\n" Uid  Pid File
+printf "%-5s %-10s %-10s\n" 102  55  spring
+printf "\n"
+printf "打印八进制\n"
+printf "%d(十) => %o(八)\n" 14 14

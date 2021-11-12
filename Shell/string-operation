@@ -1,0 +1,38 @@
+#!/bin/bash
+printf "字符串运算操作\n"
+str1="超级赛亚人"
+str2="summer"
+str3="绿巨人"
+str4="summer"
+str5=""
+
+printf "%-10s  %-10s  %-10s  %-10s %-10s\n" str1 str2 str3 str4  str5
+printf "%-10s  %-10s  %-10s  %-10s %-10s\n" $str1 $str2 $str3 $str4 $str5
+
+if [ $str2 = $str4 ] 
+then
+	printf "字符串相等  [ var1 = var2 ] \n"
+fi
+
+if [ $str1 != $str2 ]
+then
+	printf "字符串不相等  [ var1 != var2 ] \n"
+fi
+
+if [ -z $str5 ]
+then
+	printf "字符串长度为0   [ -z var ] \n"
+else
+	printf "字符串长度不为0\n"
+fi
+
+if [ -n $str2 ]
+then
+	printf "字符串长度不为0  [ -n var ] \n"
+fi
+	
+if [ $str3 ]
+then
+	printf "字符串不为空\n"
+fi
+

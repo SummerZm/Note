@@ -1,0 +1,53 @@
+#!/bin/bash
+var=126
+echo -e '1.运算操作符 expr 命令工具\n'
+echo -e '常见运算工具\n'
+echo -e '简单工具：let'
+echo -e '高级工具：expr'
+echo -e '浮点工具：bc'
+echo 
+echo '加法 2+2: '`expr 2 + 2`
+echo '减法 2-2：'`expr 2 - 2`
+echo '乘法 2*2：'`expr 2 \* 2`
+echo '除法 2/2：'`expr 2 / 2`
+echo '取余 5%2：'`expr 5 % 2`
+echo 'error 相等 5==2：'`expr 5 == 2`
+echo 'error 不等 5!=2：'`expr 5 != 2`
+echo 'error 赋值 a=$var：'`expr a = $var`
+echo 
+
+a=10
+b=20
+c=20
+echo '$a=10, $b=20 $c=20'
+echo 
+val=`expr $a + $b`
+echo '$a+$b='"$val"
+echo 
+
+val=`expr $a \* $b`
+echo '$a*$b='"$val"
+echo 
+
+val=`expr $a % $b`
+echo '$a%$b='"$val"
+echo 
+
+val=`expr $b % $a`
+echo '$b%$a='"$val"
+echo 
+
+val=`expr $b == $a`
+echo '$b==$a is '"$val"
+echo 
+
+val=`expr $b == $c`
+echo '$b==$c is '"$val"
+echo 
+
+if [ $b != $c ]
+then
+	echo -e "不相等\n"
+else
+	echo -e "相等"
+fi

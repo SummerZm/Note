@@ -1,0 +1,34 @@
+#!/bin/bash
+
+sh_start=$(date +%N) 
+
+echo "Shell格式化打印日期"
+echo "1.打印日期 date:        "`date`
+echo "2.打印纪元时 date +%s:  "`date +%s`
+echo "3.打印星期 date +%A:    "`date +%A`
+echo "4.打印星期 date +%a:    "`date +%a`
+echo "5.打印月份 date +%B:    "`date +%B`
+echo "6.打印月份 date +%b:    "`date +%b`
+echo "7.打印月份 date +%m:    "`date +%m`
+echo "8.打印年份 date +%Y:    "`date +%Y`
+echo "9.打印年份 date +%y:    "`date +%y`
+echo "10.打印日期 date +%D:   "`date +%D`
+echo "11.打印日期 date +%d:   "`date +%d`
+echo "12.打印分钟 date +%M:   "`date +%M`"[error]"
+echo "13.打印分钟 date +%m:   "`date +%m`
+echo "14.打印小时 date +%H:   "`date +%H`
+echo "15.打印小时 date +%h:   "`date +%h`"[error]"
+echo "16.打印日期 date \"+%Y %m %d %H:%M:%S\":   "`date "+%Y %m %d %H:%M:%S"`
+echo
+
+echo "1.时间字符串转纪元时 date --date \"2018-01-14\" +%s:    "`date --date "2018-01-14" +%s`
+echo "2.时间字符串转纪元时 date --date \"2018-01-14\" +%A:    "`date --date "2018-01-14" +%A`
+echo 
+
+sh_end=$(date +%N)
+run_time=$(($sh_end - $sh_start))
+
+echo "脚本运行时间: $run_time (纳秒)"
+echo "脚本运行时间二: time ./shellscript"
+
+

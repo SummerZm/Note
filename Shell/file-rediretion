@@ -1,0 +1,17 @@
+#!/bin/bash
+echo '0 => 标准输入， 1 => 标准输出， 2  => 标准出错  (如果终端当成文件，则1，2，3 是文件描述符)' 
+echo
+echo '1.  command > a; 2>&1 等级于 command 1>a; 2>&1'
+echo '2.  2>&1 与 2>1 的区别 &1是1的引用， 而2>1中的1会重新打开标准输出描述符(可能会造成覆盖写).'
+echo
+echo '     ex: ls dd ./ dd > ../test/file-rediretion 2>&1'
+echo '         ls dd ./ dd 1> ../test/file-rediretion 2>&1'
+echo '         ls dd ./ dd 1> ../test/file-rediretion 2>1 (覆盖写)'
+echo	
+echo '3. 打开一个文件，写到另一个文件'
+echo '     exec 4<../test/file-rediretion  (读文件描述符)'
+echo '     exec 5>../test/file-rediretion_1 (写文件描述符)'
+echo '     cat <&4 1>&5'
+exec 4<../test/file-rediretion
+exec 5>../test/file-rediretion_1
+cat <&4 1>&5
