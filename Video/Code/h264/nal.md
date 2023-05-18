@@ -46,13 +46,67 @@
 |31|未指定，保留||
 ||||
 
-### **C. H264视频流用RTP传输**  
+### **C. H264视频流用RTP传输 (AnnexB 格式)**  
 ![H264onRTP.png](H264onRTP.png)  
+
+#### RBSP是紧接NALU头之后的内容。其第一个字节是slice头
+![RBSP.png](RBSP.png)
+
+#### slice头结构图
+![RBSP_Head.png](RBSP_Head.png)
+
+#### slice头的相关
+1. **nalu头能区分关键帧，但不能区分I，P，B帧。这时候需要借助slice head（小标题是其对应的编码值）**
+   1.  I -slice: slice的全部MB（宏块）都采用intra-prediction（帧内预测）的方式来编码；
+   2.  P-slice:slice中的MB（宏块）使用intra-prediction（帧内预测 I宏块）和inter-prediction（帧间预测P宏块）的方式来编码，每一个inter-prediction block只能使用一个移动向量；
+   3.  B-slice:指Bi-predictive（双向预测）具有I宏块， B宏块，和 P宏块
+   4.  SP-slice: 即所谓的Switching P slice，为P-slice的一种特殊类型，用来串接两个不同bitrate的bitstream；用于切换过渡视频流。
+   5.  SI-slice: 即所谓的Switching I slice，为I-slice的一种特殊类型，除了用来串接两个不同content的bitstream外，也可用来执行随机存取(random access)来达到网络VCR的功能  
+   <br>
+
+2. **如何识别多个slice是否属于同一张图片**
+   1. 法1:一般一帧的多个slice是同时发送的，slice头部 与上 0x80 等于 1 则表示当前帧的第一个slice, 每一新帧进行 0x80 后都是 1。
+   2. 法2:h264x 则通过对两个slice head进行比较确定是否为同一张图片。
+
+3. **RBSP与EBSP的关系**
+   1. 起因：因为原始码流中，可能出现 0 0 0 1 或者 0 0 1 的，会导致读取程序将一个 NALU 误分割成多个 NALU。
+   2. 为了防止这种情况发生，AnnexB 引入了防竞争字节（Emulation Prevention Bytes）的概念。
+   3. 查找码流里面的存在的 0 0 0，0 0 1，0 0 2，0 0 3 的字节，则插入字节0x3，即0 0 3 0，0 0 3 1，0 0 3 2，0 03 3 
+   4. 之后，解码前需要去掉 0x3
+
+### **D. AVCC**
+    1.  在 AnnexB 中，SPS 和 PPS 被当做了普通的 NALU 进行处理；
+    2.  在 avcC 中，SPS 和 PPS 信息被当做了特殊的信息进行了处理。
+    3.  在一路采用 avcC 打包的 H.264 流之中，我们首先看到的将是一段被称之为 extradata 的数据
+        1.  这段数据定义了这个 H.264 流的基本属性数据，当然，也包含了 SPS 和 PPS 数据。
+        2.  extradata 数据格式
+   
+```sh
+    bits      
+    8   version ( always 0x01 )  
+    8   avc profile ( sps[0][1] )  
+    8   avc compatibility ( sps[0][2] )  
+    8   avc level ( sps[0][3] )  
+    6   reserved ( all bits on )  
+    2   NALULengthSizeMinusOne    // 这个值是（前缀长度-1）
+    3   reserved ( all bits on )  
+    5   number of SPS NALUs (usually 1)  
+            repeated once per SPS:  
+    16  SPS size  
+            variable SPS NALU data  
+    8   number of PPS NALUs (usually 1)  
+            repeated once per PPS  
+    16  PPS size  
+            variable PPS NALU data
+```
+
+
+
+
 **纠正：FU-Header type(5 bit)的取值范围：1-23**  
 ![层次的码流结构](./rtpVideoCodeLevel.png)
 
+**解码和显示的帧顺序**
+![GOP.png](./GOP.png)
+
 [参考链接](https://www.huaweicloud.com/articles79999bf7e4235d59927366e0dd1ca267.html)
-
-
-
-     
